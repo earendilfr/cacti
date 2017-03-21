@@ -1,0 +1,95 @@
+<checkpoint61k_blade>
+	<name>Checkpoint 61K - Blade stats</name>
+	<description>Get Checkpoints 61K ASG Blade</description>
+	<oid_index>1.3.6.1.4.1.2620.1.48.20.25.1.1</oid_index>
+	<oid_index_parse>OID/REGEXP:.*\.([0-9]*.0)$</oid_index_parse>
+	<index_order>asgCountersIndex</index_order>
+	<index_order_type>numeric</index_order_type>
+	<index_title_format>|chosen_order_field|</index_title_format>
+	<fields>
+		<asgCountersIndex>
+			<name>Index</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>1.3.6.1.4.1.2620.1.48.20.25.1.1</oid>
+		</asgCountersIndex>
+		<asgCountersBladeId>
+			<name>Blade ID (Name)</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>1.3.6.1.4.1.2620.1.48.20.25.1.2</oid>
+		</asgCountersBladeId>
+		<asgCountersThroughput>
+			<name>Throughput</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>1.3.6.1.4.1.2620.1.48.20.25.1.3</oid>
+		</asgCountersThroughput>
+		<asgCountersConnRate>
+			<name>Connection rate</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>1.3.6.1.4.1.2620.1.48.20.25.1.4</oid>
+		</asgCountersConnRate>
+		<asgCountersPacketRate>
+			<name>Packet rate</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>1.3.6.1.4.1.2620.1.48.20.25.1.5</oid>
+		</asgCountersPacketRate>
+		<asgCountersConcurrConnNum>
+			<name>Concurrent Connection</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>1.3.6.1.4.1.2620.1.48.20.25.1.6</oid>
+		</asgCountersConcurrConnNum>
+		<asgCountersAccelLoadAverage>
+			<name>Accel Load (avg)</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>1.3.6.1.4.1.2620.1.48.20.25.1.7</oid>
+		</asgCountersAccelLoadAverage>
+		<asgCountersAccelLoadMin>
+			<name>Accel Load (min)</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>1.3.6.1.4.1.2620.1.48.20.25.1.8</oid>
+		</asgCountersAccelLoadMin>
+		<asgCountersAccelLoadMax>
+			<name>Accel Load (max)</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>1.3.6.1.4.1.2620.1.48.20.25.1.9</oid>
+		</asgCountersAccelLoadMax>
+		<asgCountersInstanceLoadAverage>
+			<name>Instance Load (Avg)</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>1.3.6.1.4.1.2620.1.48.20.25.1.10</oid>
+		</asgCountersInstanceLoadAverage>
+		<asgCountersInstanceLoadMin>
+			<name>Instance Load (min)</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>1.3.6.1.4.1.2620.1.48.20.25.1.11</oid>
+		</asgCountersInstanceLoadMin>
+		<asgCountersInstanceLoadMax>
+			<name>Instance Load (max)</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>1.3.6.1.4.1.2620.1.48.20.25.1.12</oid>
+		</asgCountersInstanceLoadMax>
+	</fields>	
+</checkpoint61k_blade>

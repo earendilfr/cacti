@@ -1,0 +1,51 @@
+<checkpoint-vsstats>
+  <name>Get Cisco CheckPoint VS Stats</name>
+  <oid_index>.1.3.6.1.4.1.2620.1.16.23.1.1.1</oid_index>
+  <oid_index_parse>OID/REGEXP:.*\.([0-9]{1,16}\.[0-9]{1,16})$</oid_index_parse>
+  <index_order>slbVServerIndex</index_order>
+  <index_order_type>numeric</index_order_type>
+  <index_title_format>|chosen_order_field|</index_title_format>
+  <fields>
+    <vSId>
+      <name>Index</name>
+      <method>walk</method>
+      <source>index</source>
+      <direction>input</direction>
+    </vSId>
+    <connNum>
+      <name>Number of active connections</name>
+      <method>walk</method>
+      <source>value</source>
+      <direction>output</direction>
+      <oid>.1.3.6.1.4.1.2620.1.16.23.1.1.2</oid>
+    </connNum>
+    <connPeakNum>
+      <name>Peak number of active connections</name>
+      <method>walk</method>
+      <source>value</source>
+      <direction>output</direction>
+      <oid>.1.3.6.1.4.1.2620.1.16.23.1.1.3</oid>
+    </connPeakNum>
+    <dropped>
+      <name>Dropped packets</name>
+      <method>walk</method>
+      <source>value</source>
+      <direction>output</direction>
+      <oid>.1.3.6.1.4.1.2620.1.16.23.1.1.6</oid>
+    </dropped>
+    <accepted>
+      <name>Accepted packets</name>
+      <method>walk</method>
+      <source>value</source>
+      <direction>output</direction>
+      <oid>.1.3.6.1.4.1.2620.1.16.23.1.1.7</oid>
+    </accepted>
+    <rejected>
+      <name>Rejected packets</name>
+      <method>walk</method>
+      <source>value</source>
+      <direction>output</direction>
+      <oid>.1.3.6.1.4.1.2620.1.16.23.1.1.8</oid>
+    </rejected>
+ </fields>
+</checkpoint-vsstats>

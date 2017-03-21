@@ -1,0 +1,128 @@
+<checkpoint61k_cpu>
+	<name>Checkpoint 61K - CPU per blade</name>
+	<description>Get Checkpoints 61K CPU per blade stats</description>
+	<oid_index>.1.3.6.1.4.1.2620.1.48.29.1.1</oid_index>
+	<oid_index_parse>OID/REGEXP:.*\.([0-9]*.0)$</oid_index_parse>
+	<index_order>asgCoreIndex</index_order>
+	<index_order_type>numeric</index_order_type>
+	<index_title_format>|chosen_order_field|</index_title_format>
+	<fields>
+		<index>
+			<name>Index</name>
+			<source>index</source>
+			<direction>input</direction>
+		</index>
+		<asgCoreIndex>
+			<name>CPU</name>
+			<source>value</source>
+			<method>walk</method>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1.1</oid>
+		</asgCoreIndex>
+		<blade1>
+			<name>Blade 1_01</name>
+			<source>VALUE/REGEXP:([0-9]+)%</source>
+			<method>walk</method>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1.2</oid>
+		</blade1>
+		<blade2>
+			<name>Blade 1_02</name>
+			<source>VALUE/REGEXP:([0-9]+)%</source>
+			<method>walk</method>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1.3</oid>
+		</blade2>
+		<blade3>
+			<name>Blade 1_03</name>
+			<source>VALUE/REGEXP:([0-9]+)%</source>
+			<method>walk</method>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1.4</oid>
+		</blade3>
+		<blade4>
+			<name>Blade 1_04</name>
+			<source>VALUE/REGEXP:([0-9]+)%</source>
+			<method>walk</method>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1.5</oid>
+		</blade4>
+		<blade5>
+			<name>Blade 1_05</name>
+			<source>VALUE/REGEXP:([0-9]+)%</source>
+			<method>walk</method>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1.6</oid>
+		</blade5>
+		<blade6>
+			<name>Blade 1_06</name>
+			<source>VALUE/REGEXP:([0-9]+)%</source>
+			<method>walk</method>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1.7</oid>
+		</blade6>
+		<blade7>
+			<name>Blade 1_07</name>
+			<source>VALUE/REGEXP:([0-9]+)%</source>
+			<method>walk</method>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1.8</oid>
+		</blade7>
+		<blade8>
+			<name>Blade 1_08</name>
+			<source>VALUE/REGEXP:([0-9]+)%</source>
+			<method>walk</method>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1.9</oid>
+		</blade8>
+		<blade9>
+			<name>Blade 1_09</name>
+			<source>VALUE/REGEXP:([0-9]+)%</source>
+			<method>walk</method>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1.10</oid>
+		</blade9>
+		<blade10>
+			<name>Blade 1_10</name>
+			<source>VALUE/REGEXP:([0-9]+)%</source>
+			<method>walk</method>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1.11</oid>
+		</blade10>
+		<blade11>
+			<name>Blade 1_11</name>
+			<source>VALUE/REGEXP:([0-9]+)%</source>
+			<method>walk</method>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1.12</oid>
+		</blade11>
+		<blade12>
+			<name>Blade 1_12</name>
+			<source>VALUE/REGEXP:([0-9]+)%</source>
+			<method>walk</method>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1.13</oid>
+		</blade12>
+		<blade13>
+			<name>Blade 2_01</name>
+			<source>VALUE/REGEXP:([0-9]+)%</source>
+			<method>walk</method>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1.14</oid>
+		</blade13>
+		<blade14>
+			<name>Blade 2_02</name>
+			<source>VALUE/REGEXP:([0-9]+)%</source>
+			<method>walk</method>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1.15</oid>
+		</blade14>
+		<blade15>
+			<name>Blade 2_03</name>
+			<source>VALUE/REGEXP:([0-9]+)%</source>
+			<method>walk</method>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1.16</oid>
+		</blade15>
+	</fields>	
+</checkpoint61k_cpu>

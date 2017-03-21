@@ -1,0 +1,67 @@
+<checkpoint_multiDisk>
+	<name>Checkpoint multiDisk</name>
+	<description>Get Checkpoint Disk infos</description>
+	<oid_index>.1.3.6.1.4.1.2620.1.6.7.6.1.1</oid_index>
+	<oid_index_parse>OID/REGEXP:.*\.([0-9]*.0)$</oid_index_parse>
+	<index_order>multiDiskIndex</index_order>
+	<index_order_type>numeric</index_order_type>
+	<index_title_format>|chosen_order_field|</index_title_format>
+	<fields>
+		<multiDiskIndex>
+			<name>Index</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.2620.1.6.7.6.1.1</oid>
+		</multiDiskIndex>
+		<multiDiskName>
+			<name>Disk Name</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.2620.1.6.7.6.1.2</oid>
+		</multiDiskName>
+		<multiDiskSize>
+			<name>Disk Size</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.6.7.6.1.3</oid>
+		</multiDiskSize>
+		<multiDiskUsed>
+			<name>Disk Used</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.6.7.6.1.4</oid>
+		</multiDiskUsed>
+		<multiDiskFreeTotalBytes>
+			<name>Disk Free Total Bytes</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.6.7.6.1.5</oid>
+		</multiDiskFreeTotalBytes>
+		<multiDiskFreeTotalPercent>
+			<name>Disk Free Total Percent</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.6.7.6.1.6</oid>
+		</multiDiskFreeTotalPercent>
+		<multiDiskFreeAvailableBytes>
+			<name>Disk Free Available Bytes</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.6.7.6.1.7</oid>
+		</multiDiskFreeAvailableBytes>
+		<multiDiskFreeAvailablePercent>
+			<name>Disk Free Available Percent</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.6.7.6.1.8</oid>
+		</multiDiskFreeAvailablePercent>
+	</fields>	
+</checkpoint_multiDisk>

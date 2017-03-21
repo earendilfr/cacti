@@ -1,0 +1,167 @@
+<checkpoint_vsx>
+	<name>Checkpoint vsxCounters</name>
+	<description>Get Checkpoints stats per VS ID for: Connections, Packets, FW, Accepts/Rejects/Drops</description>
+	<oid_index>.1.3.6.1.4.1.2620.1.16.23.1.1.1</oid_index>
+	<oid_num_indexes>.1.3.6.1.4.1.2620.1.16.14.0</oid_num_indexes>
+	<oid_index_parse>OID/REGEXP:.*\.([0-9]*.0)$</oid_index_parse>
+	<index_order>vsxCountersVSId</index_order>
+	<index_order_type>numeric</index_order_type>
+	<index_title_format>|chosen_order_field|</index_title_format>
+	<fields>
+		<vsxCountersVSId>
+			<name>VS Id</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.23.1.1.1</oid>
+		</vsxCountersVSId>
+		<vsxStatusVsName>
+			<name>VS Name</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.22.1.1.3</oid>
+		</vsxStatusVsName>
+		<vsxStatusPolicyName>
+			<name>VS Policy Package</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.22.1.1.6</oid>
+		</vsxStatusPolicyName>
+		<vsxStatusVsType>
+			<name>VS Type</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.22.1.1.4</oid>
+		</vsxStatusVsType>
+		<vsxStatusVsPolicyType>
+			<name>VS Policy Status</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.22.1.1.7</oid>
+		</vsxStatusVsPolicyType>
+		<vsxStatusHAState>
+			<name>VS HA Status</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.22.1.1.9</oid>
+		</vsxStatusHAState>
+		<vsxCountersConnNum>
+			<name>Conn Num</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.23.1.1.2</oid>
+		</vsxCountersConnNum>
+		<vsxCountersConnPeakNum>
+			<name>Conn Peak Num</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.23.1.1.3</oid>
+		</vsxCountersConnPeakNum>
+		<vsxCountersConnTableSize>
+			<name>Conn Table Size</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.23.1.1.4</oid>
+		</vsxCountersConnTableSize>
+		<vsxCountersPackets>
+			<name>Packets</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.23.1.1.5</oid>
+		</vsxCountersPackets>
+		<vsxCountersDroppedTotal>
+			<name>Dropped Total</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.23.1.1.6</oid>
+		</vsxCountersDroppedTotal>
+		<vsxCountersAcceptedTotal>
+			<name>Accepted Total</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.23.1.1.7</oid>
+		</vsxCountersAcceptedTotal>
+		<vsxCountersRejectedTotal>
+			<name>Rejected Total</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.23.1.1.8</oid>
+		</vsxCountersRejectedTotal>
+		<vsxCountersBytesAcceptedTotal>
+			<name>Bytes Accepted Total</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.23.1.1.9</oid>
+		</vsxCountersBytesAcceptedTotal>
+		<vsxCountersBytesDroppedTotal>
+			<name>Bytes Dropped Total</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.23.1.1.10</oid>
+		</vsxCountersBytesDroppedTotal>
+		<vsxCountersBytesRejectedTotal>
+			<name>Bytes Rejected Total</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.23.1.1.11</oid>
+		</vsxCountersBytesRejectedTotal>
+		<vsxStatusCPUUsage1sec>
+			<name>CPU usage 1 sec</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.22.2.1.1</oid>
+		</vsxStatusCPUUsage1sec>
+		<vsxStatusCPUUsage10sec>
+			<name>CPU usage 10 sec</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.22.2.1.2</oid>
+		</vsxStatusCPUUsage10sec>
+		<vsxStatusCPUUsage1min>
+			<name>CPU usage 1 min</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.22.2.1.3</oid>
+		</vsxStatusCPUUsage1min>
+		<vsxStatusCPUUsage1hr>
+			<name>CPU usage 1 hour</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.22.2.1.4</oid>
+		</vsxStatusCPUUsage1hr>
+		<vsxStatusCPUUsage24hr>
+			<name>CPU usage 24 hours</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.22.2.1.5</oid>
+		</vsxStatusCPUUsage24hr>
+		<vsxCountersLoggedTotal>
+			<name>Logged Total</name>
+			<method>walk</method>
+			<source>value</source>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.16.23.1.1.12</oid>
+		</vsxCountersLoggedTotal>
+	</fields>	
+</checkpoint_vsx>

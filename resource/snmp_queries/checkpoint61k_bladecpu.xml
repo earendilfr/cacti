@@ -1,0 +1,393 @@
+<checkpoint61k_bladecpu>
+	<name>Checkpoint 61K - CPU per blade</name>
+	<description>Get Checkpoints 61K CPU per blade stats</description>
+	<fake_index>2:25</fake_index>
+	<index_order>agsBladeName</index_order>
+	<index_order_type>numeric</index_order_type>
+	<index_title_format>|chosen_order_field|</index_title_format>
+	<fields>
+		<index>
+			<name>Index</name>
+			<source>index</source>
+			<direction>input</direction>
+		</index>
+		<agsBladeName>
+			<name>Name</name>
+			<method>walk</method>
+			<direction>input</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>1.0</oid_suffix>
+		</agsBladeName>
+		<asgBladeStatus>
+			<name>Status</name>
+			<method>walk</method>
+			<direction>input</direction>
+			<source>VALUE/TEST:N/A:Not Present:Present</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>2.0</oid_suffix>
+		</asgBladeStatus>
+		<cpu0>
+			<name>CPU 0</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>2.0</oid_suffix>
+		</cpu0>
+		<cpu1>
+			<name>CPU 1</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>3.0</oid_suffix>
+		</cpu1>
+		<cpu2>
+			<name>CPU 2</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>4.0</oid_suffix>
+		</cpu2>
+		<cpu3>
+			<name>CPU 3</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>5.0</oid_suffix>
+		</cpu3>
+		<cpu4>
+			<name>CPU 4</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>6.0</oid_suffix>
+		</cpu4>
+		<cpu5>
+			<name>CPU 5</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>7.0</oid_suffix>
+		</cpu5>
+		<cpu6>
+			<name>CPU 6</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>8.0</oid_suffix>
+		</cpu6>
+		<cpu7>
+			<name>CPU 7</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>9.0</oid_suffix>
+		</cpu7>
+		<cpu8>
+			<name>CPU 8</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>10.0</oid_suffix>
+		</cpu8>
+		<cpu9>
+			<name>CPU 9</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>11.0</oid_suffix>
+		</cpu9>
+		<cpu10>
+			<name>CPU 10</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>12.0</oid_suffix>
+		</cpu10>
+		<cpu11>
+			<name>CPU 11</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>13.0</oid_suffix>
+		</cpu11>
+		<cpu12>
+			<name>CPU 12</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>14.0</oid_suffix>
+		</cpu12>
+		<cpu13>
+			<name>CPU 13</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>15.0</oid_suffix>
+		</cpu13>
+		<cpu14>
+			<name>CPU 14</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>16.0</oid_suffix>
+		</cpu14>
+		<cpu15>
+			<name>CPU 15</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>17.0</oid_suffix>
+		</cpu15>
+		<cpu16>
+			<name>CPU 16</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>18.0</oid_suffix>
+		</cpu16>
+		<cpu17>
+			<name>CPU 17</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>19.0</oid_suffix>
+		</cpu17>
+		<cpu18>
+			<name>CPU 18</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>20.0</oid_suffix>
+		</cpu18>
+		<cpu19>
+			<name>CPU 19</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>21.0</oid_suffix>
+		</cpu19>
+		<cpu20>
+			<name>CPU 20</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>22.0</oid_suffix>
+		</cpu20>
+		<cpu21>
+			<name>CPU 21</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>23.0</oid_suffix>
+		</cpu21>
+		<cpu22>
+			<name>CPU 22</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>24.0</oid_suffix>
+		</cpu22>
+		<cpu23>
+			<name>CPU 23</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>25.0</oid_suffix>
+		</cpu23>
+		<cpu24>
+			<name>CPU 24</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>26.0</oid_suffix>
+		</cpu24>
+		<cpu25>
+			<name>CPU 25</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>27.0</oid_suffix>
+		</cpu25>
+		<cpu26>
+			<name>CPU 26</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>28.0</oid_suffix>
+		</cpu26>
+		<cpu27>
+			<name>CPU 27</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>29.0</oid_suffix>
+		</cpu27>
+		<cpu28>
+			<name>CPU 28</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>30.0</oid_suffix>
+		</cpu28>
+		<cpu29>
+			<name>CPU 29</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>31.0</oid_suffix>
+		</cpu29>
+		<cpu30>
+			<name>CPU 30</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>32.0</oid_suffix>
+		</cpu30>
+		<cpu31>
+			<name>CPU 31</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>33.0</oid_suffix>
+		</cpu31>
+		<cpu32>
+			<name>CPU 32</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>34.0</oid_suffix>
+		</cpu32>
+		<cpu33>
+			<name>CPU 33</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>35.0</oid_suffix>
+		</cpu33>
+		<cpu34>
+			<name>CPU 34</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>36.0</oid_suffix>
+		</cpu34>
+		<cpu35>
+			<name>CPU 35</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>37.0</oid_suffix>
+		</cpu35>
+		<cpu36>
+			<name>CPU 36</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>38.0</oid_suffix>
+		</cpu36>
+		<cpu37>
+			<name>CPU 37</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>39.0</oid_suffix>
+		</cpu37>
+		<cpu38>
+			<name>CPU 38</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>40.0</oid_suffix>
+		</cpu38>
+		<cpu39>
+			<name>CPU 39</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.2620.1.48.29.1</oid>
+			<oid_index_parse>.*\.2620\..{9}\.(\d+)</oid_index_parse>
+			<oid_suffix>41.0</oid_suffix>
+		</cpu39>
+	</fields>
+</checkpoint61k_bladecpu>

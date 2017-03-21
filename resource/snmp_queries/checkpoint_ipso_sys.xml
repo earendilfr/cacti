@@ -1,0 +1,45 @@
+<ckp_ipso_sys>
+	<name>Checkpoint IPSO System</name>
+	<description>Get IPSO Checkpoints system stats</description>
+	<oid_index>.1.3.6.1.4.1.94.1.21.1.7.2.1.1</oid_index>
+	<index_order>ipsoProcessID:ipsoProcessName:ipsoProcessOwner</index_order>
+	<index_order_type>numeric</index_order_type>
+	<index_title_format>|chosen_order_field|</index_title_format>
+	<fields>
+		<ipsoProcessID>
+			<name>Index</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.94.1.21.1.7.2.1.1</oid>
+		</ipsoProcessID>
+		<ipsoProcessName>
+			<name>Process Name</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.94.1.21.1.7.2.1.6</oid>
+		</ipsoProcessName>
+		<ipsoProcessOwner>
+			<name>Process Owner</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>input</direction>
+                        <oid>.1.3.6.1.4.1.94.1.21.1.7.2.1.3</oid>
+		</ipsoProcessOwner>
+		<ipsoProcessMemory>
+			<name>Process Memory</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.94.1.21.1.7.2.1.4</oid>
+		</ipsoProcessMemory>
+		<ipsoProcessPercentCPU>
+			<name>Process Percent CPU</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.94.1.21.1.7.2.1.5</oid>
+		</ipsoProcessPercentCPU>
+	</fields>	
+</ckp_ipso_sys>

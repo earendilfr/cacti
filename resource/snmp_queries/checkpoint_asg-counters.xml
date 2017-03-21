@@ -1,0 +1,102 @@
+<checkpoint_asg-counters>
+	<name>Checkpoint ASG Counters</name>
+	<description>Get Checkpoints stats per blode for 61K</description>
+	<oid_index>.1.3.6.1.4.1.2620.1.48.20.25.1.1</oid_index>
+	<oid_index_parse>OID/REGEXP:.*\.([0-9]*.0)$</oid_index_parse>
+	<index_order>asgCountersIndex</index_order>
+	<index_order_type>numeric</index_order_type>
+	<index_title_format>|chosen_order_field|</index_title_format>
+	<fields>
+		<asgCountersIndex>
+			<name>Index</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.20.25.1.1</oid>
+		</asgCountersIndex>
+		<asgCountersBladeId>
+			<name>Blade ID</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.20.25.1.2</oid>
+		</asgCountersBladeId>
+		<asgCountersBladeStatus>
+			<name>Blade Status</name>
+			<method>walk</method>
+			<source>VALUE/TEST:N/A:Not Present:Present</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.20.25.1.3</oid>
+		</asgCountersBladeStatus>
+		<asgCountersThroughput>
+			<name>Throughput</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.20.25.1.3</oid>
+		</asgCountersThroughput>
+		<asgCountersConnRate>
+			<name>Connection rate</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.20.25.1.4</oid>
+		</asgCountersConnRate>
+		<asgCountersPacketRate>
+			<name>Packets rate</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.20.25.1.5</oid>
+		</asgCountersPacketRate>
+		<asgCountersConcurrConnNum>
+			<name>Nbr of Connections</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.20.25.1.6</oid>
+		</asgCountersConcurrConnNum>
+		<asgCountersAccelLoadAverage>
+			<name>Acceleration load avg</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.20.25.1.7</oid>
+		</asgCountersAccelLoadAverage>
+		<asgCountersAccelLoadMin>
+			<name>Acceleration load min</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.20.25.1.8</oid>
+		</asgCountersAccelLoadMin>
+		<asgCountersAccelLoadMax>
+			<name>Acceleration load max</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.20.25.1.9</oid>
+		</asgCountersAccelLoadMax>
+		<asgCountersInstanceLoadAverage>
+			<name>Instance load avg</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.20.25.1.10</oid>
+		</asgCountersInstanceLoadAverage>
+		<asgCountersInstanceLoadMin>
+			<name>Instance load min</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.20.25.1.11</oid>
+		</asgCountersInstanceLoadMin>
+		<asgCountersInstanceLoadMax>
+			<name>Instance load max</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.48.20.25.1.12</oid>
+		</asgCountersInstanceLoadMax>
+	</fields>	
+</checkpoint_asg-counters>

@@ -1,0 +1,54 @@
+<checkpoint_multiProc>
+	<name>Checkpoint multiProc</name>
+	<description>Get Checkpoint Per Core: CPU infos</description>
+	<oid_index>.1.3.6.1.4.1.2620.1.6.7.5.1.1</oid_index>
+	<oid_index_parse>OID/REGEXP:.*\.([0-9]*.0)$</oid_index_parse>
+	<oid_num_indexes>.1.3.6.1.4.1.2620.1.6.7.2.7.0</oid_num_indexes>
+	<index_order>multiProcIndex</index_order>
+	<index_order_type>numeric</index_order_type>
+	<index_title_format>|chosen_order_field|</index_title_format>
+	<fields>
+		<multiProcIndex>
+			<name>Index</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.2620.1.6.7.5.1.1</oid>
+		</multiProcIndex>
+		<multiProcUserTime>
+			<name>UserTime</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.6.7.5.1.2</oid>
+		</multiProcUserTime>
+		<multiProcSystemTime>
+			<name>SystemTime</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.6.7.5.1.3</oid>
+		</multiProcSystemTime>
+		<multiProcIdleTime>
+			<name>IdleTime</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.6.7.5.1.4</oid>
+		</multiProcIdleTime>
+		<multiProcUsage>
+			<name>ProcUsage</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.6.7.5.1.5</oid>
+		</multiProcUsage>
+		<multiProcInterrupts>
+			<name>Interrupts</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.2620.1.6.7.5.1.7</oid>
+		</multiProcInterrupts>
+	</fields>	
+</checkpoint_multiProc>
