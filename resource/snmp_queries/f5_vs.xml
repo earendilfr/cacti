@@ -1,0 +1,255 @@
+<f5_vs>
+	<name>F5 Virtual Server Statistics</name>
+	<description>Queries a F5 for a list of monitorable Virtual Server</description>
+	<oid_index>.1.3.6.1.4.1.3375.2.2.10.1.2.1.1</oid_index>
+	<oid_index_parse>OID/REGEXP:^.*\.3375\..{12}\.\d+\.(.*)</oid_index_parse>
+	<oid_num_indexes>.1.3.6.1.4.1.3375.2.2.10.1.1.0</oid_num_indexes>
+	<index_order>index</index_order>
+	<index_order_type>alphabetic</index_order_type>
+	<index_title_format>|chosen_order_field|</index_title_format>
+	<fields>
+		<index>
+			<name>Index</name>
+			<source>index</source>
+			<direction>input</direction>
+		</index>
+		<ltmVirtualServName>
+			<name>VS Name</name>
+			<method>walk</method>
+			<direction>input</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.1.2.1.1</oid>
+		</ltmVirtualServName>
+		<ltmVirtualServAddr>
+			<name>VS IP addr</name>
+			<method>walk</method>
+			<direction>input</direction>
+			<source>VALUE/HEX2IP:0:8</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.1.2.1.3</oid>
+		</ltmVirtualServAddr>
+		<ltmVirtualServPort>
+			<name>VS Port</name>
+			<method>walk</method>
+			<direction>input</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.1.2.1.6</oid>
+		</ltmVirtualServPort>
+		<ltmVirtualServIpProto>
+			<name>VS IP Protocol</name>
+			<method>walk</method>
+			<direction>input</direction>
+			<source>VALUE/TABLE:0:Reserved:1:ICMP:2:IGMP:4:IP:6:TCP:17:UDP</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.1.2.1.7</oid>
+		</ltmVirtualServIpProto>
+		<ltmVirtualServEnabled>
+			<name>VS Status</name>
+			<method>walk</method>
+			<direction>input</direction>
+			<source>VALUE/TABLE:0:disable:1:enable</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.1.2.1.9</oid>
+		</ltmVirtualServEnabled>
+		<ltmVirtualServConnLimit>
+			<name>VS Connection Limit</name>
+			<method>walk</method>
+			<direction>input</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.1.2.1.10</oid>
+		</ltmVirtualServConnLimit>
+		<ltmVirtualServType>
+			<name>VS Type</name>
+			<method>walk</method>
+			<direction>input</direction>
+			<source>VALUE/TABLE:0:poolbased:1:ipforward:2:l2forward:3:reject:4:fastl4:5:fasthttp:6:stateless:7:dhcp-relay:8:internal</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.1.2.1.15</oid>
+		</ltmVirtualServType>
+		<ltmVirtualServStatCsMinConnDur>
+			<name>VS - Minimum Connections durations</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.2</oid>
+		</ltmVirtualServStatCsMinConnDur>
+		<ltmVirtualServStatCsMaxConnDur>
+			<name>VS - Maximum Connections durations</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.3</oid>
+		</ltmVirtualServStatCsMaxConnDur>
+		<ltmVirtualServStatCsMeanConnDur>
+			<name>VS - Average Connections durations</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.4</oid>
+		</ltmVirtualServStatCsMeanConnDur>
+		<ltmVirtualServStatNoNodesErrors>
+			<name>VS - No active server</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.5</oid>
+		</ltmVirtualServStatNoNodesErrors>
+		<ltmVirtualServStatClientPktsIn>
+			<name>VS - Client Side - Pkts IN</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.6</oid>
+		</ltmVirtualServStatClientPktsIn>
+		<ltmVirtualServStatClientBytesIn>
+			<name>VS - Client Side - Bytes IN</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.7</oid>
+		</ltmVirtualServStatClientBytesIn>
+		<ltmVirtualServStatClientPktsOut>
+			<name>VS - Client Side - Pkts OUT</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.8</oid>
+		</ltmVirtualServStatClientPktsOut>
+		<ltmVirtualServStatClientBytesOut>
+			<name>VS - Client Side - Bytes OUT</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.9</oid>
+		</ltmVirtualServStatClientBytesOut>
+		<ltmVirtualServStatClientMaxConns>
+			<name>VS - Client Side - Max connections</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.10</oid>
+		</ltmVirtualServStatClientMaxConns>
+		<ltmVirtualServStatClientTotConns>
+			<name>VS - Client Side - Total connections</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.11</oid>
+		</ltmVirtualServStatClientTotConns>
+		<ltmVirtualServStatClientCurConns>
+			<name>VS - Client Side - Current connections</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.12</oid>
+		</ltmVirtualServStatClientCurConns>
+		<ltmVirtualServStatEphemeralPktsIn>
+			<name>VS - TCP No Compliant - Pkts IN</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.13</oid>
+		</ltmVirtualServStatEphemeralPktsIn>
+		<ltmVirtualServStatEphemeralBytesIn>
+			<name>VS - TCP No Compliant - Bytes IN</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.14</oid>
+		</ltmVirtualServStatEphemeralBytesIn>
+		<ltmVirtualServStatEphemeralPktsOut>
+			<name>VS - TCP No Compliant - Pkts OUT</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.15</oid>
+		</ltmVirtualServStatEphemeralPktsOut>
+		<ltmVirtualServStatEphemeralBytesOut>
+			<name>VS - TCP No Compliant - Bytes OUT</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.16</oid>
+		</ltmVirtualServStatEphemeralBytesOut>
+		<ltmVirtualServStatEphemeralMaxConns>
+			<name>VS - TCP No Compliant - Max connections</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.17</oid>
+		</ltmVirtualServStatEphemeralMaxConns>
+		<ltmVirtualServStatEphemeralTotConns>
+			<name>VS - TCP No Compliant - Total connections</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.18</oid>
+		</ltmVirtualServStatEphemeralTotConns>
+		<ltmVirtualServStatEphemeralCurConns>
+			<name>VS - TCP No Compliant - Current Connections</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.19</oid>
+		</ltmVirtualServStatEphemeralCurConns>
+		<ltmVirtualServStatPvaPktsIn>
+			<name>VS - Hardware Accelerated - Pkts IN</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.20</oid>
+		</ltmVirtualServStatPvaPktsIn>
+		<ltmVirtualServStatPvaBytesIn>
+			<name>VS - Hardware Accelerated - Bytes IN</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.21</oid>
+		</ltmVirtualServStatPvaBytesIn>
+		<ltmVirtualServStatPvaPktsOut>
+			<name>VS - Hardware Accelerated - Pkts OUT</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.22</oid>
+		</ltmVirtualServStatPvaPktsOut>
+		<ltmVirtualServStatPvaBytesOut>
+			<name>VS - Hardware Accelerated - Bytes OUT</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.23</oid>
+		</ltmVirtualServStatPvaBytesOut>
+		<ltmVirtualServStatPvaMaxConns>
+			<name>VS - Hardware Accelerated - Max connections</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.24</oid>
+		</ltmVirtualServStatPvaMaxConns>
+		<ltmVirtualServStatPvaTotConns>
+			<name>VS - Hardware Accelerated - Total connections</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.25</oid>
+		</ltmVirtualServStatPvaTotConns>
+		<ltmVirtualServStatPvaCurConns>
+			<name>VS - Hardware Accelerated - Current connections</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.26</oid>
+		</ltmVirtualServStatPvaCurConns>
+		<ltmVirtualServStatTotRequests>
+			<name>VS - Total requests</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.27</oid>
+		</ltmVirtualServStatTotRequests>
+		<ltmVirtualServStatTotPvaAssistConn>
+			<name>VS - Total requests partially hardware accelerated</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.10.2.3.1.28</oid>
+		</ltmVirtualServStatTotPvaAssistConn>
+	</fields>
+</f5_vs>

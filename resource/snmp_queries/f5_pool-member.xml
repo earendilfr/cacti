@@ -1,0 +1,192 @@
+<f5_poolmember>
+	<name>F5 Pool Member Statistics</name>
+	<description>Queries a F5 for a list of monitorable Pool Member</description>
+	<oid_index>.1.3.6.1.4.1.3375.2.2.5.3.2.1.1</oid_index>
+	<oid_index_parse>OID/REGEXP:^.*\.3375\..{11}\.\d+\.(.*)</oid_index_parse>
+	<oid_num_indexes>.1.3.6.1.4.1.3375.2.2.5.4.2.0</oid_num_indexes>
+	<index_order>index</index_order>
+	<index_order_type>alphabetic</index_order_type>
+	<index_title_format>|chosen_order_field|</index_title_format>
+	<fields>
+		<index>
+			<name>Index</name>
+			<source>index</source>
+			<direction>input</direction>
+		</index>
+		<ltmPoolMemberPoolName>
+			<name>Pool name</name>
+			<method>walk</method>
+			<direction>input</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.3.2.1.1</oid>
+		</ltmPoolMemberPoolName>
+		<ltmPoolMemberNodeName>
+			<name>Node name</name>
+			<method>walk</method>
+			<direction>input</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.3.2.1.19</oid>
+		</ltmPoolMemberNodeName>
+		<ltmPoolMemberAddrType>
+			<name>Type</name>
+			<method>walk</method>
+			<direction>input</direction>
+			<source>VALUE/TABLE:0:unknown:1:ipv4:2:ipv6:3:ipv4z:4:ipv6z:16:dns</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.3.2.1.2</oid>
+		</ltmPoolMemberAddrType>
+		<ltmPoolMemberAddr>
+			<name>IP Address</name>
+			<method>walk</method>
+			<direction>input</direction>
+			<source>VALUE/HEX2IP:0:8</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.3.2.1.3</oid>
+		</ltmPoolMemberAddr>
+		<ltmPoolMemberPort>
+			<name>Port</name>
+			<method>walk</method>
+			<direction>input</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.3.2.1.4</oid>
+		</ltmPoolMemberPort>
+		<ltmPoolMemberConnLimit>
+			<name>Connection Limit</name>
+			<method>walk</method>
+			<direction>input</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.3.2.1.5</oid>
+		</ltmPoolMemberConnLimit>
+		<ltmPoolMemberStatServerPktsIn>
+			<name>PM - Server Packets IN</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.4.3.1.5</oid>
+		</ltmPoolMemberStatServerPktsIn>
+		<ltmPoolMemberStatServerBytesIn>
+			<name>PM - Servers Bytes IN</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.4.3.1.6</oid>
+		</ltmPoolMemberStatServerBytesIn>
+		<ltmPoolMemberStatServerPktsOut>
+			<name>PM - Server Packets OUT</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.4.3.1.7</oid>
+		</ltmPoolMemberStatServerPktsOut>
+		<ltmPoolMemberStatServerBytesOut>
+			<name>PM - Server Bytes OUT</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.4.3.1.8</oid>
+		</ltmPoolMemberStatServerBytesOut>
+		<ltmPoolMemberStatServerTotConns>
+			<name>PM - Server Total Connections</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.4.3.1.10</oid>
+		</ltmPoolMemberStatServerTotConns>
+		<ltmPoolMemberStatServerCurConns>
+			<name>PM - Server Current Connections</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.4.3.1.11</oid>
+		</ltmPoolMemberStatServerCurConns>
+		<ltmPoolMemberStatPvaPktsIn>
+			<name>PM - PVA Packets IN</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.4.3.1.12</oid>
+		</ltmPoolMemberStatPvaPktsIn>
+		<ltmPoolMemberStatPvaBytesIn>
+			<name>PM - PVA Bytes IN</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.4.3.1.13</oid>
+		</ltmPoolMemberStatPvaBytesIn>
+		<ltmPoolMemberStatPvaPktsOut>
+			<name>PM - PVA Packets OUT</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.4.3.1.14</oid>
+		</ltmPoolMemberStatPvaPktsOut>
+		<ltmPoolMemberStatPvaBytesOut>
+			<name>PM - PVA Bytes OUT</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.4.3.1.15</oid>
+		</ltmPoolMemberStatPvaBytesOut>
+		<ltmPoolMemberStatPvaTotConns>
+			<name>PM - PVA Total Connections</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.4.3.1.17</oid>
+		</ltmPoolMemberStatPvaTotConns>
+		<ltmPoolMemberStatPvaCurConns>
+			<name>PM - PVA Current Connections</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.4.3.1.18</oid>
+		</ltmPoolMemberStatPvaCurConns>
+		<ltmPoolMemberStatTotRequests>
+			<name>PM - Total Requests</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.4.3.1.19</oid>
+		</ltmPoolMemberStatTotRequests>
+		<ltmPoolMemberStatConnqDepth>
+			<name>PM - Connections in queue</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.4.3.1.22</oid>
+		</ltmPoolMemberStatConnqDepth>
+		<ltmPoolMemberStatConnqAgeHead>
+			<name>PM - Current Oldest Connections</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.4.3.1.23</oid>
+		</ltmPoolMemberStatConnqAgeHead>
+		<ltmPoolMemberStatConnqAgeMax>
+			<name>PM - Max age connections allowed</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.4.3.1.24</oid>
+		</ltmPoolMemberStatConnqAgeMax>
+		<ltmPoolMemberStatCurSessions>
+			<name>PM - Current sessions</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.4.3.1.29</oid>
+		</ltmPoolMemberStatCurSessions>
+		<ltmPoolMemberStatCurrentConnsPerSec>
+			<name>PM - Current connections rate</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.4.3.1.30</oid>
+		</ltmPoolMemberStatCurrentConnsPerSec>
+		<ltmPoolMemberStatDurationRateExceeded>
+			<name>PM - Duration of the connection rate exceeded</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.2.5.4.3.1.31</oid>
+		</ltmPoolMemberStatDurationRateExceeded>
+	</fields>
+</f5_poolmember>

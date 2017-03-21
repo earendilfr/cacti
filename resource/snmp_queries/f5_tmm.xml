@@ -1,0 +1,184 @@
+<f5_tmm>
+        <name>Get TMM (Traffic Management Module) stats of a F5 Big-IP device</name>
+        <oid_index>.1.3.6.1.4.1.3375.2.1.8.2.3.1.1</oid_index>  
+        <oid_index_parse>OID/REGEXP:^.*\.3375\..{11}\.\d+\.(.*)</oid_index_parse>
+	<oid_num_indexes>.1.3.6.1.4.1.3375.2.1.8.2.2.0</oid_num_indexes>
+        <index_order>index</index_order>
+        <index_order_type>alphabetic</index_order_type>
+	<index_title_format>|chosen_order_field|</index_title_format>
+        <fields>
+                <index>
+                        <name>Index</name>
+                        <source>index</source>
+                        <direction>input</direction>
+                </index>
+                <sysTmmStatTmmId>
+                        <name>TMM</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>input</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.1</oid>
+                </sysTmmStatTmmId>
+                <sysTmmStatTmmPid>
+                        <name>PID</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>input</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.2</oid>
+                </sysTmmStatTmmPid>
+                <sysTmmStatCpu>
+                        <name>CPU Index</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>input</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.3</oid>
+                </sysTmmStatCpu>
+                <sysTmmStatTmid>
+                        <name>TMM Index</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>input</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.4</oid>
+                </sysTmmStatTmid>
+                <sysTmmStatNpus>
+                        <name>number of TMMs</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>input</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.5</oid>
+                </sysTmmStatNpus>
+                <sysTmmStatClientPktsIn>
+                        <name>TMM Client Packets In</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.6</oid>
+                </sysTmmStatClientPktsIn>
+                <sysTmmStatClientBytesIn>
+                        <name>TMM Client Bytes In</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.7</oid>
+                </sysTmmStatClientBytesIn>
+                <sysTmmStatClientPktsOut>
+                	<name>TMM Client Packets Out</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.8</oid>
+                </sysTmmStatClientPktsOut>
+                <sysTmmStatClientBytesOut>
+                        <name>TMM Client Bytes Out</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.9</oid>
+                </sysTmmStatClientBytesOut>
+                <sysTmmStatClientMaxConns>
+                        <name>TMM Client Max Connections</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.10</oid>
+                </sysTmmStatClientMaxConns>
+                <sysTmmStatClientTotConns>
+                        <name>TMM Client Total Connections</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.11</oid>
+                </sysTmmStatClientTotConns>
+                <sysTmmStatClientCurConns>
+                        <name>TMM Client Current Connections</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.12</oid>
+                </sysTmmStatClientCurConns>
+                <sysTmmStatServerPktsIn>
+                        <name>TMM Server Packets In</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.13</oid>
+                </sysTmmStatServerPktsIn>
+                <sysTmmStatServerBytesIn>
+                        <name>TMM Server Bytes In</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.14</oid>
+                </sysTmmStatServerBytesIn>
+                <sysTmmStatServerPktsOut>
+                        <name>TMM Server Packets Out</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.15</oid>
+                </sysTmmStatServerPktsOut>
+                <sysTmmStatServerBytesOut>
+                        <name>TMM Server Bytes Out</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.16</oid>
+                </sysTmmStatServerBytesOut>
+                <sysTmmStatServerMaxConns>
+                        <name>TMM Server Max Connections</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.17</oid>
+                </sysTmmStatServerMaxConns>
+                <sysTmmStatServerTotConns>
+                        <name>TMM Server Total Connections</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.18</oid>
+                </sysTmmStatServerTotConns>
+                <sysTmmStatServerCurConns>
+                        <name>TMM Server Current Connections</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.19</oid>
+                </sysTmmStatServerCurConns>
+                <sysTmmStatTmTotalCycles>
+                        <name>total cycles spent in traffic management</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.28</oid>
+                </sysTmmStatTmTotalCycles>
+                <sysTmmStatTmIdleCycles>
+                        <name>cycles spent polling with no traffic</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.29</oid>
+                </sysTmmStatTmIdleCycles>
+                <sysTmmStatTmSleepCycles>
+                        <name>cycles yielded (uniprocessor only)</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.30</oid>
+                </sysTmmStatTmSleepCycles>
+                <sysTmmStatMemoryTotal>
+                        <name>total memory available in bytes for TMM</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.31</oid>
+                </sysTmmStatMemoryTotal>
+                <sysTmmStatMemoryUsed>
+                        <name>memory in use in bytes for TMM</name>
+                        <method>walk</method>
+                        <source>value</source>
+                        <direction>output</direction>
+                        <oid>.1.3.6.1.4.1.3375.2.1.8.2.3.1.32</oid>
+                </sysTmmStatMemoryUsed>
+        </fields>
+</f5_tmm>

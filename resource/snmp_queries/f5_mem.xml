@@ -1,0 +1,59 @@
+<f5_mem>
+	<name>F5 Mem Statistics</name>
+	<description>Queries a F5 for Memory statistics</description>
+	<oid_index>.1.3.6.1.4.1.3375.2.1.7.4.2.1.1</oid_index>
+	<oid_index_parse>OID/REGEXP:^.*\.3375\..{11}\.\d+\.(.*)</oid_index_parse>
+	<oid_num_indexes>.1.3.6.1.4.1.3375.2.1.7.4.1.0</oid_num_indexes>
+	<index_order>index</index_order>
+	<index_order_type>alphabetic</index_order_type>
+	<index_title_format>|chosen_order_field|</index_title_format>
+	<fields>
+		<index>
+			<name>Index</name>
+			<source>index</source>
+			<direction>input</direction>
+		</index>
+		<sysMultiHostHostId>
+			<name>Host ID</name>
+			<method>walk</method>
+			<direction>input</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.1.7.4.2.1.1</oid>
+		</sysMultiHostHostId>
+		<sysMultiHostMode>
+			<name>Mode</name>
+			<method>walk</method>
+			<direction>input</direction>
+			<source>VALUE/TABLE:0:modeup:1:modesmp</source>
+			<oid>.1.3.6.1.4.1.3375.2.1.7.4.2.1.4</oid>
+		</sysMultiHostMode>
+		<sysMultiHostCpuCount>
+			<name>Nbr CPU</name>
+			<method>walk</method>
+			<direction>input</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.1.7.4.2.1.5</oid>
+		</sysMultiHostCpuCount>
+		<sysMultiHostActiveCpuCount>
+			<name>Nbr active CPU</name>
+                        <method>walk</method>
+                        <direction>input</direction>
+                        <source>value</source>
+                        <oid>.1.3.6.1.4.1.3375.2.1.7.4.2.1.6</oid>
+		</sysMultiHostActiveCpuCount>
+		<sysMultiHostUsed>
+			<name>Memory Used</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.1.7.4.2.1.3</oid>
+		</sysMultiHostUsed>
+		<sysMultiHostTotal>
+			<name>Memory Total</name>
+			<method>walk</method>
+			<direction>output</direction>
+			<source>value</source>
+			<oid>.1.3.6.1.4.1.3375.2.1.7.4.2.1.2</oid>
+		</sysMultiHostTotal>
+	</fields>
+</f5_mem>
