@@ -168,7 +168,7 @@ function form_save() {
 				get_nfilter_request_var('snmp_priv_protocol'), get_nfilter_request_var('snmp_context'), 
 				get_nfilter_request_var('snmp_engine_id'), get_nfilter_request_var('max_oids'), 
 				get_nfilter_request_var('device_threads'), get_nfilter_request_var('poller_id'), 
-				get_nfilter_request_var('site_id'));
+				get_nfilter_request_var('site_id'), get_nfilter_request_var('external_id'));
 
 			if ($host_id !== false) {
 				api_plugin_hook_function('host_save', array('host_id' => $host_id));
@@ -511,7 +511,7 @@ function form_actions() {
 				<td class='textArea'>
 					<p>" . __('Click \'Continue\' to place the following Device(s) under the branch selected below.') . "</p>
 					<div class='itemlist'><ul>$host_list</ul></div>
-					<p><strong>" . __('Destination Branch:') . "</strong><br>\n";
+					<p>" . __('Destination Branch:') . "<br>\n";
 					grow_dropdown_tree($matches[1], '0', 'tree_item_id', '0'); 
 
 			print "</p>
@@ -1435,12 +1435,10 @@ function host() {
 		FROM host
 		$sql_where");
 
-	$sortby = get_request_var('sort_column');
-	if ($sortby=='hostname') {
-		$sortby = 'INET_ATON(hostname)';
-	}
-
 	$poller_interval = read_config_option('poller_interval');
+
+	$sql_order = get_order_string();
+	$sql_limit = 'LIMIT ' . ($rows*(get_request_var('page')-1)) . ',' . $rows;
 
 	$sql_query = "SELECT host.*, graphs, data_sources,
 		IF(status_event_count>0, status_event_count*$poller_interval, 
@@ -1453,8 +1451,8 @@ function host() {
 		ON host.id=dl.host_id
 		$sql_where
 		GROUP BY host.id
-		ORDER BY " . $sortby . ' ' . get_request_var('sort_direction') . '
-		LIMIT ' . ($rows*(get_request_var('page')-1)) . ',' . $rows;
+		$sql_order
+		$sql_limit";
 
 	$hosts = db_fetch_assoc($sql_query);
 

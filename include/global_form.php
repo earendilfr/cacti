@@ -1123,7 +1123,7 @@ $fields_host_edit = array(
 		'value' => '|arg1:snmp_context|',
 		'default' => '',
 		'max_length' => '64',
-		'size' => '30'
+		'size' => '40'
 		),
 	'snmp_engine_id' => array(
 		'method' => 'textbox',
@@ -1131,8 +1131,8 @@ $fields_host_edit = array(
 		'description' => __('Enter the SNMP v3 Engine Id to use for this device. Leave this field empty to use the SNMP Engine ID being defined per SNMPv3 Notification receiver.'),
 		'value' => '|arg1:snmp_engine_id|',
 		'default' => '',
-		'max_length' => '30',
-		'size' => '30'
+		'max_length' => '64',
+		'size' => '40'
 		),
 	'snmp_port' => array(
 		'method' => 'textbox',
@@ -1224,6 +1224,15 @@ $fields_host_edit = array(
 		'value' => '|arg1:notes|',
 		'textarea_rows' => '5',
 		'textarea_cols' => '50'
+		),
+	'external_id' => array(
+		'friendly_name' => __('External ID'),
+		'description' => __('External ID for linking Cacti data to external monitoring systems.'),
+		'method' => 'textbox',
+		'value' => '|arg1:external_id|',
+		'default' => '',
+		'max_length' => '40',
+		'size' => '20'
 		),
 	'id' => array(
 		'method' => 'hidden_zero',

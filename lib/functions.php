@@ -1085,7 +1085,7 @@ function is_hexadecimal(&$result) {
    @arg $result - (string) some string to be evaluated
    @returns - (bool) either to result is a mac address of not */
 function is_mac_address($result) {
-	if (preg_match('/^([0-9a-f]{1,2}[\.:-]){5}([0-9a-f]{1,2})$/i', $result)) {
+	if (filter_var($result, FILTER_VALIDATE_MAC)) {
 		return true;
 	}else{
 		return false;
@@ -1095,6 +1095,12 @@ function is_mac_address($result) {
 function is_hex_string($result) {
 	if ($result != '') {
 		$parts = explode(' ', $result);
+
+		/* assume if something is a hex string 
+		   it will have a length > 1 */
+		if (sizeof($parts) == 1) {
+			return false;
+		}
 
 		foreach($parts as $part) {
 			if (strlen($part) != 2) {
@@ -2797,7 +2803,9 @@ function draw_navigation_text($type = 'url') {
 
 		$tree_title = $tree_name . ($leaf_name != '' ? ' (' . $leaf_name:'') . ($leaf_sub != '' ? ':' . $leaf_sub . ')':($leaf_name != '' ? ')':''));
 
-		$current_nav .= "<li><a id='nav_title' href=#>" . htmlspecialchars($tree_title) . '</a></li></ul>';
+		if ($tree_title != '') {
+			$current_nav .= "<li><a id='nav_title' href=#>" . htmlspecialchars($tree_title) . '</a></li></ul>';
+		}
 	}elseif (preg_match('#link.php\?id=(\d+)#', $_SERVER['REQUEST_URI'], $matches)) {
         $title      = db_fetch_cell_prepared('SELECT title FROM external_links WHERE id = ?', array($matches[1]));
 		$style      = db_fetch_cell_prepared('SELECT style FROM external_links WHERE id = ?', array($matches[1]));
@@ -3256,6 +3264,31 @@ function cacti_escapeshellarg($string, $quote=true) {
 	}
 }
 
+/**
+ * set a page refresh in Cacti through a callback
+ * @param $refresh - an array containing the page, seconds, and logout
+ * @return         - nill
+ */
+function set_page_refresh($refresh) {
+	if (isset($refresh['seconds'])) {
+		$_SESSION['refresh']['seconds'] = $refresh['seconds'];
+	}
+
+	if (isset($refresh['logout'])) {
+		if ($refresh['logout'] == 'true' || $refresh['logout'] === true) {
+			$_SESSION['refresh']['logout']  = 'true';
+		}else{
+			$_SESSION['refresh']['logout']  = 'false';
+		}
+	}else{
+		$_SESSION['refresh']['logout']  = 'true';
+	}
+
+	if (isset($refresh['page'])) {
+		$_SESSION['refresh']['page']    = $refresh['page'];
+	}
+}
+
 function bottom_footer() {
 	global $config, $refresh;
 
@@ -3351,7 +3384,7 @@ function send_mail($to, $from, $subject, $body, $attachments = '', $headers = ''
 
 	$from = array($from, $fromname);
 
-	mailer($from, $to, '', '', '', $subject, $body, '', $attachments, $headers, $html);
+	return mailer($from, $to, '', '', '', $subject, $body, '', $attachments, $headers, $html);
 }
 
 /** mailer - function to send mails to users 
@@ -3441,7 +3474,7 @@ function mailer($from, $to, $cc, $bcc, $replyto, $subject, $body, $body_text = '
 		// Set a reasonable timeout of 5 seconds
 		$timeout = read_config_option('settings_smtp_timeout');
 		if (empty($timeout) || $timeout < 0 || $timeout > 300) {
-			$mail->Timeout = 5;
+			$mail->Timeout = 10;
 		}else{
 			$mail->Timeout = $timeout;
 		}
@@ -3646,7 +3679,7 @@ function mailer($from, $to, $cc, $bcc, $replyto, $subject, $body, $body_text = '
 	}
 }
 
-function ping_mail_server($host, $port, $user, $password, $timeout = 5, $secure = 'none') {
+function ping_mail_server($host, $port, $user, $password, $timeout = 10, $secure = 'none') {
 	global $config;
 
 	include_once($config['include_path'] . '/phpmailer/PHPMailerAutoload.php');
@@ -3683,10 +3716,11 @@ function ping_mail_server($host, $port, $user, $password, $timeout = 5, $secure 
 				throw new Exception(__('HELO failed: %s', $smtp->getLastReply()));
 			}
 		} else {
-			throw new Exception(__('Connect failed'));
+			throw new Exception(__('Connect failed: %s', $smtp->getLastReply()));
 		}
 	} catch (Exception $e) {
 		$results = __('SMTP error: ') . $e->getMessage();
+		cacti_log($results);
 	}
 
 	//Whatever happened, close the connection.
@@ -3943,9 +3977,9 @@ function update_system_mibs($host_id) {
 	if (sizeof($h)) {
 		open_snmp_session($host_id, $h);
 
-		if (isset($sessions[$host_id . '_' . $h['snmp_version']])) {
+		if (isset($sessions[$host_id . '_' . $h['snmp_version'] . '_' . $h['snmp_port']])) {
 			foreach($system_mibs as $name => $oid) {
-				$value = cacti_snmp_session_get($sessions[$host_id . '_' . $h['snmp_version']], $oid);
+				$value = cacti_snmp_session_get($sessions[$host_id . '_' . $h['snmp_version'] . '_' . $h['snmp_port']], $oid);
 
 				if (!empty($value)) {
 					db_execute_prepared("UPDATE host SET $name = ? WHERE id = ?",
@@ -4452,76 +4486,90 @@ function repair_system_data_input_methods($step = 'import') {
 						AND data_name = ?', 
 						array($bhash['hash'], $data_input_id, $bhash['data_name']));
 
-					cacti_log("Data Input ID $data_input_id Bad Field ID is " . $bhash['id'] . ", Good Field ID: " . $good_field_id, false, 'WEBUI', POLLER_VERBOSITY_DEVDBG);
+					if (!empty($good_field_id)) {
+						cacti_log("Data Input ID $data_input_id Bad Field ID is " . $bhash['id'] . ", Good Field ID: " . $good_field_id, false, 'WEBUI', POLLER_VERBOSITY_DEVDBG);
 
-					cacti_log("Executing Data Input Data Check", false, 'WEBUI', POLLER_VERBOSITY_DEVDBG);
+						cacti_log('Executing Data Input Data Check', false, 'WEBUI', POLLER_VERBOSITY_DEVDBG);
 
-					// Data Input Data
-					$bad_mappings = db_fetch_assoc_prepared('SELECT * FROM data_input_data WHERE data_input_field_id = ?', array($bhash['id']));
+						// Data Input Data
+						$bad_mappings = db_fetch_assoc_prepared('SELECT * 
+							FROM data_input_data 
+							WHERE data_input_field_id = ?', 
+							array($bhash['id']));
 
-					if (sizeof($bad_mappings)) {
-						cacti_log(strtoupper($step) . ' NOTE: Found ' . sizeof($bad_mappings) . ' Damaged data_input_fields', false);
-						foreach($bad_mappings as $mfid) {
-							$good_found = db_fetch_cell_prepared('SELECT COUNT(*) 
-								FROM data_input_data 
-								WHERE data_input_field_id = ?
-								AND data_template_data_id = ?',
-								array($good_field_id, $mfid['data_template_data_id']));
+						if (sizeof($bad_mappings)) {
+							cacti_log(strtoupper($step) . ' NOTE: Found ' . sizeof($bad_mappings) . ' Damaged data_input_fields', false);
+							foreach($bad_mappings as $mfid) {
+								$good_found = db_fetch_cell_prepared('SELECT COUNT(*) 
+									FROM data_input_data 
+									WHERE data_input_field_id = ?
+									AND data_template_data_id = ?',
+									array($good_field_id, $mfid['data_template_data_id']));
 
-							if ($good_found) {
-								cacti_log("Good Found for " . $mfid['data_input_field_id'] . ", Fixing", false, 'WEBUI', POLLER_VERBOSITY_DEVDBG);
+								if ($good_found > 0) {
+									cacti_log('Good Found for ' . $mfid['data_input_field_id'] . ', Fixing', false, 'WEBUI', POLLER_VERBOSITY_DEVDBG);
 
-								db_execute("DELETE FROM data_input_data 
-									WHERE data_input_field_id = " . $mfid['data_input_field_id'] . " 
-									AND data_template_data_id = " . $mfid['data_template_data_id']);
-							}else{
-								cacti_log("Good NOT Found for " . $mfid['data_input_field_id'] . ", Fixing", false, 'WEBUI', POLLER_VERBOSITY_DEVDBG);
+									db_execute_prepared('DELETE FROM data_input_data 
+										WHERE data_input_field_id = ?
+										AND data_template_data_id = ?',
+										array($mfid['data_input_field_id'], $mfid['data_template_data_id']));
+								}else{
+									cacti_log('Good NOT Found for ' . $mfid['data_input_field_id'] . ', Fixing', false, 'WEBUI', POLLER_VERBOSITY_DEVDBG);
 
-								db_execute("UPDATE data_input_data 
-									SET data_input_field_id = $good_field_id 
-									WHERE data_input_field_id = " . $mfid['data_input_field_id'] . " 
-									AND data_template_data_id = " . $mfid['data_template_data_id']);
+									db_execute_prepared('UPDATE data_input_data 
+										SET data_input_field_id = ?
+										WHERE data_input_field_id = ?
+										AND data_template_data_id = ?',
+										array($good_field_id, $mfid['data_input_field_id'], $mfid['data_template_data_id']));
+								}
 							}
+						}else{
+							cacti_log('No Bad Data Input Data Records', false, 'WEBUI', POLLER_VERBOSITY_DEVDBG);
 						}
-					}else{
-						cacti_log("No Bad Data Input Data Records", false, 'WEBUI', POLLER_VERBOSITY_DEVDBG);
-					}
 
-					// Data Template RRD
-					cacti_log("Executing Data Template RRD Check", false, 'WEBUI', POLLER_VERBOSITY_DEVDBG);;
+						// Data Template RRD
+						cacti_log('Executing Data Template RRD Check', false, 'WEBUI', POLLER_VERBOSITY_DEVDBG);;
 
-					$bad_mappings = db_fetch_assoc_prepared('SELECT * FROM data_template_rrd WHERE data_input_field_id = ?', array($bhash['id']));
+						$bad_mappings = db_fetch_assoc_prepared('SELECT * 
+							FROM data_template_rrd 
+							WHERE data_input_field_id = ?', 
+							array($bhash['id']));
 
-					if (sizeof($bad_mappings)) {
-						cacti_log(strtoupper($step) . ' NOTE: Found ' . sizeof($bad_mappings) . ' Damaged data_template_rrd', false);
+						if (sizeof($bad_mappings)) {
+							cacti_log(strtoupper($step) . ' NOTE: Found ' . sizeof($bad_mappings) . ' Damaged data_template_rrd', false);
 
-						foreach($bad_mappings as $mfid) {
-							$good_found = db_fetch_cell_prepared('SELECT COUNT(*) 
-								FROM data_template_rrd 
-								WHERE data_input_field_id = ?
-								AND id = ?',
-								array($good_field_id, $mfid['id']));
+							foreach($bad_mappings as $mfid) {
+								$good_found = db_fetch_cell_prepared('SELECT COUNT(*) 
+									FROM data_template_rrd 
+									WHERE data_input_field_id = ?
+									AND id = ?',
+									array($good_field_id, $mfid['id']));
 
-							if ($good_found) {
-								cacti_log("Good Found for " . $mfid['data_input_field_id'] . ", Fixing", false, 'WEBUI', POLLER_VERBOSITY_DEVDBG);
+								if ($good_found > 0) {
+									cacti_log('Good Found for ' . $mfid['data_input_field_id'] . ', Fixing', false, 'WEBUI', POLLER_VERBOSITY_DEVDBG);
 
-								db_execute("DELETE FROM data_template_rrd 
-									WHERE data_input_field_id = " . $mfid['data_input_field_id'] . " 
-									AND id = " . $mfid['id']);
-							}else{
-								cacti_log("Good NOT Found for " . $mfid['data_input_field_id'] . ", Fixing", false, 'WEBUI', POLLER_VERBOSITY_DEVDBG);
+									db_execute_prepared('DELETE FROM data_template_rrd 
+										WHERE data_input_field_id = ?
+										AND id = ?', 
+										array($mfid['data_input_field_id'], $mfid['id']));
+								}else{
+									cacti_log('Good NOT Found for ' . $mfid['data_input_field_id'] . ', Fixing', false, 'WEBUI', POLLER_VERBOSITY_DEVDBG);
 
-								db_execute("UPDATE data_template_rrd 
-									SET data_input_field_id = $good_field_id 
-									WHERE data_input_field_id = " . $mfid['data_input_field_id'] . " 
-									AND id = " . $mfid['id']);
+									db_execute_prepared('UPDATE data_template_rrd 
+										SET data_input_field_id = ?
+										WHERE data_input_field_id = ?
+										AND id = ?',
+										array($good_field_id, $mfid['data_input_field_id'], $mfid['id']));
+								}
 							}
+						}else{
+							cacti_log('No Bad Data Template RRD Records', false, 'WEBUI', POLLER_VERBOSITY_DEVDBG);
 						}
-					}else{
-						cacti_log("No Bad Data Template RRD Records", false, 'WEBUI', POLLER_VERBOSITY_DEVDBG);
-					}
 
-					db_execute_prepared('DELETE FROM data_input_fields WHERE hash = ?', array($bhash['hash']));
+						db_execute_prepared('DELETE FROM data_input_fields WHERE hash = ?', array($bhash['hash']));
+					}else{
+						cacti_log('WARNING: Could not find Cacti default matching hash for unknown system hash "' . $bhash['hash'] . '" for ' . $data_input_id . '.  No repair performed.');
+					}
 				}
 			}
 		}else{

@@ -71,7 +71,7 @@ $ldap_error_message = '';
 $realm        = 0;
 
 if (get_nfilter_request_var('action') == 'login') {
-	if (get_nfilter_request_var('realm') == 'local') {
+	if (get_nfilter_request_var('realm') == '1') {
 		$auth_method = 1;
 	}else{
 		$auth_method = read_config_option('auth_method');
@@ -101,7 +101,7 @@ if (get_nfilter_request_var('action') == 'login') {
 		break;
 	case '3':
 		/* LDAP Auth */
- 		if ((get_nfilter_request_var('realm') == 'ldap') && (strlen(get_nfilter_request_var('login_password')) > 0)) {
+ 		if ((get_nfilter_request_var('realm') == '2') && (strlen(get_nfilter_request_var('login_password')) > 0)) {
 			/* include LDAP lib */
 			include_once('./lib/ldap.php');
 
@@ -149,9 +149,13 @@ if (get_nfilter_request_var('action') == 'login') {
 
 		break;
 	case '4':
-		domains_login_process();
+		if (get_request_var('realm') > 0) {
+			domains_login_process();
 
-		break;
+			break;
+		}
+
+		/* continue on to normal login process */
 	default:
 		secpass_login_process();
 
@@ -560,12 +564,12 @@ if (api_plugin_hook_function('custom_login', OPER_MODE_NATIVE) == OPER_MODE_RESK
 							if (read_config_option('auth_method') == '3') {
 								$realms = api_plugin_hook_function('login_realms', 
 									array(
-										'local' => array(
-											'name' => 'Local', 
+										'1' => array(
+											'name' => __('Local'), 
 											'selected' => false
 										), 
-										'ldap' => array(
-											'name' => 'LDAP', 
+										'2' => array(
+											'name' => __('LDAP'), 
 											'selected' => true
 										)
 									)
@@ -581,8 +585,8 @@ if (api_plugin_hook_function('custom_login', OPER_MODE_NATIVE) == OPER_MODE_RESK
 							<td>
 								<select id='realm' name='realm'><?php
 									if (sizeof($realms)) {
-									foreach($realms as $name => $realm) {
-										print "\t\t\t\t\t<option value='" . $name . "'" . ($realm['selected'] ? ' selected':'') . '>' . htmlspecialchars($realm['name']) . "</option>\n";
+									foreach($realms as $index => $realm) {
+										print "\t\t\t\t\t<option value='" . $index . "'" . ($realm['selected'] ? ' selected':'') . '>' . htmlspecialchars($realm['name']) . "</option>\n";
 									}
 									}
 									?>

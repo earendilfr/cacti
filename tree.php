@@ -573,6 +573,10 @@ function tree_edit() {
 
 	html_start_box($header_label, '100%', '', '3', 'center', '');
 
+	if (!sizeof($tree)) {
+		unset($fields_tree_edit['enabled']);
+	}
+
 	draw_edit_form(
 		array(
 			'config' => array('no_form_tag' => true),
@@ -1524,6 +1528,9 @@ function tree() {
 		$sql_where = '';
 	}
 
+	$sql_order = get_order_string();
+	$sql_limit = ' LIMIT ' . ($rows*(get_request_var('page')-1)) . ',' . $rows;
+
 	$trees = db_fetch_assoc("SELECT t.*,
 		SUM(CASE WHEN ti.host_id>0 THEN 1 ELSE 0 END) AS hosts,
 		SUM(CASE WHEN ti.local_graph_id>0 THEN 1 ELSE 0 END) AS graphs,
@@ -1533,8 +1540,8 @@ function tree() {
 		ON t.id=ti.graph_tree_id
 		$sql_where
 		GROUP BY t.id
-		ORDER BY " . get_request_var('sort_column') . ' ' . get_request_var('sort_direction') . '
-		LIMIT ' . ($rows*(get_request_var('page')-1)) . ',' . $rows);
+		$sql_order
+		$sql_limit");
 
 	$total_rows = db_fetch_cell("SELECT COUNT(DISTINCT(ti.graph_tree_id))
 		FROM graph_tree AS t

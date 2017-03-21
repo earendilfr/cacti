@@ -1,32 +1,91 @@
 Cacti CHANGELOG
 
+1.1.0
+-issue#337: Generic SNMP OID Graph Template damanged
+-issue#338: Extremely slow new graph/DS creation
+-issue#353: Broadcast & Multicast Packet counters missing
+-issue#376: Structured RRD path permission issues
+-issue#389: Manual template based graph creation not working
+-issue#407: The RRDfile does not exist message is misleading
+-issue#410: Select character data was interpreted as hex by cacti_snmp_walk()
+-issue#422: additional issues with LDAP authentication
+-issue#424: Automation does not discover devices w/o resolvable hostnames
+-issue#427: undefined index TotalVisibleMemorySize on FreeBSD
+-issue#432: SpikeKill menu wonky on Paw Theme
+-issue#434: password_verify not compatible in php5.4-
+-issue#435: urlPath missing from paw theme links
+-issue#436: Restricted user does not see graphs in tree view
+-issue#443: Allow remote_agent.php through a NAT
+-issue#446: No local admin when using multiple LDAP configuration
+-issue#447: Creating another non data query graph from same template reuses first data source
+-issue#449: exec_poll_php does not flush pipes when using script server
+-issue#450: Graph list view - No Graphs Found
+-issue: Improve email test exception errors and change default timeout to 10 seconds
+-issue: When on links page, breadcrumbs would become corrupted
+-issue: When upgrading from any version of Cacti to 1.0.5, SQL's relative to poller_reindex might appear
+-issue: Color page performance poor
+-issue: The Device dropdown on the Graph View page was unreliable
+-issue: Aggregate and non-Device Graphs in list view had not Device or Title description
+-issue: Re-engineer back button design to accomocate ajax and native navigation
+-issue: Make Graph Template filter wider 
+-issue: Resolve some visual issues in Classic theme
+-feature: Add page refresh API to make page refreshing in Ajax easier to accomplish
+-feature: Update fontawesome to version 4.7
+-feature: Use fontawesome glyphs for menu items
+-feature: Support multiple column sort in table library
+-feature: Add glyphs to main Cacti console menu
+
+1.0.6
+-issue#386: Allow special characters in graph title
+-issue#414: Install Wizard check path for spine
+-issue#415: SNMP session handling broken
+-issue#418: LDAP create user from template not working
+
 1.0.5
 -issue#296: Poller warning for Non-SNMP device
--issue#319: Add default 'High Collection Rate' Data Source Profile to new installs to demonstrate concept of multiple rates
+-issue#319: Add default 'High Collection Rate' data source profile to new installs to demonstrate concept of multiple rates
+-issue#330: Import templates to non-default Data Profile
 -issue#337: Error when try create new graph - SNMP - Generic OID
 -issue#342: Infinite loop in poller_automation.php with invalid schedule
--issue#343: Device Discovery cannot handle dots in device name
+-issue#343: Device discovery cannot handle dots in device name
 -issue#344: Unable to upgrade to latest Cacti on FreeBSD
--issue#353: Legacy Broadcast & Multicast Packet Counters Missing in interface.xml
+-issue#353: Legacy broadcast & multicast packet counters missing in interface.xml
 -issue#354: Place on tree dashes / ordering is not correct
 -issue#355: Replace table rows with count when using InnoDB tables
--issue#357: If Recovery Mode runs longer than a polling interval, a second is spawned
+-issue#357: If recovery mode runs longer than a polling interval, a second is spawned
 -issue#358: Sending test e-mail results in warning
 -issue#360: Issue importing cacti.sql with some charsets
 -issue#364: Moving graph item causes page render issue
 -issue#365: ss_host_disk.php and ss_host_cpu.php should use return
--issue#367: Upgrade Chart.js to version 2.5
+-issue#367: Upgrade chart.js to version 2.5
 -issue#368: Issue with device automation ip vs. ip_address
--issue#369: Interface Bits/Second Total Bandwidth wrong CDEF
+-issue#369: Interface bits/second total Bandwidth wrong CDEF
 -issue#375: Drag and Drop of Devices and Graphs allows dropping onto self
+-issue#380: Ignores a non-standard SNMP port
 -issue#382: When using php5.5+ new users unable to change their password
+-issue#384: graph_view.php backtrace errors
+-issue#385: Unable to place an aggregate grapn on a subtree
+-issue#390: Display graphs from this aggregate icon next to graph not displaying
+-issue#392: cdef.php missing sql where for system cdef's
+-issue#398: checkbox is not honored when creating tree
+-issue#399: External link configuration: Order buttons don't work
+-issue#400: SNMP Engine ID (v3) field too short
+-issue#401: Graphs -> Apply Automation Rules fails
+-issue#404: Success even when test mail fails
+-issue#406: HRULE text format special characters not escaped
+-issue#408: Suppress SNMP units suffix from cacti_snmp_get() output
 -issue: Improve is_ipaddress functions
--issue: Drag & Drop showing when disabled on page automation_templates.php
+-issue: Drag & drop showing when disabled on page automation_templates.php
 -issue: Output messages displayed incorrectly in automation_templates.php and automation_snmp.php
+-issue: Importing template from old Cacti would not show data templates
 -issue: Handle snmp error exceptions better
--feature#332: Support 'Copy User Groups'
--feature: Log proper IP Address if logging in behind a NAT
--feature: Add new query parsing rules: VALUE/TEST:(test):(true):(false), VALUE/TABLE:(value1):(return1):...:(valueX):(returnX), VALUE/HEX2IP:(start_nbr):(end_nbr)
+-issue: Update Apache .htaccess files to support multiple version
+-issue: When executing a full sync, if the table structured has changed, recreate the remote table
+-issue: Multiple domains not working as expected
+-feature#197: Add external_id to Cacti for linking Cacti to other monitoring systems
+-feature#332: Support copy user groups
+-feature: Log proper IP address if logging in behind a NAT
+-feature: New qquery parsing rules: VALUE/TEST, VALUE/TABLE, VALUE/HEX2IP
 
 1.0.4
 -feature: Javascript: make menu movement smooth and use localStorage
