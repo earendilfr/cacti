@@ -1,0 +1,58 @@
+<cisco-ace-vip>
+  <name>Get Cisco ACE VIP Stats</name>
+  <oid_index>.1.3.6.1.4.1.9.9.161.1.4.2.1.2</oid_index>
+  <oid_index_parse>OID/REGEXP:.*\.([0-9]{1,16}\.[0-9]{1,16})$</oid_index_parse>
+  <index_order>slbVServerIndex</index_order>
+  <index_order_type>numeric</index_order_type>
+  <index_title_format>|chosen_order_field|</index_title_format>
+  <fields>
+    <slbVServerIndex>
+      <name>Index</name>
+      <method>walk</method>
+      <source>index</source>
+      <direction>input</direction>
+    </slbVServerIndex>
+    <slbVServerClassMap>
+      <name>VIP Class Map</name>
+      <method>walk</method>
+      <source>value</source>
+      <direction>input</direction>
+      <oid>.1.3.6.1.4.1.9.9.161.1.4.2.1.2</oid>
+    </slbVServerClassMap>
+    <slbVServerPolicyMap>
+      <name>Policy Map</name>
+      <method>walk</method>
+      <source>value</source>
+      <direction>input</direction>
+      <oid>.1.3.6.1.4.1.9.9.161.1.4.2.1.3</oid>
+    </slbVServerPolicyMap>
+    <slbVServerState>
+      <name>VIP Status</name>
+      <method>walk</method>
+      <source>value</source>
+      <direction>input</direction>
+      <oid>.1.3.6.1.4.1.9.9.161.1.4.2.1.4</oid>
+    </slbVServerState>
+    <slbVServerStateChangeDescr>
+      <name>VIP Status description</name>
+      <method>walk</method>
+      <source>value</source>
+      <direction>input</direction>
+      <oid>.1.3.6.1.4.1.9.9.161.1.4.2.1.5</oid>
+    </slbVServerStateChangeDescr>
+    <slbVServerNumberOfConnections>
+      <name>Nbr of connections</name>
+      <method>walk</method>
+      <source>value</source>
+      <direction>output</direction>
+      <oid>.1.3.6.1.4.1.9.9.161.1.4.2.1.6</oid>
+    </slbVServerNumberOfConnections>
+    <slbVServerTotalConnections>
+      <name>Total of connections</name>
+      <method>walk</method>
+      <source>value</source>
+      <direction>output</direction>
+      <oid>.1.3.6.1.4.1.9.9.161.1.4.2.1.7</oid>
+    </slbVServerTotalConnections>
+  </fields>
+</cisco-ace-vip>

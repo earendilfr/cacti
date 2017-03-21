@@ -1,0 +1,44 @@
+<cisco-ace-serverfarm>
+  <name>Get Cisco ACE Server Farm Stats</name>
+  <oid_index>.1.3.6.1.4.1.9.9.161.1.2.1.1.2</oid_index>
+  <oid_index_parse>OID/REGEXP:^.{30}(.*)</oid_index_parse>
+  <index_order>slbServerFarmIndex</index_order>
+  <index_order_type>alphabetic</index_order_type>
+  <index_title_format>|chosen_order_field|</index_title_format>
+  <fields>
+    <slbServerFarmIndex>
+      <name>Index</name>
+      <method>walk</method>
+      <source>index</source>
+      <direction>input</direction>
+    </slbServerFarmIndex>
+    <slbServerFarmName>
+      <name>Server Farm</name>
+      <method>walk</method>
+      <source>OID/REGEXP:^.{29}\.[1-9]{1,2}\.(.*)</source>
+      <direction>input</direction>
+      <oid>.1.3.6.1.4.1.9.9.161.1.2.1.1.2</oid>
+    </slbServerFarmName>
+    <slbServerFarmPredictor>
+      <name>Server Farm Prediction</name>
+      <method>walk</method>
+      <source>value</source>
+      <direction>input</direction>
+      <oid>.1.3.6.1.4.1.9.9.161.1.2.1.1.2</oid>
+    </slbServerFarmPredictor>
+    <slbServerFarmRowStatus>
+      <name>Server Farm Status</name>
+      <method>walk</method>
+      <source>value</source>
+      <direction>input</direction>
+      <oid>.1.3.6.1.4.1.9.9.161.1.2.1.1.6</oid>
+    </slbServerFarmRowStatus>
+    <slbServerFarmNumberOfRealServers>
+      <name>Nbr of Real Servers</name>
+      <method>walk</method>
+      <source>value</source>
+      <direction>output</direction>
+      <oid>.1.3.6.1.4.1.9.9.161.1.2.1.1.4</oid>
+    </slbServerFarmNumberOfRealServers>
+  </fields>
+</cisco-ace-serverfarm>
