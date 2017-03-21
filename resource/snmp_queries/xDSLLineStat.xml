@@ -1,0 +1,101 @@
+<interface>
+	<name>Get xDSL Line Statistics</name>
+	<description>Queries a host for a list of xDSL interfaces</description>
+	<oid_index>.1.3.6.1.2.1.10.94.1.1.3.1.4</oid_index>
+  	<oid_index_parse>OID/REGEXP:.*\.([0-9]{1,16})$</oid_index_parse>
+    	<index_order>dslIndex</index_order>
+	<index_order_type>numeric</index_order_type>
+
+	<fields>
+		<dslIndex>
+		      	<name>Index</name>
+		        <method>walk</method>
+		        <source>index</source>
+		        <direction>input</direction>
+		</dslIndex>
+		<ifRateDown>
+			<name>Current Transmitting Rate (Down)</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.2.1.10.94.1.1.4.1.2</oid>
+		</ifRateDown>
+		<ifRateUp>
+			<name>Current transmitting Rate (Up)</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.2.1.10.94.1.1.5.1.2</oid>
+		</ifRateUp>
+		<ifESsUp>
+			<name>Last 15min Erroneous Seconds (Up)</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.2.1.10.94.1.1.7.1.14</oid>
+		</ifESsUp>
+		<ifESsDown>
+			<name>Last 15min Erroneous Seconds (Down)</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.2.1.10.94.1.1.6.1.14</oid>
+		</ifESsDown>
+		<ifLofsUp>
+			<name>Last 15min Loss of Framing (Up)</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.2.1.10.94.1.1.7.1.10</oid>
+		</ifLofsUp>
+		<ifLofsDown>
+			<name>Last 15min Loss of Framing (Down)</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.2.1.10.94.1.1.6.1.10</oid>
+		</ifLofsDown>
+		<ifSNRUp>
+			<name>SNR (x10) Up</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.2.1.10.94.1.1.3.1.4</oid>
+		</ifSNRUp>
+		<ifSNRDown>
+			<name>SNR (x10) Down</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.2.1.10.94.1.1.2.1.4</oid>
+		</ifSNRDown>
+		<ifAttenUp>
+			<name>Attentuation (x10) Up</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.2.1.10.94.1.1.2.1.5</oid>
+		</ifAttenUp>
+		<ifAttenDown>
+			<name>Attentuation (x10) Down</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.2.1.10.94.1.1.3.1.5</oid>
+		</ifAttenDown>
+		<ifAttenUpIn>
+			<name>Attentuation (x10) Up</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.2.1.10.94.1.1.2.1.5</oid>
+		</ifAttenUpIn>
+		<ifAttenDownIn>
+			<name>Attentuation (x10) Down</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.2.1.10.94.1.1.3.1.5</oid>
+		</ifAttenDownIn>
+	</fields>
+</interface>

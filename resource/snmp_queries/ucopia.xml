@@ -1,0 +1,96 @@
+<interface>
+	<name>Get Ucopia Interfaces</name>
+	<description>Queries an UCOPIA appliance to get stats</description>
+	<oid_index>.1.3.6.1.4.1.31218.5.2.1.1</oid_index>
+	<oid_num_indexes>.1.3.6.1.4.1.31218.5.1.0</oid_num_indexes>
+	<index_order>ifDescr:ifRealAddr:ifIndex</index_order>
+	<index_order_type>numeric</index_order_type>
+	<index_title_format>|chosen_order_field|</index_title_format>
+
+	<fields>
+		<ifIndex>
+			<name>Index</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.31218.5.2.1.1</oid>
+		</ifIndex>
+		<ifDescr>
+			<name>Description</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.31218.5.2.1.2</oid>
+		</ifDescr>
+		<ifRealAddr>
+			<name>Real Address</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.31218.5.2.1.3</oid>
+		</ifRealAddr>
+		<ifNetMask>
+			<name>Netmask</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.31218.5.2.1.4</oid>
+		</ifNetMask>
+		<ifMACAddr>
+			<name>MAC Address</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.31218.5.2.1.5</oid>
+		</ifMACAddr>
+		<ifMTU>
+			<name>MTU</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.31218.5.2.1.6</oid>
+		</ifMTU>
+		<ifDHCP>
+			<name>DHCP</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.31218.5.2.1.7</oid>
+		</ifDHCP>
+		</adminAccess>
+			<name>Admin access</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.31218.5.2.1.8</oid>
+		</adminAccess>
+		<delegAccess>
+			<name>Delegation Access</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.4.1.31218.5.2.1.9</oid>
+		</delegAccess>
+		<connectedUsers>
+			<name>Connected users</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.31218.5.2.1.10</oid>
+		</connectedUsers>
+		<download>
+			<name>Bytes In</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.31218.5.2.1.11</oid>
+		</download>
+		<upload>
+			<name>Bytes Out</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.4.1.31218.5.2.1.12</oid>
+		</upload>
+	</fields>
+</interface>

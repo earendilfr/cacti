@@ -1,0 +1,39 @@
+<interface>
+	<name>Get Host CPU Information</name>
+	<index_order_type>numeric</index_order_type>
+	<oid_index>.1.3.6.1.2.1.25.3.3.1.2</oid_index>
+	<oid_index_parse>OID/REGEXP:.*\.[0-9]{1,16}$</oid_index_parse>
+	<index_order>hrDeviceIndex</index_order>
+	<index_order_type>numeric</index_order_type>
+	<index_title_format>|chosen_order_field|</index_title_format>
+	<fields>
+		<hrDeviceIndex>
+			<name>Index</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.2.1.25.3.2.1.1</oid>
+		</hrDeviceIndex>
+		<hrDeviceType>
+			<name>Type</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.2.1.25.3.2.1.2</oid>
+		</hrDeviceType>
+		<hrDeviceDescr>
+			<name>Description</name>
+			<method>walk</method>
+			<source>value</source>
+			<direction>input</direction>
+			<oid>.1.3.6.1.2.1.25.3.2.1.3</oid>
+		</hrDeviceDescr>
+		<hrProcessorLoad>
+			<name></name>
+			<method></method>
+			<source>value</source>
+			<direction>output</direction>
+			<oid>.1.3.6.1.2.1.25.3.3.1.2</oid>
+		</hrProcessorLoad>
+	</fields>
+</interface>

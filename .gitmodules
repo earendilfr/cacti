@@ -1,0 +1,9 @@
+[submodule "plugins/reportit"]
+	path = plugins/reportit
+	url = https://earendilfr@github.com/earendilfr/plugin_reportit.git
+[submodule "plugins/thold"]
+	path = plugins/thold
+	url = https://github.com/Cacti/plugin_thold.git
+[submodule "plugins/intropage"]
+	path = plugins/intropage
+	url = https://earendilfr@github.com/earendilfr/plugin_intropage.git

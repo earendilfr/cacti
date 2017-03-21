@@ -1,0 +1,205 @@
+<ifTrafficCosCisco>
+        <name>TATA COS Retrieve Data</name>
+        <script_path>|path_cacti|/scripts/ss_cisco_cos.php</script_path>
+	<script_function>ss_cisco_cos</script_function>
+	<script_server>php</script_server>
+	<arg_prepend>|host_hostname| |host_snmp_version|:|host_snmp_port|:|host_snmp_timeout|:|host_ping_retries|:|host_max_oids|:|host_snmp_community|:|host_snmp_username|:|host_snmp_password|:|host_snmp_auth_protocol|:|host_snmp_priv_passphrase|:|host_snmp_priv_protocol|:|host_snmp_context|</arg_prepend>
+	<arg_num_indexes>numindex</arg_num_indexes>
+        <arg_index>index</arg_index>
+        <arg_query>query</arg_query>
+        <arg_get>get</arg_get>
+        <output_delimeter>:</output_delimeter>
+        <index_order>cosIndex</index_order>
+        <index_order_type>alphabetic</index_order_type>
+        <index_title_format>|chosen_order_field|</index_title_format>
+
+        <fields>
+		<cosIndex>
+			<name>Index</name>
+			<direction>input</direction>
+			<query_name>cosid</query_name>
+		</cosIndex>
+		<ifName>
+			<name>Interface</name>
+			<direction>input</direction>
+			<query_name>ifName</query_name>
+                </ifName>
+		<ifDirection>
+			<name>COS Direction</name>
+			<direction>input</direction>
+			<query_name>cbQosPolicyDirection</query_name>
+		</ifDirection>
+		<ifSpeed>
+			<name>Interface Speed</name>
+			<direction>input</direction>
+			<query_name>ifSpeed</query_name>
+		</ifSpeed>
+		<cosName>
+			<name>COS Name</name>
+			<direction>input</direction>
+			<query_name>cosname</query_name>
+		</cosName>
+
+		<!-- OUT Bytes -->
+                <dscpOutRt>
+                        <name>DSCP-OUT-RT</name>
+                        <direction>output</direction>
+			<query_name>class1</query_name>
+		</dscpOutRt>	
+                <dscpOutRtvi>
+                        <name>DSCP-OUT-RTVI</name>
+                        <direction>output</direction>
+			<query_name>class2</query_name>
+		</dscpOutRtvi>
+                <dscpOutD1>
+                        <name>DSCP-OUT-D1</name>
+                        <direction>output</direction>
+			<query_name>class3</query_name>
+		</dscpOutD1>
+                <dscpOutD2>
+                        <name>DSCP-OUT-D2</name>
+                        <direction>output</direction>
+			<query_name>class4</query_name>
+		</dscpOutD2>
+                <dscpOutD3>
+                        <name>DSCP-OUT-D3</name>
+                        <direction>output</direction>
+			<query_name>class-default</query_name>
+		</dscpOutD3>
+
+		<!-- OUT Drops Bytes -->
+		<dscpOutRtDrop>
+                        <name>DSCP-OUT-RT_DROP</name>
+                        <direction>output</direction>
+                        <query_name>class1_drop</query_name>
+                </dscpOutRtDrop>
+                <dscpOutRtviDrop>
+                        <name>DSCP-OUT-RTVI_DROP</name>
+                        <direction>output</direction>
+                        <query_name>class2_drop</query_name>
+                </dscpOutRtviDrop>
+                <dscpOutD1Drop>
+                        <name>DSCP-OUT-D1_DROP</name>
+                        <direction>output</direction>
+                        <query_name>class3_drop</query_name>
+                </dscpOutD1Drop>
+                <dscpOutD2Drop>
+                        <name>DSCP-OUT-D2_DROP</name>
+                        <direction>output</direction>
+                        <query_name>class4_drop</query_name>
+                </dscpOutD2Drop>
+                <dscpOutD3Drop>
+                        <name>DSCP-OUT-D3_DROP</name>
+                        <direction>output</direction>
+                        <query_name>class-default_drop</query_name>
+                </dscpOutD3Drop>
+
+		<!-- OUT Packets -->
+		<dscpOutRtPkt>
+                        <name>DSCP-OUT-RT_PKT</name>
+                        <direction>output</direction>
+                        <query_name>class1_packet</query_name>
+                </dscpOutRtPkt>
+                <dscpOutRtviPkt>
+                        <name>DSCP-OUT-RTVI_PKT</name>
+                        <direction>output</direction>
+                        <query_name>class2_packet</query_name>
+                </dscpOutRtviPkt>
+                <dscpOutD1Pkt>
+                        <name>DSCP-OUT-D1_PKT</name>
+                        <direction>output</direction>
+                        <query_name>class3_packet</query_name>
+                </dscpOutD1Pkt>
+                <dscpOutD2Pkt>
+                        <name>DSCP-OUT-D2_PKT</name>
+                        <direction>output</direction>
+                        <query_name>class4_packet</query_name>
+                </dscpOutD2Pkt>
+                <dscpOutD3Pkt>
+                        <name>DSCP-OUT-D3_PKT</name>
+                        <direction>output</direction>
+                        <query_name>class-default_packet</query_name>
+                </dscpOutD3Pkt>
+
+		<!-- OUT Drops Packets -->
+		<dscpOutRtPktDrp>
+                        <name>DSCP-OUT-RT_PKT_DROP</name>
+                        <direction>output</direction>
+                        <query_name>class1_packet-drop</query_name>
+                </dscpOutRtPktDrp>
+                <dscpOutRtviPktDrp>
+                        <name>DSCP-OUT-RTVI_PKT_DROP</name>
+                        <direction>output</direction>
+                        <query_name>class2_packet-drop</query_name>
+                </dscpOutRtviPktDrp>
+                <dscpOutD1PktDrp>
+                        <name>DSCP-OUT-D1_PKT_DROP</name>
+                        <direction>output</direction>
+                        <query_name>class3_packet-drop</query_name>
+                </dscpOutD1PktDrp>
+                <dscpOutD2PktDrp>
+                        <name>DSCP-OUT-D2_PKT_DROP</name>
+                        <direction>output</direction>
+                        <query_name>class4_packet-drop</query_name>
+                </dscpOutD2PktDrp>
+                <dscpOutD3PktDrp>
+                        <name>DSCP-OUT-D3_PKT_DROP</name>
+                        <direction>output</direction>
+                        <query_name>class-default_packet-drop</query_name>
+                </dscpOutD3PktDrp>
+
+		<!-- IN Bytes -->
+                <dscpCountRt>
+                	<name>DSCP-COUNT-RT</name>
+                	<direction>output</direction>
+                	<query_name>ef-voip</query_name>
+                </dscpCountRt>
+                <dscpCountRtvi>
+                	<name>DSCP-COUNT-RTVI</name>
+                	<direction>output</direction>
+                	<query_name>af41-business1</query_name>
+                </dscpCountRtvi>
+                <dscpCountD1>
+                	<name>DSCP-COUNT-D1</name>
+                	<direction>output</direction>
+                	<query_name>af31-business2</query_name>
+                </dscpCountD1>
+                <dscpCountD2>
+                	<name>DSCP-COUNT-D2</name>
+                	<direction>output</direction>
+                	<query_name>default-business-default</query_name>
+                </dscpCountD2>
+                <dscpCountD3>
+                	<name>DSCP-COUNT-D3</name>
+                	<direction>output</direction>
+                	<query_name>af11-business3</query_name>
+                </dscpCountD3>
+
+		<!-- IN Packets -->
+		<dscpCountRtPkt>
+                        <name>DSCP-COUNT-RT_PKT</name>
+                        <direction>output</direction>
+                        <query_name>ef-voip_packet</query_name>
+                </dscpCountRtPkt>
+                <dscpCountRtviPkt>
+                        <name>DSCP-COUNT-RTVI_PKT</name>
+                        <direction>output</direction>
+                        <query_name>af41-business1_packet</query_name>
+                </dscpCountRtviPkt>
+                <dscpCountD1Pkt>
+                        <name>DSCP-COUNT-D1_PKT</name>
+                        <direction>output</direction>
+                        <query_name>af31-business2_packet</query_name>
+                </dscpCountD1Pkt>
+                <dscpCountD2Pkt>
+                        <name>DSCP-COUNT-D2_PKT</name>
+                        <direction>output</direction>
+                        <query_name>default-business-default_packet</query_name>
+                </dscpCountD2Pkt>
+                <dscpCountD3Pkt>
+                        <name>DSCP-COUNT-D3_PKT</name>
+                        <direction>output</direction>
+                        <query_name>af11-business3_packet</query_name>
+                </dscpCountD3Pkt>
+        </fields>
+</ifTrafficCosCisco>
