@@ -201,13 +201,13 @@ if ($total_rows > 0 && !$force) {
 	echo "\nWARNING: Cacti Template Problems found in your Database.  Using the '--force' option will remove\n";
 	echo "the invalid records.  However, these changes can be catastrophic to existing data sources.  Therefore, you \n";
 	echo "should contact your support organization prior to proceeding with that repair.\n\n";
-}elseif ($total_rows == 0) {
+} elseif ($total_rows == 0) {
 	echo "NOTE: No Invalid Cacti Template Records found in your Database\n\n";
 }
 
 /*  display_version - displays version information */
 function display_version() {
-	$version = db_fetch_cell('SELECT cacti FROM version');
+	$version = get_cacti_version();
 	echo "Cacti Database Repair Utility, Version $version, " . COPYRIGHT_YEARS . "\n";
 }
 

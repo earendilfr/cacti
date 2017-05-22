@@ -64,7 +64,7 @@ function api_device_remove_multi($device_ids) {
 		foreach($device_ids as $device_id) {
 			if ($i == 0) {
 				$devices_to_delete .= $device_id;
-			}else{
+			} else {
 				$devices_to_delete .= ', ' . $device_id;
 			}
 
@@ -100,20 +100,69 @@ function api_device_remove_multi($device_ids) {
 	}
 }
 
+/* api_device_dq_add - adds a device->data query mapping
+   @arg $device_id - the id of the device which contains the mapping
+   @arg $data_query_id - the id of the data query to remove the mapping for 
+   @arg $reindex_method - the reindex method to user when adding the data query */
+function api_device_dq_add($device_id, $data_query_id, $reindex_method) {
+    db_execute_prepared('REPLACE INTO host_snmp_query
+        (host_id, snmp_query_id, reindex_method)
+        VALUES (?, ?, ?)',
+        array($device_id, $data_query_id, $reindex_method));
+
+    /* recache snmp data */
+	run_data_query($device_id, $data_query_id);
+}
+
 /* api_device_dq_remove - removes a device->data query mapping
    @arg $device_id - the id of the device which contains the mapping
    @arg $data_query_id - the id of the data query to remove the mapping for */
 function api_device_dq_remove($device_id, $data_query_id) {
-	db_execute_prepared('DELETE FROM host_snmp_cache WHERE snmp_query_id = ? AND host_id = ?', array($data_query_id, $device_id));
-	db_execute_prepared('DELETE FROM host_snmp_query WHERE snmp_query_id = ? AND host_id = ?', array($data_query_id, $device_id));
-	db_execute_prepared('DELETE FROM poller_reindex  WHERE data_query_id = ? AND host_id = ?', array($data_query_id, $device_id));
+	db_execute_prepared('DELETE FROM host_snmp_cache 
+		WHERE snmp_query_id = ? 
+		AND host_id = ?', 
+		array($data_query_id, $device_id));
+
+	db_execute_prepared('DELETE FROM host_snmp_query 
+		WHERE snmp_query_id = ? 
+		AND host_id = ?', 
+		array($data_query_id, $device_id));
+
+	db_execute_prepared('DELETE FROM poller_reindex
+		WHERE data_query_id = ? 
+		AND host_id = ?', 
+		array($data_query_id, $device_id));
+}
+
+/* api_device_dq_change - changes a device->data query mapping
+   @arg $device_id - the id of the device which contains the mapping
+   @arg $data_query_id - the id of the data query to remove the mapping for 
+   @arg $reindex_method - the reindex method to use when changing the data query */
+function api_device_dq_change($device_id, $data_query_id, $reindex_method) {
+	db_execute_prepared('INSERT INTO host_snmp_query 
+		(host_id, snmp_query_id, reindex_method) 
+		VALUES (?, ?, ?) 
+		ON DUPLICATE KEY UPDATE reindex_method=VALUES(reindex_method)', 
+		array($device_id, $data_query_id, $reindex_method));
+
+	cacti_log("INSERT INTO host_snmp_query (host_id, snmp_query_id, reindex_method) VALUES ($device_id, $data_query_id, $reindex_method) ON DUPLICATE KEY UPDATE reindex_method=VALUES(reindex_method)");
+
+	db_execute_prepared('DELETE FROM poller_reindex 
+		WHERE data_query_id = ? 
+		AND host_id = ?', array($data_query_id, $device_id));
+
+	/* finally rerun the data query */
+	run_data_query($device_id, $data_query_id);
 }
 
 /* api_device_gt_remove - removes a device->graph template mapping
    @arg $device_id - the id of the device which contains the mapping
    @arg $graph_template_id - the id of the graph template to remove the mapping for */
 function api_device_gt_remove($device_id, $graph_template_id) {
-	db_execute_prepared('DELETE FROM host_graph WHERE graph_template_id = ? AND host_id = ?', array($graph_template_id, $device_id));
+	db_execute_prepared('DELETE FROM host_graph 
+		WHERE graph_template_id = ? 
+		AND host_id = ?', 
+		array($graph_template_id, $device_id));
 }
 
 function api_device_save($id, $host_template_id, $description, $hostname, $snmp_community, $snmp_version,
@@ -129,7 +178,7 @@ function api_device_save($id, $host_template_id, $description, $hostname, $snmp_
 	/* fetch some cache variables */
 	if (empty($id)) {
 		$_host_template_id = 0;
-	}else{
+	} else {
 		$_host_template_id = db_fetch_cell_prepared('SELECT host_template_id FROM host WHERE id = ?', array($id));
 	}
 
@@ -198,7 +247,7 @@ function api_device_save($id, $host_template_id, $description, $hostname, $snmp_
 			/* change reindex method for 'None' for non-snmp devices */
 			if ($save['snmp_version'] == 0) {
 				db_execute_prepared('UPDATE host_snmp_query SET reindex_method = 0 WHERE host_id = ?', array($host_id));
-				db_execute_prepared('DELETE * FROM poller_reindex WHERE host_id = ?', array($host_id));
+				db_execute_prepared('DELETE FROM poller_reindex WHERE host_id = ?', array($host_id));
 			}
 
 			api_device_cache_crc_update($save['poller_id']);
@@ -212,7 +261,7 @@ function api_device_save($id, $host_template_id, $description, $hostname, $snmp_
 			/* update title cache for graph and data source */
 			update_data_source_title_cache_from_host($host_id);
 			update_graph_title_cache_from_host($host_id);
-		}else{
+		} else {
 			raise_message(2);
 		}
 
@@ -235,14 +284,14 @@ function api_device_save($id, $host_template_id, $description, $hostname, $snmp_
 							if ((chown($host_dir, $owner_id)) &&
 								(chgrp($host_dir, $group_id))) {
 								/* permissions set ok */
-							}else{
+							} else {
 								cacti_log("ERROR: Unable to set directory permissions for '" . $host_dir . "'", FALSE);
 							}
 						}
-					}else{
+					} else {
 						cacti_log("ERROR: Unable to create directory '" . $host_dir . "'", FALSE);
 					}
-				}else{
+				} else {
 					cacti_log("ERROR: Unable to create directory due to missing write permissions '" . $host_dir . "'", FALSE);
 				}
 			}
@@ -253,7 +302,7 @@ function api_device_save($id, $host_template_id, $description, $hostname, $snmp_
 
 		snmpagent_api_device_new($save);
 
-		automation_hook_device_create_tree($host_id);
+		automation_execute_device_create_tree($host_id);
 
 		api_plugin_hook_function('api_device_new', $save);
 	}
@@ -308,7 +357,7 @@ function api_device_update_host_template($host_id, $host_template_id) {
 function api_device_template_sync_template($device_template, $down_devices = false) {
 	if ($down_devices == true) {
 		$status_where = '';
-	}else{
+	} else {
 		$status_where = ' AND status IN(3,2)';
 	}
 
@@ -348,7 +397,7 @@ function api_device_ping_device($device_id, $from_remote = false) {
 	if ($host['disabled'] == 'on') {
 		print __('Device is Disabled') . '<br>';
 		print __('Device Availability Check Bypassed') . '<br>';
-	}elseif ($am == AVAIL_SNMP || $am == AVAIL_SNMP_GET_NEXT ||
+	} elseif ($am == AVAIL_SNMP || $am == AVAIL_SNMP_GET_NEXT ||
 		$am == AVAIL_SNMP_GET_SYSDESC || $am == AVAIL_SNMP_AND_PING ||
 		$am == AVAIL_SNMP_OR_PING) {
 
@@ -359,7 +408,7 @@ function api_device_ping_device($device_id, $from_remote = false) {
 
 		if (($host['snmp_community'] == '' && $host['snmp_username'] == '') || $host['snmp_version'] == 0) {
 			print "<span style='color: #ab3f1e; font-weight: bold;'>" . __('SNMP not in use') . "</span>\n";
-		}else{
+		} else {
 			$session = cacti_snmp_session($host['hostname'], $host['snmp_community'], $host['snmp_version'],
  				$host['snmp_username'], $host['snmp_password'], $host['snmp_auth_protocol'], $host['snmp_priv_passphrase'],
  				$host['snmp_priv_protocol'], $host['snmp_context'], $host['snmp_engine_id'], $host['snmp_port'],
@@ -367,8 +416,12 @@ function api_device_ping_device($device_id, $from_remote = false) {
 
 			if ($session === false) {
 				print "<span class='hostDown'>" . __('SNMP error') . "</span>\n";
-			}else{
+			} else {
 				$snmp_system = cacti_snmp_session_get($session, '.1.3.6.1.2.1.1.1.0');
+				if ($snmp_system === false || $snmp_system == 'U') {
+					print "<span class='hostDown'>" . __('SNMP error') . "</span>\n";
+					return false;
+				}
 
 				/* modify for some system descriptions */
 				/* 0000937: System output in host.php poor for Alcatel */
@@ -379,7 +432,7 @@ function api_device_ping_device($device_id, $from_remote = false) {
 
 				if ($snmp_system == '') {
 					print "<span class='hostDown'>" . __('SNMP error') . "</span>\n";
-				}else{
+				} else {
 					$snmp_uptime     = cacti_snmp_session_get($session, '.1.3.6.1.2.1.1.3.0');
 					$snmp_hostname   = cacti_snmp_session_get($session, '.1.3.6.1.2.1.1.5.0');
 					$snmp_location   = cacti_snmp_session_get($session, '.1.3.6.1.2.1.1.6.0');
@@ -419,7 +472,7 @@ function api_device_ping_device($device_id, $from_remote = false) {
 		if ($ping_results == true) {
 			$host_down = false;
 			$class     = 'hostUp';
-		}else{
+		} else {
 			$host_down = true;
 			$class     = 'hostDown';
 		}

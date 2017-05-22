@@ -5,14 +5,12 @@ if (!isset($_SERVER['argv'][0]) || isset($_SERVER['REQUEST_METHOD'])  || isset($
 	die('<br><strong>This script is only meant to run at the command line.</strong>');
 }
 
+global $config;
+
 $no_http_headers = true;
 
 /* display No errors */
 error_reporting(0);
-
-if (isset($config)) {
-	include_once(dirname(__FILE__) . '/../lib/snmp.php');
-}
 
 if (!isset($called_by_script_server)) {
 	include_once(dirname(__FILE__) . '/../include/global.php');
@@ -21,6 +19,8 @@ if (!isset($called_by_script_server)) {
 	array_shift($_SERVER['argv']);
 
 	print call_user_func_array('ss_host_disk', $_SERVER['argv']);
+}else{
+	include_once($config['library_path'] . '/snmp.php');
 }
 
 function ss_host_disk($hostname, $host_id, $snmp_auth, $cmd, $arg1 = '', $arg2 = '') {
@@ -46,7 +46,7 @@ function ss_host_disk($hostname, $host_id, $snmp_auth, $cmd, $arg1 = '', $arg2 =
 		$snmp_priv_passphrase = $snmp[9];
 		$snmp_priv_protocol   = $snmp[10];
 		$snmp_context         = $snmp[11];
-	}else{
+	} else {
 		$snmp_community = $snmp[5];
 	}
 
@@ -70,7 +70,7 @@ function ss_host_disk($hostname, $host_id, $snmp_auth, $cmd, $arg1 = '', $arg2 =
 		for ($i=0;($i<sizeof($return_arr));$i++) {
 			print $return_arr[$i] . "\n";
 		}
-	}elseif ($cmd == 'num_indexes') {
+	} elseif ($cmd == 'num_indexes') {
 		$return_arr = ss_host_disk_reindex(
 			cacti_snmp_walk($hostname, $snmp_community, $oids['index'], $snmp_version, $snmp_auth_username, 
 				$snmp_auth_password, $snmp_auth_protocol, $snmp_priv_passphrase, $snmp_priv_protocol, 
@@ -78,7 +78,7 @@ function ss_host_disk($hostname, $host_id, $snmp_auth, $cmd, $arg1 = '', $arg2 =
 			);
 
 		return sizeof($return_arr);
-	}elseif ($cmd == 'query') {
+	} elseif ($cmd == 'query') {
 		$arg = $arg1;
 
 		$arr_index = ss_host_disk_reindex(
@@ -96,7 +96,7 @@ function ss_host_disk($hostname, $host_id, $snmp_auth, $cmd, $arg1 = '', $arg2 =
 		for ($i=0;($i<sizeof($arr_index));$i++) {
 			print $arr_index[$i] . '!' . $arr[$i] . "\n";
 		}
-	}elseif ($cmd == 'get') {
+	} elseif ($cmd == 'get') {
 		$arg   = $arg1;
 		$index = $arg2;
 
@@ -119,12 +119,12 @@ function ss_host_disk($hostname, $host_id, $snmp_auth, $cmd, $arg1 = '', $arg2 =
 				} else {
 					return $snmp_data * $sau;
 				}
-			}else{
+			} else {
 				return cacti_snmp_get($hostname, $snmp_community, $oids[$arg] . ".$index", $snmp_version, 
 					$snmp_auth_username, $snmp_auth_password, $snmp_auth_protocol, $snmp_priv_passphrase, 
 					$snmp_priv_protocol, $snmp_context, $snmp_port, $snmp_timeout, $ping_retries, SNMP_POLLER);
 			}
-		}else{
+		} else {
 			return $value;
 		}
 	}

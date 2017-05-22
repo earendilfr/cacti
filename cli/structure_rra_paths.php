@@ -161,7 +161,7 @@ foreach ($data_sources as $info) {
 		if ($config['cacti_server_os'] != 'win32') {
 			if (chown($new_rrd_path, $owner_id) && chgrp($new_rrd_path, $group_id)) {
 				echo "NOTE: Permissions set for '$new_rrd_path'\n";
-			}else{
+			} else {
 				/* turn on the poller */
 				enable_poller();
 
@@ -223,7 +223,7 @@ function disable_poller() {
 
 /*  display_version - displays version information */
 function display_version() {
-    $version = db_fetch_cell('SELECT cacti FROM version');
+	$version = get_cacti_version();
     echo "Cacti Structured Paths Creation Utility, Version $version, " . COPYRIGHT_YEARS . "\n";
 }
 

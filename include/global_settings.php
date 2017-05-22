@@ -223,10 +223,6 @@ $settings = array(
 					'friendly_name' => __('Graph Syntax'),
 					'default' => ''
 					),
-				'log_export' => array(
-					'friendly_name' => __('Graph Export'),
-					'default' => ''
-					),
 				'developer_mode' => array(
 					'friendly_name' => __('Developer Mode'),
 					'default' => ''
@@ -292,29 +288,6 @@ $settings = array(
 			'collapsible' => 'true',
 			'method' => 'spacer',
 			),
-		'default_site' => array(
-			'friendly_name' => __('Site'),
-			'description' => __('The default Site for all new Devices.'),
-			'method' => 'drop_sql',
-			'default' => '1',
-			'none_value' => __('None'),
-			'sql' => 'SELECT id, name FROM sites ORDER BY name',
-			),
-		'default_poller' => array(
-			'friendly_name' => __('Poller'),
-			'description' => __('The default Poller for all new Devices.'),
-			'method' => 'drop_sql',
-			'default' => '1',
-			'none_value' => __('None'),
-			'sql' => 'SELECT id, name FROM poller ORDER BY name',
-			),
-		'reindex_method' => array(
-			'friendly_name' => __('Re-index Method for Data Queries'),
-			'description' => __('The default Re-index Method to use for all Data Queries.'),
-			'method' => 'drop_array',
-			'default' => '1',
-			'array' => $reindex_types,
-			),
 		'default_has' => array(
 			'friendly_name' => __('Has Graphs/Data Sources Checked'),
 			'description' => __('Should the Has Graphs and Has Data Sources be Checked by Default.'),
@@ -365,6 +338,20 @@ $settings = array(
             'default' => '1',
             'array' => array( '0' => __('Disabled'), '1' => __('Enabled'))
             ),
+		'default_date_format' => array(
+			'friendly_name' => __('Date Display Format'),
+			'description' => __('The System default date format to use in Cacti.'),
+			'method' => 'drop_array',
+			'array' => $dateformats,
+			'default' => GD_Y_MO_D
+			),
+		'default_datechar' => array(
+			'friendly_name' => __('Date Separator'),
+			'description' => __('The System default date separator to be used in Cacti.'),
+			'method' => 'drop_array',
+			'array' => $datechar,
+			'default' => GDC_SLASH
+			),
 		'other1_header' => array(
 			'friendly_name' => __('Other Settings'),
 			'collapsible' => 'true',
@@ -425,6 +412,7 @@ $settings = array(
 		'automation_header' => array(
 			'friendly_name' => __('Automation'),
 			'method' => 'spacer',
+			'collapsible' => 'true'
 			),
 		'automation_graphs_enabled' => array(
 			'method' => 'checkbox',
@@ -444,6 +432,34 @@ $settings = array(
 			),
 		),
 	'snmp' => array(
+		'general_header' => array(
+			'friendly_name' => __('General Defaults'),
+			'method' => 'spacer',
+			'collapsible' => 'true'
+			),
+		'default_site' => array(
+			'friendly_name' => __('Site'),
+			'description' => __('The default Site for all new Devices.'),
+			'method' => 'drop_sql',
+			'default' => '1',
+			'none_value' => __('None'),
+			'sql' => 'SELECT id, name FROM sites ORDER BY name',
+			),
+		'default_poller' => array(
+			'friendly_name' => __('Poller'),
+			'description' => __('The default Poller for all new Devices.'),
+			'method' => 'drop_sql',
+			'default' => '1',
+			'none_value' => __('None'),
+			'sql' => 'SELECT id, name FROM poller ORDER BY name',
+			),
+		'reindex_method' => array(
+			'friendly_name' => __('Re-index Method for Data Queries'),
+			'description' => __('The default Re-index Method to use for all Data Queries.'),
+			'method' => 'drop_array',
+			'default' => '1',
+			'array' => $reindex_types,
+			),
 		'snmp_header' => array(
 			'friendly_name' => __('SNMP Defaults'),
 			'method' => 'spacer',
@@ -516,7 +532,7 @@ $settings = array(
 			),
 		'snmp_retries' => array(
 			'friendly_name' => __('Retries'),
-			'description' => __('The number times the SNMP poller will attempt to reach the host before failing.'),
+			'description' => __('The number of times the SNMP poller will attempt to reach the host before failing.'),
 			'method' => 'textbox',
 			'default' => '3',
 			'max_length' => '10',
@@ -656,6 +672,14 @@ $settings = array(
 			'method' => 'drop_array',
 			'default' => 500,
 			'array' => $log_tail_lines,
+			),
+		'max_display_rows' => array(
+			'friendly_name' => __('Maximum number of rows per page'),
+			'description' => __("User defined number of lines for the CLOG to tail when selecting 'All lines'."),
+			'method' => 'textbox',
+			'max_length' => 5,
+			'size' => 5,
+			'default' => 1000
 			),
 		'log_refresh_interval' => array(
 			'friendly_name' => __('Log Tail Refresh'),
@@ -915,6 +939,7 @@ $settings = array(
 		'auth_header' => array(
 			'friendly_name' => __('General'),
 			'method' => 'spacer',
+			'collapsible' => 'true'
 			),
 		'auth_method' => array(
 			'friendly_name' => __('Authentication Method'),
@@ -1194,6 +1219,7 @@ $settings = array(
 		'settings_web_url' => array(
 			'friendly_name' => __('URL Linking'),
 			'method' => 'spacer',
+			'collapsible' => 'true'
 			),
 		'base_url' => array(
 			'friendly_name' => __('Server Base URL'),
@@ -1219,6 +1245,13 @@ $settings = array(
 			'method' => 'drop_array',
 			'default' => __('PHP Mail() Function'),
 			'array' => array( __('PHP Mail() Function'), __('Sendmail'), __('SMTP') ),
+			),
+		'settings_ping_mail' => array(
+			'friendly_name' => __('Ping Mail Server'),
+			'description' => __('Ping the Mail Server before sending test Email?'),
+			'method' => 'drop_array',
+			'default' => 0,
+			'array' => array(0 => __('Yes'), 1 => __('No'))
 			),
 		'settings_from_email' => array(
 			'friendly_name' => __('From Email Address'),
@@ -1609,6 +1642,7 @@ $settings = array(
 		'spikekill_header' => array(
 			'friendly_name' => __('Spike Kill Settings'),
 			'method' => 'spacer',
+			'collapsible' => 'true'
 			),
 		'spikekill_method' => array(
 			'friendly_name' => __('Removal Method'),
@@ -1636,7 +1670,7 @@ $settings = array(
 			A good number will be dependent on the type of data to be operated on.  We recommend a number no lower
 			than 5 Standard Deviations.'),
 			'method' => 'drop_array',
-			'default' => '5',
+			'default' => '10',
 			'array' => array(
 				3 => __('%d Standard Deviations', 3),
 				4 => __('%d Standard Deviations', 4),
@@ -1645,7 +1679,9 @@ $settings = array(
 				7 => __('%d Standard Deviations', 7),
 				8 => __('%d Standard Deviations', 8),
 				9 => __('%d Standard Deviations', 9),
-				10 => __('%d Standard Deviations', 10)
+				10 => __('%d Standard Deviations', 10),
+				15 => __('%d Standard Deviations', 15),
+				20 => __('%d Standard Deviations', 20)
 				)
 			),
 		'spikekill_percent' => array(
@@ -1654,7 +1690,7 @@ $settings = array(
 			have been removed from the sample.  For example, a Variance Percentage of 100% on an adjusted average of 50
 			would remove any sample above the quantity of 100 from the graph.'),
 			'method' => 'drop_array',
-			'default' => '500',
+			'default' => '1000',
 			'array' => array(
 				100 => '100 %',
 				200 => '200 %',
@@ -1665,7 +1701,9 @@ $settings = array(
 				700 => '700 %',
 				800 => '800 %',
 				900 => '900 %',
-				1000 => '1000 %'
+				1000 => '1000 %',
+				2000 => '2000 %',
+				3000 => '3000 %'
 				)
 			),
 		'spikekill_outliers' => array(
@@ -1714,6 +1752,7 @@ $settings = array(
 		'spikekill_batch_header' => array(
 			'friendly_name' => __('Batch Spike Kill Settings'),
 			'method' => 'spacer',
+			'collapsible' => 'true'
 			),
 		'spikekill_batch' => array(
 			'friendly_name' => __('Removal Schedule'),
@@ -1777,17 +1816,17 @@ $settings_user = array(
 			'default' => ''
 			),
 		'default_date_format' => array(
-			'friendly_name' => __('Graph Date Display Format'),
-			'description' => __('The date format to use for graphs'),
+			'friendly_name' => __('Date Display Format'),
+			'description' => __('The date format to use in Cacti.'),
 			'method' => 'drop_array',
-			'array' => $graph_dateformats,
+			'array' => $dateformats,
 			'default' => GD_Y_MO_D
 			),
 		'default_datechar' => array(
-			'friendly_name' => __('Graph Date Separator'),
-			'description' => __('The date separator to be used for graphs'),
+			'friendly_name' => __('Date Separator'),
+			'description' => __('The date separator to be used in Cacti.'),
 			'method' => 'drop_array',
-			'array' => $graph_datechar,
+			'array' => $datechar,
 			'default' => GDC_SLASH
 			),
 		'page_refresh' => array(

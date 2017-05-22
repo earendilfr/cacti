@@ -145,7 +145,7 @@ $cache_dir = read_config_option('realtime_cache_path');
 if (!is_dir($cache_dir)) {
 	cacti_log("FATAL: Realtime Cache Directory '$cache_dir' Does Not Exist!");
 	return -1;
-}elseif (!is_writable($cache_dir)) {
+} elseif (!is_writable($cache_dir)) {
 	cacti_log("FATAL: Realtime Cache Directory '$cache_dir' is Not Writable!");
 	return -2;
 }
@@ -166,7 +166,7 @@ db_close();
 
 /*  display_version - displays version information */
 function display_version() {
-    $version = db_fetch_cell('SELECT cacti FROM version');
+	$version = get_cacti_version();
 	echo "Cacti Realtime Poller, Version $version, " . COPYRIGHT_YEARS . "\n";
 }
 
@@ -232,7 +232,7 @@ function process_poller_output_rt($rrdtool_pipe, $poller_id, $interval) {
 
 				/* change permissions so that the poller can clear */
 				@chmod($rt_graph_path, 0644);
-			}else{
+			} else {
 				/* change permissions so that the poller can clear */
 				@chmod($rt_graph_path, 0644);
 			}
@@ -250,7 +250,7 @@ function process_poller_output_rt($rrdtool_pipe, $poller_id, $interval) {
 			if ((is_numeric($value)) || ($value == 'U')) {
 				$rrd_update_array{$item['rrd_path']}['times'][$unix_time]{$item['rrd_name']} = $value;
 			/* multiple value output */
-			}else{
+			} else {
 				$values = explode(' ', $value);
 
 				$rrd_field_names = array_rekey(db_fetch_assoc_prepared('SELECT
@@ -278,7 +278,6 @@ function process_poller_output_rt($rrdtool_pipe, $poller_id, $interval) {
 		}
 
 		/* make sure each .rrd file has complete data */
-		reset($results);
 		foreach ($results as $item) {
 			db_execute_prepared('DELETE FROM poller_output_realtime
 				WHERE local_data_id = ? 

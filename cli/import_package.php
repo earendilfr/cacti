@@ -34,6 +34,7 @@ $no_http_headers = true;
 include(dirname(__FILE__).'/../include/global.php');
 include_once($config['base_path'] . '/lib/import.php');
 include_once($config['base_path'] . '/lib/utility.php');
+include_once($config['base_path'] . '/lib/template.php');
 
 /* process calling arguments */
 $parms = $_SERVER['argv'];
@@ -92,6 +93,20 @@ if (sizeof($parms)) {
 				exit(1);
 		}
 	}
+
+	if ($profile_id != '') {
+		$exists = db_fetch_cell_prepared('SELECT id 
+			FROM data_source_profiles 
+			WHERE id = ?',
+			array($profile_id));
+
+		if (empty($exists)) {
+			echo "FATAL: Data Source Profile ID " . $profile_id . " does not exist!\n";
+			exit(1);
+		}
+	} else {
+		$profile_id = db_fetch_cell('SELECT id FROM data_source_profiles ORDER BY `default` DESC LIMIT 1');
+	}
 	
 	if ($filename != '' && is_readable($filename)) {
 		if(file_exists($filename) && is_readable($filename)) {
@@ -101,9 +116,16 @@ if (sizeof($parms)) {
 
 			echo 'Read ' . strlen($data) . " bytes of Package data\n";
 
-			list($debug_data, $filestatus) = import_package($filename, $profile_id, $remove_orphans, $preview_only);
+			$result = import_package($filename, $profile_id, $remove_orphans, $preview_only);
 
-			import_display_results($debug_data, $filestatus, false, $preview_only);
+			if ($result !== false) {
+				$debug_data = $result[0];
+				$filestatus = $result[1];
+
+				import_display_results($debug_data, $filestatus, false, $preview_only);
+			} else {
+				echo "ERROR: file $filename import process failed\n\n";
+			}
 		} else {
 			echo "ERROR: file $filename is not readable, or does not exist\n\n";
 			exit(1);
@@ -121,14 +143,14 @@ if (sizeof($parms)) {
 
 /*  display_version - displays version information */
 function display_version() {
-	$version = db_fetch_cell('SELECT cacti FROM version');
+	$version = get_cacti_version();
 	echo "Cacti Import Template Utility, Version $version, " . COPYRIGHT_YEARS . "\n";
 }
 
 function display_help() {
 	display_version();
 
-	echo "\nusage: import_package.php --filename=[filename] [--with-profile] [--profile-id=N\n\n";
+	echo "\nusage: import_package.php --filename=[filename] [--remove-orphans] [--with-profile] [--profile-id=N\n\n";
 	echo "A utility to allow signed Cacti Packages to be imported from the command line.\n\n";
 	echo "Required:\n";
 	echo "    --filename              The name of the gziped package file to import\n\n";

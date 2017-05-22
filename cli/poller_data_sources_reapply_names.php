@@ -92,7 +92,7 @@ if (sizeof($parms)) {
 }
 
 /* form the 'where' clause for our main sql query */
-if (strlen($filter)) {
+if ($filter != '') {
 	$sql_where = "AND (data_template_data.name_cache like '%" . $filter . "%'" .
 	" OR data_template_data.local_data_id like '%" . $filter . "%'" .
 	" OR data_template.name like '%" . $filter . "%'" .
@@ -151,7 +151,7 @@ foreach ($data_source_list as $data_source) {
 
 /*  display_version - displays version information */
 function display_version() {
-	$version = db_fetch_cell('SELECT cacti FROM version');
+	$version = get_cacti_version();
 	echo "Cacti Reapply Data Source Names Utility, Version $version, " . COPYRIGHT_YEARS . "\n";
 }
 

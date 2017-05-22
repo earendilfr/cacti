@@ -45,7 +45,7 @@ function get_cdef_item_name($cdef_item_id) 	{
    @arg $cdef_id - the id of the cdef to resolve
    @returns - a text-based representation of the cdef */
 function get_cdef($cdef_id) {
-	$cdef_items = db_fetch_assoc_prepared('SELECT * FROM cdef_items WHERE cdef_id = ? ORDER BY sequence', array($cdef_id));
+	$cdef_items = db_fetch_assoc_prepared('SELECT id, type, value FROM cdef_items WHERE cdef_id = ? ORDER BY sequence', array($cdef_id));
 
 	$i = 0; $cdef_string = '';
 
@@ -57,7 +57,7 @@ function get_cdef($cdef_id) {
 			if ($cdef_item['type'] == 5) {
 				$current_cdef_id = $cdef_item['value'];
 				$cdef_string .= get_cdef($current_cdef_id);
-			}else{
+			} else {
 				$cdef_string .= get_cdef_item_name($cdef_item['id']);
 			}
 			$i++;

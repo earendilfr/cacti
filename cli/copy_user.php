@@ -36,7 +36,7 @@ include_once($config['base_path'] . '/lib/auth.php');
 if (empty($_SERVER['argv'][1]) ){
 	display_help();
 	exit;
-}else{
+} else {
 	switch($_SERVER['argv'][1]) {
 		case '--help':
 		case '-H':
@@ -78,7 +78,7 @@ print "User copied...\n";
 
 /*  display_version - displays version information */
 function display_version() {
-	$version = db_fetch_cell('SELECT cacti FROM version');
+	$version = get_cacti_version();
 	echo "Cacti Copy User Utility, Version $version, " . COPYRIGHT_YEARS . "\n";
 }
 

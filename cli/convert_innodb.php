@@ -109,10 +109,10 @@ if (sizeof($tables)) {
 				echo "Converting Table -> '" . $table['Name'] . "'";
 				$status = db_execute('ALTER TABLE ' . $table['Name'] . ' ENGINE=Innodb');
 				echo ($status == 0 ? ' Failed' : ' Successful') . "\n";
-			}else{
+			} else {
 				echo "Skipping Table -> '" . $table['Name'] . " too many rows '" . $table['Rows'] . "'\n";
 			}
-		}else{
+		} else {
 			echo "Skipping Table ->'" . $table['Name'] . "\n";
 		}
 	}
@@ -120,7 +120,7 @@ if (sizeof($tables)) {
 
 /*  display_version - displays version information */
 function display_version() {
-	$version = db_fetch_cell('SELECT cacti FROM version');
+	$version = get_cacti_version();
 	echo "Cacti Database Conversion Utility, Version $version, " . COPYRIGHT_YEARS . "\n";
 }
 

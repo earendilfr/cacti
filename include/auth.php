@@ -27,18 +27,18 @@ global $current_user;
 include('./include/global.php');
 
 if (!isset($config['cacti_db_version'])) {
-	$version = db_fetch_cell('SELECT cacti FROM version');
+	$version = get_cacti_version();
 	$config['cacti_db_version'] = $version;
-}else{
+} else {
 	$version = $config['cacti_db_version'];
 }
 
-if ($version != $config['cacti_version'] && $config['poller_id'] == 1) {
+if ($version != CACTI_VERSION && $config['poller_id'] == 1) {
 	header ('Location: ' . $config['url_path'] . 'install/');
 	exit;
 }
 
-if (basename($_SERVER['PHP_SELF']) == 'logout.php') {
+if (get_current_page() == 'logout.php') {
 	return true;
 }
 
@@ -81,11 +81,11 @@ if (read_config_option('auth_method') != 0) {
 	if (empty($_SESSION['sess_user_id'])) {
 		include($config['base_path'] . '/auth_login.php');
 		exit;
-	}elseif (!empty($_SESSION['sess_user_id'])) {
+	} elseif (!empty($_SESSION['sess_user_id'])) {
 		$realm_id = 0;
 
-		if (isset($user_auth_realm_filenames{basename($_SERVER['PHP_SELF'])})) {
-			$realm_id = $user_auth_realm_filenames{basename($_SERVER['PHP_SELF'])};
+		if (isset($user_auth_realm_filenames[get_current_page()])) {
+			$realm_id = $user_auth_realm_filenames[get_current_page()];
 		}
 
 		if ($realm_id > 0) {
@@ -106,16 +106,18 @@ if (read_config_option('auth_method') != 0) {
 					AND uagm.user_id = ?
 					AND uagr.realm_id = ?
 				) AS authorized', array($_SESSION['sess_user_id'], $realm_id, $_SESSION['sess_user_id'], $realm_id));
-		}else{
+		} else {
 			$authorized = false;
 		}
 
 		if ($realm_id != -1 && !$authorized) {
 			if (isset($_SERVER['HTTP_REFERER'])) {
 				$goBack = "<td colspan='2' align='center'>[<a href='" . htmlspecialchars($_SERVER['HTTP_REFERER']) . "'>" . __('Return') . "</a> | <a href='" . $config['url_path'] . "logout.php'>" . __('Login Again') . "</a>]</td>";
-			}else{
+			} else {
 				$goBack = "<td colspan='2' align='center'>[<a href='" . $config['url_path'] . "logout.php'>" . __('Login Again') . "</a>]</td>";
 			}
+
+			$selectedTheme = get_selected_theme();
 
 			print "<!DOCTYPE html>\n";
 			print "<html>\n";
@@ -123,18 +125,18 @@ if (read_config_option('auth_method') != 0) {
 			print "\t<title>" . __('Permission Denied') . "</title>\n";
 			print "\t<meta http-equiv='Content-Type' content='text/html;charset=utf-8'>\n";
 			print "\t<meta name='robots' content='noindex,nofollow'>\n";
-			print "\t<link href='" . $config['url_path'] . "include/themes/" . get_selected_theme() . "/jquery-ui.css' type='text/css' rel='stylesheet'>\n";
+			print "\t<link href='" . $config['url_path'] . "include/themes/" . $selectedTheme . "/jquery-ui.css' type='text/css' rel='stylesheet'>\n";
 			print "\t<link href='" . $config['url_path'] . "include/fa/css/font-awesome.css' type='text/css' rel='stylesheet'>\n";
-			print "\t<link href='" . $config['url_path'] . "include/themes/" . get_selected_theme() . "/main.css' type='text/css' rel='stylesheet'>\n";
-			print "\t<link href='" . $config['url_path'] . "include/themes/" . get_selected_theme() . "/images/favicon.ico' rel='shortcut icon'>\n";
-			print "\t<link href='" . $config['url_path'] . "include/themes/" . get_selected_theme() . "/images/cacti_logo.gif' rel='icon' sizes='96x96'>\n";
+			print "\t<link href='" . $config['url_path'] . "include/themes/" . $selectedTheme . "/main.css' type='text/css' rel='stylesheet'>\n";
+			print "\t<link href='" . $config['url_path'] . "include/themes/" . $selectedTheme . "/images/favicon.ico' rel='shortcut icon'>\n";
+			print "\t<link href='" . $config['url_path'] . "include/themes/" . $selectedTheme . "/images/cacti_logo.gif' rel='icon' sizes='96x96'>\n";
 			print "\t<script type='text/javascript' src='" . $config['url_path'] . "include/js/jquery.js' language='javascript'></script>\n";
 			print "\t<script type='text/javascript' src='" . $config['url_path'] . "include/js/jquery-ui.js' language='javascript'></script>\n";
 			print "\t<script type='text/javascript' src='" . $config['url_path'] . "include/js/jquery.cookie.js' language='javascript'></script>\n";
 			print "\t<script type='text/javascript' src='" . $config['url_path'] . "include/js/jquery.hotkeys.js'></script>\n";
 			print "\t<script type='text/javascript' src='" . $config['url_path'] . "include/layout.js'></script>\n";
-			print "\t<script type='text/javascript' src='" . $config['url_path'] . "include/themes/". get_selected_theme() . "/main.js'></script>\n";
-			print "<script type='text/javascript'>var theme='" . get_selected_theme() . "';</script>\n";
+			print "\t<script type='text/javascript' src='" . $config['url_path'] . "include/themes/". $selectedTheme . "/main.js'></script>\n";
+			print "<script type='text/javascript'>var theme='" . $selectedTheme . "';</script>\n";
 			print "</head>\n";
 			print "<body class='logoutBody'>
 			<div class='logoutLeft'></div>

@@ -85,7 +85,7 @@ function form_save() {
 
 			if ($domain_id) {
 				raise_message(1);
-			}else{
+			} else {
 				raise_message(2);
 			}
 
@@ -125,13 +125,13 @@ function form_save() {
 
 					if ($insert_id) {
 						raise_message(1);
-					}else{
+					} else {
 						raise_message(2);
 					}
 				}
 			}
 		}
-	}elseif (isset_request_var('save_component_domain')) {
+	} elseif (isset_request_var('save_component_domain')) {
 		/* ================= input validation ================= */
 		get_filter_request_var('domain_id');
 		get_filter_request_var('type');
@@ -149,7 +149,7 @@ function form_save() {
 
 			if ($domain_id) {
 				raise_message(1);
-			}else{
+			} else {
 				raise_message(2);
 			}
 		}
@@ -166,22 +166,22 @@ function form_actions() {
 		$selected_items = sanitize_unserialize_selected_items(get_nfilter_request_var('selected_items'));
 
 		if ($selected_items != false) {
-			if (get_nfilter_request_var('drp_action') == '1') { /* delete */
+			if (get_nfilter_request_var('drp_action') == '1') { // delete
 				for ($i=0;($i<count($selected_items));$i++) {
 					domain_remove($selected_items[$i]);
 				}
-			}elseif (get_nfilter_request_var('drp_action') == '2') { /* disable */
+			} elseif (get_nfilter_request_var('drp_action') == '2') { // disable
 				for ($i=0;($i<count($selected_items));$i++) {
 					domain_disable($selected_items[$i]);
 				}
-			}elseif (get_nfilter_request_var('drp_action') == '3') { /* enable */
+			} elseif (get_nfilter_request_var('drp_action') == '3') { // enable
 				for ($i=0;($i<count($selected_items));$i++) {
 					domain_enable($selected_items[$i]);
 				}
-			}elseif (get_nfilter_request_var('drp_action') == '4') { /* default */
+			} elseif (get_nfilter_request_var('drp_action') == '4') { // default
 				if (sizeof($selected_items) > 1) {
 					/* error message */
-				}else{
+				} else {
 					for ($i=0;($i<count($selected_items));$i++) {
 						domain_default($selected_items[$i]);
 					}
@@ -194,10 +194,11 @@ function form_actions() {
 	}
 
 	/* setup some variables */
-	$d_list = ''; $d_array = array();
+	$d_list = '';
+	$d_array = array();
 
 	/* loop through each of the data queries and process them */
-	while (list($var,$val) = each($_POST)) {
+	foreach ($_POST as $var => $val) {
 		if (preg_match('/^chk_([0-9]+)$/', $var, $matches)) {
 			/* ================= input validation ================= */
 			input_validate_input_number($matches[1]);
@@ -215,7 +216,7 @@ function form_actions() {
 	html_start_box($actions[get_nfilter_request_var('drp_action')], '60%', '', '3', 'center', '');
 
 	if (isset($d_array) && sizeof($d_array)) {
-		if (get_nfilter_request_var('drp_action') == '1') { /* delete */
+		if (get_nfilter_request_var('drp_action') == '1') { // delete
 			print "<tr>
 				<td class='textArea'>
 					<p>" . __n('Click \'Continue\' to delete the following User Domain.', 'Click \'Continue\' to delete following User Domains.', sizeof($d_array)) . "</p>
@@ -224,7 +225,7 @@ function form_actions() {
 			</tr>\n";
 
 			$save_html = "<input type='button' value='" . __('Cancel') . "' onClick='cactiReturnTo()'>&nbsp;<input type='submit' value='" . __('Continue') . "' title='" . __n('Delete User Domain', 'Delete User Domains', sizeof($d_array)) . "'>";
-		}else if (get_nfilter_request_var('drp_action') == '2') { /* disable */
+		}else if (get_nfilter_request_var('drp_action') == '2') { // disable
 			print "<tr>
 				<td class='textArea'>
 					<p>" . __n('Click \'Continue\' to disable the following User Domain.', 'Click \'Continue\' to disable following User Domains.', sizeof($d_array)) . "</p>
@@ -233,7 +234,7 @@ function form_actions() {
 			</tr>\n";
 
 			$save_html = "<input type='button' value='" . __('Cancel') . "' onClick='cactiReturnTo()'>&nbsp;<input type='submit' value='" . __('Continue') . "' title='" . __n('Disable User Domain', 'Disable User Domains', sizeof($d_array)) . "'>";
-		}else if (get_nfilter_request_var('drp_action') == '3') { /* enable */
+		}else if (get_nfilter_request_var('drp_action') == '3') { // enable
 			print "<tr>
 				<td class='textArea'>
 					<p>" . __('Click \'Continue\' to enable the following User Domain.', 'Click \'Continue\' to enable following User Domains.', sizeof($d_array)) . "</p>
@@ -242,7 +243,7 @@ function form_actions() {
 			</tr>\n";
 
 			$save_html = "<input type='button' value='" . __('Cancel') . "' onClick='cactiReturnTo()'>&nbsp;<input type='submit' value='" . __('Continue') . "' title='" . __n('Enabled User Domain', 'Enable User Domains', sizeof($d_array)) . "'>";
-		}else if (get_nfilter_request_var('drp_action') == '4') { /* default */
+		}else if (get_nfilter_request_var('drp_action') == '4') { // default
 			print "<tr>
 				<td class='textArea'>
 					<p>" . __('Click \'Continue\' to make the following the following User Domain the default one.') . "</p>
@@ -252,7 +253,7 @@ function form_actions() {
 
 			$save_html = "<input type='button' value='" . __('Cancel') . "' onClick='cactiReturnTo()'>&nbsp;<input type='submit' value='" . __('Continue') . "' title='" . __('Make Selected Domain Default') . "'>";
 		}
-	}else{
+	} else {
 		print "<tr><td class='even'><span class='textError'>" . __('You must select at least one User Domain.') . "</span></td></tr>\n";
 		$save_html = "<input type='button' value='" . __('Return') . "' onClick='cactiReturnTo()'>";
 	}
@@ -305,7 +306,7 @@ function domain_edit() {
 	if (!isempty_request_var('domain_id')) {
 		$domain = db_fetch_row_prepared('SELECT * FROM user_domains WHERE domain_id = ?', array(get_request_var('domain_id')));
 		$header_label = __('User Domain [edit: %s]', $domain['domain_name']);
-	}else{
+	} else {
 		$header_label = __('User Domain [new]');
 	}
 
@@ -485,26 +486,26 @@ function domain_edit() {
 
 	form_start('user_domains.php');
 
-	html_start_box($header_label, '100%', '', '3', 'center', '');
+	html_start_box($header_label, '100%', true, '3', 'center', '');
 
 	draw_edit_form(array(
 		'config' => array(),
 		'fields' => inject_form_variables($fields_domain_edit, (isset($domain) ? $domain : array()))
 		));
 
-	html_end_box();
+	html_end_box(true, true);
 
 	if (!isempty_request_var('domain_id')) {
 		$domain = db_fetch_row_prepared('SELECT * FROM user_domains_ldap WHERE domain_id = ?', array(get_request_var('domain_id')));
 
-		html_start_box( __('Domain Properties'), '100%', '', '3', 'center', '');
+		html_start_box( __('Domain Properties'), '100%', true, '3', 'center', '');
 
 		draw_edit_form(array(
 			'config' => array(),
 			'fields' => inject_form_variables($fields_domain_ldap_edit, (isset($domain) ? $domain : array()))
 			));
 
-		html_end_box();
+		html_end_box(true, true);
 	}
 
 	?>
@@ -515,7 +516,7 @@ function domain_edit() {
 			$('#row_group_dn').show();
 			$('#row_group_attrib').show();
 			$('#row_group_member_type').show();
-		}else{
+		} else {
 			$('#row_group_header').hide();
 			$('#row_group_dn').hide();
 			$('#row_group_attrib').hide();
@@ -549,7 +550,7 @@ function domain_edit() {
 		}
 	}
 
-	$(function(data) {
+	$(function() {
 		initSearch();
 		initGroupMember();
 
@@ -604,7 +605,7 @@ function domains() {
 
 	if (get_request_var('rows') == '-1') {
 		$rows = read_config_option('num_rows_table');
-	}else{
+	} else {
 		$rows = get_request_var('rows');
 	}
 
@@ -650,7 +651,7 @@ function domains() {
 		<script type='text/javascript'>
 		function applyFilter() {
 			strURL  = 'user_domains.php?rows=' + $('#rows').val();
-			strURL += '&filter=' + $('#filter').val();
+			strURL += '&filter=' + escape($('#filter').val());
 			strURL += '&page=' + $('#page').val();
 			strURL += '&header=false';
 			loadPageNoHeader(strURL);
@@ -661,7 +662,7 @@ function domains() {
 			loadPageNoHeader(strURL);
 		}
 
-		$(function(data) {
+		$(function() {
 			$('#refresh').click(function() {
 				applyFilter();
 			});
@@ -686,7 +687,7 @@ function domains() {
 	if (get_request_var('filter') != '') {
 		$sql_where = "WHERE (domain_name LIKE '%%" . get_request_var('filter') . "%%') ||
 			(type LIKE '%%" . get_request_var('filter') . "%%')";
-	}else{
+	} else {
 		$sql_where = '';
 	}
 
@@ -731,7 +732,7 @@ function domains() {
 			form_checkbox_cell($domain['domain_name'], $domain['domain_id']);
 			form_end_row();
 		}
-	}else{
+	} else {
 		print '<tr><td><em>' . __('No User Domains Found') . '</em></td></tr>';
 	}
 

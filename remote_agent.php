@@ -106,20 +106,26 @@ function strip_domain($host) {
 	if (strpos($host, '.') !== false) {
 		$parts = explode('.', $host);
 		return $parts[0];
-	}else{
+	} else {
 		return $host;
 	}
 }
 
 function remote_client_authorized() {
 	/* don't allow to run from the command line */
-	if (isset($_SERVER['X-Forwarded-For'])) {
+	if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+		$client_addr = $_SERVER['HTTP_CLIENT_IP'];
+	} elseif (isset($_SERVER['X-Forwarded-For'])) {
 		$client_addr = $_SERVER['X-Forwarded-For'];
 	} elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
 		$client_addr = $_SERVER['HTTP_X_FORWARDED_FOR'];
+	} elseif (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+		$client_addr = $_SERVER['HTTP_FORWARDED_FOR'];
+	} elseif (isset($_SERVER['HTTP_FORWARDED'])) {
+		$client_addr = $_SERVER['HTTP_FORWARDED'];
 	} elseif (isset($_SERVER['REMOTE_ADDR'])) {
 		$client_addr = $_SERVER['REMOTE_ADDR'];
-	}else{
+	} else {
 		return false;
 	}
 
@@ -131,7 +137,7 @@ function remote_client_authorized() {
 		foreach($pollers as $poller) {
 			if (strip_domain($poller['hostname']) == $client_name) {
 				return true;
-			}elseif ($poller['hostname'] == $client_addr) {
+			} elseif ($poller['hostname'] == $client_addr) {
 				return true;
 			}
 		}
@@ -198,7 +204,7 @@ function get_graph_data() {
 	/* set the theme */
 	if (isset_request_var('effective_user')) {
 		$user = get_request_var('effective_user');
-	}else{
+	} else {
 		$user = 0;
 	}
 
@@ -224,7 +230,7 @@ function get_snmp_data() {
 
 		if ($session === false) {
 			$output = 'U';
-		}else{
+		} else {
 			$output = cacti_snmp_session_get($session, $oid);
 			$session->close();
 		}
@@ -246,7 +252,7 @@ function get_snmp_data_walk() {
 
 		if ($session === false) {
 			$output = 'U';
-		}else{
+		} else {
 			$output = cacti_snmp_session_walk($session, $oid);
 			$session->close();
 		}
@@ -254,7 +260,7 @@ function get_snmp_data_walk() {
 
 	if (sizeof($output)) {
 		print json_encode($output);
-	}else{
+	} else {
 		print 'U';
 	}
 }
@@ -298,7 +304,7 @@ function poll_for_data() {
 
 				if ($session === false) {
 					$output = 'U';
-				}else{
+				} else {
 					$output = cacti_snmp_session_get($session, $item['arg1']);
 					$session->close();
 				}
@@ -356,7 +362,7 @@ function poll_for_data() {
 
 					$output = 'U';
 				}
-			}else{
+			} else {
 				$output = 'U';
 			}
 

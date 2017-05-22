@@ -112,7 +112,7 @@ function form_save() {
 
 			if ($host_template_id) {
 				raise_message(1);
-			}else{
+			} else {
 				raise_message(2);
 			}
 		}
@@ -135,8 +135,7 @@ function duplicate_host_template($_host_template_id, $host_template_title) {
 	$save['id']   = 0;
 	$save['hash'] = get_hash_host_template(0);
 
-	reset($fields_host_template_edit);
-	while (list($field, $array) = each($fields_host_template_edit)) {
+	foreach ($fields_host_template_edit as $field => $array) {
 		if (!preg_match('/^hidden/', $array['method'])) {
 			$save[$field] = $host_template[$field];
 		}
@@ -205,18 +204,18 @@ function form_actions() {
 		$selected_items = sanitize_unserialize_selected_items(get_nfilter_request_var('selected_items'));
 
 		if ($selected_items != false) {
-			if (get_nfilter_request_var('drp_action') == '1') { /* delete */
+			if (get_nfilter_request_var('drp_action') == '1') { // delete
 				db_execute('DELETE FROM host_template WHERE ' . array_to_sql_or($selected_items, 'id'));
 				db_execute('DELETE FROM host_template_snmp_query WHERE ' . array_to_sql_or($selected_items, 'host_template_id'));
 				db_execute('DELETE FROM host_template_graph WHERE ' . array_to_sql_or($selected_items, 'host_template_id'));
 
 				/* "undo" any device that is currently using this template */
 				db_execute('UPDATE host SET host_template_id=0 WHERE ' . array_to_sql_or($selected_items, 'host_template_id'));
-			}elseif (get_nfilter_request_var('drp_action') == '2') { /* duplicate */
+			} elseif (get_nfilter_request_var('drp_action') == '2') { // duplicate
 				for ($i=0;($i<count($selected_items));$i++) {
 					duplicate_host_template($selected_items[$i], get_nfilter_request_var('title_format'));
 				}
-			}elseif (get_nfilter_request_var('drp_action') == '3') { /* sync */
+			} elseif (get_nfilter_request_var('drp_action') == '3') { // sync
 				for ($i=0;($i<count($selected_items));$i++) {
 					api_device_template_sync_template($selected_items[$i]);
 				}
@@ -231,7 +230,7 @@ function form_actions() {
 	$host_list = ''; $i = 0;
 
 	/* loop through each of the host templates selected on the previous page and get more info about them */
-	while (list($var,$val) = each($_POST)) {
+	foreach ($_POST as $var => $val) {
 		if (preg_match('/^chk_([0-9]+)$/', $var, $matches)) {
 			/* ================= input validation ================= */
 			input_validate_input_number($matches[1]);
@@ -251,7 +250,7 @@ function form_actions() {
 	html_start_box($host_actions{get_nfilter_request_var('drp_action')}, '60%', '', '3', 'center', '');
 
 	if (isset($host_array) && sizeof($host_array)) {
-		if (get_request_var('drp_action') == '1') { /* delete */
+		if (get_request_var('drp_action') == '1') { // delete
 			print "<tr>
 				<td class='textArea'>
 					<p>" . __('Click \'Continue\' to delete the following Device Template(s).') . "</p>
@@ -260,7 +259,7 @@ function form_actions() {
 			</tr>\n";
 
 			$save_html = "<input type='button' value='" . __('Cancel') . "' onClick='cactiReturnTo()'>&nbsp;<input type='submit' value='" . __('Continue') . "' title='" . __('Delete Device Template(s)') . "'>";
-		}elseif (get_request_var('drp_action') == '2') { /* duplicate */
+		} elseif (get_request_var('drp_action') == '2') { // duplicate
 			print "<tr>
 				<td class='textArea'>
 					<p>" . __('Click \'Continue\' to duplicate the following Device Template(s).  Optionally change the title for the new Device Template(s).') ."</p>
@@ -274,7 +273,7 @@ function form_actions() {
 			</tr>\n";
 
 			$save_html = "<input type='button' value='" . __('Cancel') ."' onClick='cactiReturnTo()'>&nbsp;<input type='submit' value='" . __('Continue') . "' title='" . __('Duplicate Device Template(s)') ."'>";
-		}elseif (get_request_var('drp_action') == '3') { /* sync devices */
+		} elseif (get_request_var('drp_action') == '3') { // sync devices
 			print "<tr>
 				<td class='textArea'>
 					<p>" . __('Click \'Continue\' to Synchronize Devices associated with the selected Device Template(s).  Note that this action may take some time depending on the number of Devices mapped to the Device Template.') ."</p>
@@ -286,7 +285,7 @@ function form_actions() {
 
 			$save_html = "<input type='button' value='" . __('Cancel') ."' onClick='cactiReturnTo()'>&nbsp;<input type='submit' value='" . __('Continue') . "' title='" . __('Sync Devices to Device Template(s)') ."'>";
 		}
-	}else{
+	} else {
 		print "<tr><td class='even'><span class='textError'>" . __('You must select at least one host template.') . "</span></td></tr>\n";
 		$save_html = "<input type='button' value='" . __('Return') . "' onClick='cactiReturnTo()'>";
 	}
@@ -441,14 +440,14 @@ function template_edit() {
 	if (!isempty_request_var('id')) {
 		$host_template = db_fetch_row_prepared('SELECT * FROM host_template WHERE id = ?', array(get_request_var('id')));
 		$header_label = __('Device Templates [edit: %s]', htmlspecialchars($host_template['name']));
-	}else{
+	} else {
 		$header_label = __('Device Templates [new]');
 		set_request_var('id', 0);
 	}
 
 	form_start('host_templates.php', 'form_network');
 
-	html_start_box($header_label, '100%', '', '3', 'center', '');
+	html_start_box($header_label, '100%', true, '3', 'center', '');
 
 	draw_edit_form(
 		array(
@@ -461,7 +460,7 @@ function template_edit() {
 	 * submit action */
 	echo "<div style='display:none;'><input type='submit' value='" . __('Default Submit Button') . "'></div>";
 
-	html_end_box();
+	html_end_box(true, true);
 
 	if (!isempty_request_var('id')) {
 		html_start_box(__('Associated Graph Templates'), '100%', '', '3', 'center', '');
@@ -490,7 +489,7 @@ function template_edit() {
 
 				$i++;
 			}
-		}else{ 
+		} else { 
 			print '<tr><td><em>' . __('No associated graph templates.') . '</em></td></tr>'; 
 		}
 
@@ -499,10 +498,10 @@ function template_edit() {
 			<td colspan='2'>
 				<table>
 					<tr style='line-height:10px'>
-						<td style='padding-right: 15px;'>
+						<td class='nowrap templateAdd'>
 							<?php print __('Add Graph Template');?>
 						</td>
-						<td>
+						<td class='noHide'>
 							<?php form_dropdown('graph_template_id', db_fetch_assoc_prepared('SELECT gt.id, gt.name
 								FROM graph_templates AS gt 
 								LEFT JOIN host_template_graph AS htg
@@ -512,7 +511,7 @@ function template_edit() {
 								AND gt.id NOT IN (SELECT graph_template_id FROM snmp_query_graph)
 								ORDER BY gt.name', array(get_request_var('id'))),'name','id','','','');?>
 						</td>
-						<td>
+						<td class='noHide'>
 							<input type='button' value='<?php print __('Add');?>' id='add_gt' title='<?php print __('Add Graph Template to Device Template');?>'>
 						</td>
 					</tr>
@@ -547,7 +546,7 @@ function template_edit() {
 
 				$i++;
 			}
-		}else{ 
+		} else { 
 			print '<tr><td><em>' . __('No associated data queries.') . '</em></td></tr>'; 
 		}
 
@@ -556,17 +555,17 @@ function template_edit() {
 			<td colspan='2'>
 				<table>
 					<tr style='line-height:10px;'>
-						<td style='padding-right: 15px;'>
+						<td class='nowrap queryAdd'>
 							<?php print __('Add Data Query');?>
 						</td>
-						<td>
+						<td class='noHide'>
 							<?php form_dropdown('snmp_query_id', db_fetch_assoc_prepared('SELECT snmp_query.id, snmp_query.name
 								FROM snmp_query LEFT JOIN host_template_snmp_query
 								ON (snmp_query.id = host_template_snmp_query.snmp_query_id AND host_template_snmp_query.host_template_id = ?)
 								WHERE host_template_snmp_query.host_template_id is null
 								ORDER BY snmp_query.name', array(get_request_var('id'))),'name','id','','','');?>
 						</td>
-						<td>
+						<td class='noHide'>
 							<input type='button' value='<?php print __('Add');?>' id='add_dq' title='<?php print __('Add Data Query to Device Template');?>'>
 						</td>
 					</tr>
@@ -685,7 +684,7 @@ function template() {
 
 	if (get_request_var('rows') == '-1') {
 		$rows = read_config_option('num_rows_table');
-	}else{
+	} else {
 		$rows = get_request_var('rows');
 	}
 
@@ -737,7 +736,7 @@ function template() {
 		</td>
 		<script type='text/javascript'>
 		function applyFilter() {
-			strURL = 'host_templates.php?filter='+$('#filter').val()+'&rows='+$('#rows').val()+'&page='+$('#page').val()+'&has_hosts='+$('#has_hosts').is(':checked')+'&header=false';
+			strURL = 'host_templates.php?filter='+escape($('#filter').val())+'&rows='+$('#rows').val()+'&page='+$('#page').val()+'&has_hosts='+$('#has_hosts').is(':checked')+'&header=false';
 			loadPageNoHeader(strURL);
 		}
 
@@ -769,13 +768,13 @@ function template() {
 	/* form the 'where' clause for our main sql query */
 	if (get_request_var('filter') != '') {
 		$sql_where = "WHERE (host_template.name LIKE '%%" . get_request_var('filter') . "%%')";
-	}else{
+	} else {
 		$sql_where = '';
 	}
 
 	if (get_request_var('has_hosts') == 'true') {
 		$sql_having = 'HAVING hosts>0';
-	}else{
+	} else {
 		$sql_having = '';
 	}
 
@@ -825,7 +824,7 @@ function template() {
 		foreach ($template_list as $template) {
 			if ($template['hosts'] > 0) {
 				$disabled = true;
-			}else{
+			} else {
 				$disabled = false;
 			}
 
@@ -833,11 +832,11 @@ function template() {
 			form_selectable_cell(filter_value($template['name'], get_request_var('filter'), 'host_templates.php?action=edit&id=' . $template['id']), $template['id']);
 			form_selectable_cell($template['id'], $template['id'], '', 'text-align:right');
 			form_selectable_cell($disabled ? __('No'):__('Yes'), $template['id'], '', 'text-align:right');
-			form_selectable_cell(number_format_i18n($template['hosts']), $template['id'], '', 'text-align:right');
+			form_selectable_cell('<a class="linkEditMain" href="' . htmlspecialchars('host.php?reset=true&host_template_id=' . $template['id']) . '">' . number_format_i18n($template['hosts'], '-1') . '</a>', $template['id'], '', 'text-align:right');
 			form_checkbox_cell($template['name'], $template['id'], $disabled);
 			form_end_row();
 		}
-	}else{
+	} else {
 		print "<tr class='tableRow'><td colspan='4'><em>" . __('No Device Templates Found') . "</em></td></tr>\n";
 	}
 	html_end_box(false);

@@ -33,6 +33,7 @@ $fields_site_edit = array(
 	'spacer0' => array(
 		'method' => 'spacer',
 		'friendly_name' => __('Site Information'),
+		'collapsible' => 'true'
 	),
 	'name' => array(
 		'method' => 'textbox',
@@ -209,7 +210,7 @@ function form_save() {
 
 			if ($site_id) {
 				raise_message(1);
-			}else{
+			} else {
 				raise_message(2);
 			}
 		}
@@ -248,7 +249,7 @@ function form_actions() {
 	$site_list = ''; $i = 0;
 
 	/* loop through each of the graphs selected on the previous page and get more info about them */
-	while (list($var,$val) = each($_POST)) {
+	foreach ($_POST as $var => $val) {
 		if (preg_match('/^chk_([0-9]+)$/', $var, $matches)) {
 			/* ================= input validation ================= */
 			input_validate_input_number($matches[1]);
@@ -278,7 +279,7 @@ function form_actions() {
 
 			$save_html = "<input type='button' value='" . __('Cancel') . "' onClick='cactiReturnTo()'>&nbsp;<input type='submit' value='" . __('Continue') . "' title='" . __n('Delete Site', 'Delete Sites', sizeof($site_array)) . "'>";
 		}
-	}else{
+	} else {
 		print "<tr><td class='odd'><span class='textError'>" . __('You must select at least one Site.') . "</span></td></tr>\n";
 		$save_html = "<input type='button' value='" . __('Return') . "' onClick='cactiReturnTo()'>";
 	}
@@ -313,13 +314,13 @@ function site_edit() {
 	if (!isempty_request_var('id')) {
 		$site = db_fetch_row_prepared('SELECT * FROM sites WHERE id = ?', array(get_request_var('id')));
 		$header_label = __('Site [edit: %s]', htmlspecialchars($site['name']));
-	}else{
+	} else {
 		$header_label = __('Site [new]');
 	}
 
 	form_start('sites.php', 'site');
 
-	html_start_box($header_label, '100%', '', '3', 'center', '');
+	html_start_box($header_label, '100%', true, '3', 'center', '');
 
 	draw_edit_form(
 		array(
@@ -328,7 +329,7 @@ function site_edit() {
 		)
 	);
 
-	html_end_box();
+	html_end_box(true, true);
 
 	form_save_button('sites.php', 'return');
 }
@@ -370,7 +371,7 @@ function sites() {
 
 	if (get_request_var('rows') == '-1') {
 		$rows = read_config_option('num_rows_table');
-	}else{
+	} else {
 		$rows = get_request_var('rows');
 	}
 
@@ -416,7 +417,7 @@ function sites() {
 			<script type='text/javascript'>
 
 			function applyFilter() {
-				strURL = 'sites.php?filter='+$('#filter').val()+'&rows='+$('#rows').val()+'&page='+$('#page').val()+'&header=false';
+				strURL = 'sites.php?filter='+escape($('#filter').val())+'&rows='+$('#rows').val()+'&page='+$('#page').val()+'&header=false';
 				loadPageNoHeader(strURL);
 			}
 
@@ -450,7 +451,7 @@ function sites() {
 	/* form the 'where' clause for our main sql query */
 	if (get_request_var('filter') != '') {
 		$sql_where = "WHERE (name LIKE '%" . get_request_var('filter') . "%')";
-	}else{
+	} else {
 		$sql_where = '';
 	}
 
@@ -492,14 +493,14 @@ function sites() {
 			form_alternate_row('line' . $site['id'], true);
 			form_selectable_cell(filter_value($site['name'], get_request_var('filter'), 'sites.php?action=edit&id=' . $site['id']), $site['id']);
 			form_selectable_cell($site['id'], $site['id'], '', 'right');
-			form_selectable_cell(number_format_i18n($site['hosts']), $site['id'], '', 'right');
+			form_selectable_cell(number_format_i18n($site['hosts'], '-1'), $site['id'], '', 'right');
 			form_selectable_cell($site['city'], $site['id'], '', 'left');
 			form_selectable_cell($site['state'], $site['id'], '', 'left');
 			form_selectable_cell($site['country'], $site['id'], '', 'left');
 			form_checkbox_cell($site['name'], $site['id']);
 			form_end_row();
 		}
-	}else{
+	} else {
 		print "<tr class='tableRow'><td colspan='4'><em>" . __('No Sites Found') . "</em></td></tr>\n";
 	}
 

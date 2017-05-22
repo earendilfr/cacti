@@ -104,12 +104,12 @@ function form_actions() {
 
 					if ($host_id) {
 						$message = "<span class='deviceUp'>" . __('Device') . ' ' . htmlspecialchars($description) . ' ' . __('Added to Cacti') . '</span><br>';
-					}else{
+					} else {
 						$message = "<span class='deviceDown'>" . __('Device') . ' ' . htmlspecialchars($description) . ' ' . __('Not Added to Cacti') . '</span><br>';
 					}
 				}
 
-				if (strlen($message)) {
+				if ($message != '') {
 					$_SESSION['automation_message'] = $message;
 					raise_message('automation_message');
 				}
@@ -124,7 +124,7 @@ function form_actions() {
 	$device_list = ''; $device_array = array(); $i = 0;
 
 	/* loop through each of the graphs selected on the previous page and get more info about them */
-	while (list($var,$val) = each($_POST)) {
+	foreach ($_POST as $var => $val) {
 		if (preg_match('/^chk_([0-9]+)$/', $var, $matches)) {
 			/* ================= input validation ================= */
 			input_validate_input_number($matches[1]);
@@ -198,7 +198,7 @@ function form_actions() {
 
 			$save_html = "<input type='button' value='" . __('Cancel') . "' onClick='cactiReturnTo()'>&nbsp;<input type='submit' value='" . __('Continue') . "' title='" . __('Add Device(s)') . "'>";
 		}
-	}else{
+	} else {
 		print "<tr><td class='odd'><span class='textError'>" . __('You must select at least one Device.') . "</span></td></tr>\n";
 		$save_html = "<input type='button' value='" . __('Return') . "' onClick='cactiReturnTo()'>";
 	}
@@ -271,7 +271,7 @@ function display_discovery_page() {
 	$status = array("<span class='deviceDown'>" . __('Down') . '</span>',"<span class='deviceUp'>" . __('Up') . '</span>');
 	if (sizeof($results)) {
 		foreach($results as $host) {
-			form_alternate_row('line' . $host['network_id'], true);
+			form_alternate_row('line' . base64_encode($host['ip']), true);
 
 			if ($host['sysUptime'] != 0) {
 				$days = intval($host['sysUptime']/8640000);
@@ -299,7 +299,7 @@ function display_discovery_page() {
 			form_checkbox_cell($host['ip'], $host['id']);
 			form_end_row();
 		}
-	}else{
+	} else {
 		print "<tr><td colspan=12><em>" . __('No Devices Found') . "</em></td></tr>";
 	}
 
@@ -393,21 +393,21 @@ function get_discovery_results(&$total_rows = 0, $rows = 0, $export = false) {
 	}
 
 	if ($network > 0) {
-		$sql_where .= (strlen($sql_where) ? ' AND ':'WHERE ') . 'network_id=' . $network;
+		$sql_where .= ($sql_where != '' ? ' AND ':'WHERE ') . 'network_id=' . $network;
 	}
 
 	if ($snmp == __('Down')) {
-		$sql_where .= (strlen($sql_where) ? ' AND ':'WHERE ') . 'snmp=0';
+		$sql_where .= ($sql_where != '' ? ' AND ':'WHERE ') . 'snmp=0';
 	} else if ($snmp == __('Up')) {
-		$sql_where .= (strlen($sql_where) ? ' AND ':'WHERE ') . 'snmp=1';
+		$sql_where .= ($sql_where != '' ? ' AND ':'WHERE ') . 'snmp=1';
 	}
 
 	if ($os != '-1' && in_array($os, $os_arr)) {
-		$sql_where .= (strlen($sql_where) ? ' AND ':'WHERE ') . "os='$os'";
+		$sql_where .= ($sql_where != '' ? ' AND ':'WHERE ') . "os='$os'";
 	}
 
 	if ($filter != '') {
-		$sql_where .= (strlen($sql_where) ? ' AND ':'WHERE ') . "(hostname LIKE '%$filter%' OR ip LIKE '%$filter%')";
+		$sql_where .= ($sql_where != '' ? ' AND ':'WHERE ') . "(hostname LIKE '%$filter%' OR ip LIKE '%$filter%')";
 	}
 
 	if ($export) {
@@ -565,7 +565,7 @@ function draw_filter() {
 			});
 
 			$('#export').click(function() {
-				document.location = 'automation_devices.php?export=1';
+				document.location = 'automation_devices.php?action=export';
 			});
 		});
 	
@@ -579,7 +579,7 @@ function draw_filter() {
 			strURL += '&network=' + $('#network').val();
 			strURL += '&snmp=' + $('#snmp').val();
 			strURL += '&os=' + $('#os').val();
-			strURL += '&filter=' + $('#filter').val();
+			strURL += '&filter=' + escape($('#filter').val());
 			strURL += '&rows=' + $('#rows').val();
 
 			loadPageNoHeader(strURL);
@@ -642,7 +642,7 @@ function purge_discovery_results() {
 function snmp_data($item) {
 	if ($item == '') {
 		return 'N/A';
-	}else{
+	} else {
 		return htmlspecialchars(str_replace(':',' ', $item));
 	}
 }
@@ -650,7 +650,7 @@ function snmp_data($item) {
 function export_data($item) {
 	if ($item == '') {
 		return 'N/A';
-	}else{
+	} else {
 		return $item;
 	}
 }

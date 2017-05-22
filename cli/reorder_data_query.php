@@ -83,7 +83,7 @@ if (sizeof($parms)) {
 				exit;
 		}
 	}
-}else{
+} else {
 	print "ERROR: You must supply input parameters\n\n";
 	display_help();
 	exit;
@@ -96,8 +96,8 @@ $sql_where = "WHERE data_input_fields.type_code='output_type'";
 if (strtolower($host_id) == 'all') {
 	/* NOP */
 }else if (is_numeric($host_id)) {
-	$sql_where .= (strlen($sql_where) ? ' AND ' : ' WHERE ' ) . 'data_local.host_id = ' . $host_id;
-}else{
+	$sql_where .= ($sql_where != '' ? ' AND ' : ' WHERE ' ) . 'data_local.host_id = ' . $host_id;
+} else {
 	print "ERROR: You must specify either a host_id or 'all' to proceed.\n";
 	display_help();
 	exit;
@@ -105,8 +105,8 @@ if (strtolower($host_id) == 'all') {
 
 /* determine data queries to rerun */
 if (is_numeric($query_id)) {
-	$sql_where .= (strlen($sql_where) ? ' AND ' : ' WHERE ' ) . 'data_local.snmp_query_id= ' . $query_id;
-}else{
+	$sql_where .= ($sql_where != '' ? ' AND ' : ' WHERE ' ) . 'data_local.snmp_query_id= ' . $query_id;
+} else {
 	print "ERROR: You must specify either a query_id or 'all' to proceed.\n";
 	display_help();
 	exit;
@@ -152,7 +152,7 @@ if (sizeof($data_queries)) {
 
 /*  display_version - displays version information */
 function display_version() {
-    $version = db_fetch_cell('SELECT cacti FROM version');
+	$version = get_cacti_version();
     echo "Cacti Reorder Data Query Utility, Version $version, " . COPYRIGHT_YEARS . "\n";
 }
 

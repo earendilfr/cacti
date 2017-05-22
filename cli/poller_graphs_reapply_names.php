@@ -81,23 +81,23 @@ if (sizeof($parms)) {
 				exit;
 		}
 	}
-}else{
+} else {
 	print "ERROR: You must supply input parameters\n\n";
 	display_help();
 	exit;
 }
 
 /* form the 'where' clause for our main sql query */
-if (strlen($filter)) {
+if ($filter != '') {
 	$sql_where = "AND (graph_templates_graph.title_cache LIKE '%" . $filter . "%'" .
 		" OR graph_templates.name LIKE '%" . $filter . "%')";
-}else{
+} else {
 	$sql_where = '';
 }
 
 if (strtolower($host_id) == 'all') {
 	/* Act on all graphs */
-}elseif (substr_count($host_id, ',')) {
+} elseif (substr_count($host_id, ',')) {
 	$hosts = explode(',', $host_id);
 	$host_str = '';
 
@@ -108,11 +108,11 @@ if (strtolower($host_id) == 'all') {
 	}
 
 	$sql_where .= " AND graph_local.host_id IN ($host_str)";
-}elseif ($host_id == '0') {
+} elseif ($host_id == '0') {
 	$sql_where .= ' AND graph_local.host_id=0';
-}elseif (!empty($host_id) && $host_id > 0) {
+} elseif (!empty($host_id) && $host_id > 0) {
 	$sql_where .= ' AND graph_local.host_id=' . $host_id;
-}else{
+} else {
 	print "ERROR: You must specify either a host_id or 'all' to proceed.\n";
 	display_help();
 	exit;
@@ -147,7 +147,7 @@ foreach ($graph_list as $graph) {
 
 /*  display_version - displays version information */
 function display_version() {
-	$version = db_fetch_cell('SELECT cacti FROM version');
+	$version = get_cacti_version();
 	echo "Cacti Reapply graph Names Utility, Version $version, " . COPYRIGHT_YEARS . "\n";
 }
 

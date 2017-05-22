@@ -121,7 +121,7 @@ function aggregate_form_save() {
 		$save_me += ($old['total']         != $save1['total']);
 		$save_me += ($old['total_prefix']  != $save1['total_prefix']);
 		$save_me += ($old['order_type']    != $save1['order_type']);
-	}else{
+	} else {
 		$save_me = 1;
 	}
 
@@ -137,7 +137,7 @@ function aggregate_form_save() {
 				$save1['total'], $save1['total_prefix'],  $save1['order_type'], $id));
 
 		cacti_log('AGGREGATE GRAPH TEMPLATE Saved ID: ' . $id, FALSE, 'AGGREGATE', POLLER_VERBOSITY_DEBUG);
-	}else{
+	} else {
 		$id = $save1['id'];
 	}
 
@@ -273,7 +273,7 @@ function aggregate_form_actions() {
 				db_execute('DELETE FROM aggregate_graph_templates_graph WHERE ' . array_to_sql_or($selected_items, 'aggregate_template_id'));
 				db_execute("UPDATE aggregate_graphs SET aggregate_template_id=0, template_propogation='' WHERE " . array_to_sql_or($selected_items, 'aggregate_template_id'));
 			}
-		}else{
+		} else {
 		}
 
 		header('Location: aggregate_templates.php?header=false');
@@ -284,7 +284,7 @@ function aggregate_form_actions() {
 	$aggregate_list = ''; $i = 0;
 
 	/* loop through each of the color templates selected on the previous page and get more info about them */
-	while (list($var,$val) = each($_POST)) {
+	foreach ($_POST as $var => $val) {
 		if (preg_match('/^chk_([0-9]+)$/', $var, $matches)) {
 			/* ================= input validation ================= */
 			input_validate_input_number($matches[1]);
@@ -311,7 +311,7 @@ function aggregate_form_actions() {
 
 			$save_html = "<input type='button' value='" . __('Cancel') . "' onClick='cactiReturnTo()'>&nbsp;<input type='submit' value='" . __('Continue') . "' title='" . __('Delete Color Template(s)') . "'>";
 		}
-	}else{
+	} else {
 		print "<tr><td class='even'><span class='textError'>" . __('You must select at least one Aggregate Graph Template.') . "</span></td></tr>\n";
 		$save_html = "<input type='button' value='" . __('Return') . "' onClick='cactiReturnTo()'>";
 	}
@@ -349,7 +349,7 @@ function aggregate_template_edit() {
 			array(get_request_var('id')));
 
 		$header_label = __('Aggregate Template [edit: %s]', $template['name']);
-	}else{
+	} else {
 		$header_label = __('Aggregate Template [new]');
 	}
 
@@ -364,7 +364,7 @@ function aggregate_template_edit() {
 
 	form_start('aggregate_templates.php', 'template_edit');
 
-	html_start_box($header_label, '100%', '', '3', 'center', '');
+	html_start_box($header_label, '100%', true, '3', 'center', '');
 
 	draw_edit_form(
 		array(
@@ -373,7 +373,7 @@ function aggregate_template_edit() {
 		)
 	);
 
-	html_end_box();
+	html_end_box(true, true);
 
 	if (isset($template)) {
 		draw_aggregate_graph_items_list(0, $template['graph_template_id'], $template);
@@ -408,7 +408,7 @@ function aggregate_template_edit() {
 			});
 
 			$('#save_component_template').parent().next('table').css('display', 'none');
-		}else{
+		} else {
 			$('#graph_template_id').prop('disabled', true);
 		}
 
@@ -420,23 +420,20 @@ function aggregate_template_edit() {
 			changeTotalsType();
 		});
 
-		$('[id^="agg_skip"]').change(function() {
-			pieces=$(this).attr('id').split('_');
-			total_id='agg_total_'+pieces[2];
+		$('input[id^="agg_total"], input[id^="agg_skip"]').click(function() {
+			id = $(this).attr('id');
 
-			if ($(this).is(':checked')) {
-				$('#'+total_id).removeAttr('checked');
-			}
-		});
-
-		$('[id^="agg_total"]').change(function() {
-			pieces=$(this).attr('id').split('_');
-			skip_id='agg_skip_'+pieces[2];
-
-			if ($(this).is(':checked')) {
-				$('#'+skip_id).removeAttr('checked');
+			if (id.indexOf('skip') > 0) {
+				altId = id.replace('skip', 'total');
+			} else {
+				altId = id.replace('total', 'skip');
 			}
 
+			if ($('#'+id).is(':checked')) {
+				$('#'+altId).prop('checked', false);
+			} else {
+				$('#'+altId).prop('checked', true);
+			}
 		});
 
 		changeTotals();
@@ -525,7 +522,7 @@ function aggregate_template() {
 
 	if (get_request_var('rows') == '-1') {
 		$rows = read_config_option('num_rows_table');
-	}else{
+	} else {
 		$rows = get_request_var('rows');
 	}
 
@@ -548,7 +545,7 @@ function aggregate_template() {
 					</td>
 					<td>
 						<select id="rows" onChange="applyFilter()">
-						<option value="-1"';
+						<option value="-1" ';
 
 	if (get_request_var("rows") == "-1") {
 		$filter_html .= 'selected';
@@ -598,7 +595,7 @@ function aggregate_template() {
 	}
 
 	if (get_request_var('has_graphs') == 'true') {
-		$sql_where .= (strlen($sql_where) ? ' AND ':'WHERE ') . 'graphs.graphs>0';
+		$sql_where .= ($sql_where != '' ? ' AND ':'WHERE ') . 'graphs.graphs>0';
 	}
 
 	$total_rows = db_fetch_cell("SELECT
@@ -642,7 +639,7 @@ function aggregate_template() {
 	$display_text = array(
 		'pgt.name'            => array('display' => __('Template Title'), 'align' => 'left', 'sort' => 'ASC'),
 		'nosort'              => array('display' => __('Deletable'), 'align' => 'right', 'tip' => __('Aggregate Templates that are in use can not be Deleted.  In use is defined as being referenced by an Aggregate.')),
-		'graphs.graphs'       => array('display' => __('Graphs'), 'align' => 'right', 'sort' => 'DESC'),
+		'graphs.graphs'       => array('display' => __('Graphs Using'), 'align' => 'right', 'sort' => 'DESC'),
 		'graph_template_name' => array('display' => __('Graph Template'), 'align' => 'left', 'sort' => 'ASC')
 	);
 
@@ -652,19 +649,19 @@ function aggregate_template() {
 		foreach ($template_list as $template) {
 			if ($template['graphs'] > 0) {
 				$disabled = true;
-			}else{
+			} else {
 				$disabled = false;
 			}
 
 			form_alternate_row('line' . $template['id'], true, $disabled);
 			form_selectable_cell(filter_value($template['name'], get_request_var('filter'), 'aggregate_templates.php?action=edit&id=' . $template['id'] . '&page=1'), $template['id']);
 			form_selectable_cell($disabled ? 'No':'Yes', $template['id'], '', 'text-align:right');
-			form_selectable_cell(number_format_i18n($template['graphs'],0), $template['id'], '', 'text-align:right;');
+			form_selectable_cell('<a class="linkEditMain" href="' . htmlspecialchars('aggregate_graphs.php?reset=true&template_id=' . $template['id']) . '">' . number_format_i18n($template['graphs'], '-1') . '</a>', $template['id'], '', 'text-align:right;');
 			form_selectable_cell(filter_value($template['graph_template_name'], get_request_var('filter')), $template['id']);
 			form_checkbox_cell($template['graph_template_name'], $template['id'], $disabled);
 			form_end_row();
 		}
-	}else{
+	} else {
 		print "<tr><td><em>" . __('No Aggregate Templates Found') . "</em></td></tr>\n";
 	}
 
@@ -688,7 +685,7 @@ function aggregate_template() {
 		strURL += '?rows=' + $('#rows').val();
 		strURL += '&page=' + $('#page').val();
 		strURL += '&has_graphs=' + $('#has_graphs').is(':checked');
-		strURL += '&filter=' + $('#filter').val();
+		strURL += '&filter=' + escape($('#filter').val());
 		strURL += '&header=false';
 		loadPageNoHeader(strURL);
 	}

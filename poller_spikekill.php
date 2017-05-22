@@ -89,14 +89,14 @@ echo "NOTE: SpikeKill Running\n";
 if (!$templates) {
 	$templates = db_fetch_cell("SELECT value FROM settings WHERE name='spikekill_templates'");
 	$templates = explode(',', $templates);
-}else{
+} else {
 	$templates = explode(',', $templates);
 }
 
 if (!sizeof($templates)) {
 	print "ERROR: No valid Graph Templates selected\n\n";
 	exit(1);
-}else{
+} else {
 	foreach($templates as $template) {
 		if (!is_numeric($template)) {
 			print "ERROR: Graph Template '" . $template . "' Invalid\n\n";
@@ -210,7 +210,7 @@ function kill_spikes($templates, &$found) {
 
 /*  display_version - displays version information */
 function display_version() {
-    $version = db_fetch_cell('SELECT cacti FROM version');
+	$version = get_cacti_version();
 	echo "Cacti SpikeKiller Batch Poller, Version $version, " . COPYRIGHT_YEARS . "\n";
 }
 

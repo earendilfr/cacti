@@ -31,7 +31,7 @@ $no_http_headers = true;
 
 /*  display_version - displays version information */
 function display_version() {
-    $version = db_fetch_cell('SELECT cacti FROM version');
+	$version = get_cacti_version();
 	print "Cacti Boost RRD Update Poller, Version $version " . COPYRIGHT_YEARS . "\n";
 }
 
@@ -107,7 +107,7 @@ function output_rrd_data($start_time, $force = FALSE) {
 	if (!function_exists('memory_get_peak_usage')) {
 		$get_memory   = true;
 		$memory_used  = memory_get_usage();
-	}else{
+	} else {
 		$get_memory   = false;
 	}
 
@@ -139,7 +139,7 @@ function output_rrd_data($start_time, $force = FALSE) {
 		}
 	}
 
-	if (!strlen($archive_table)) {
+	if ($archive_table == '') {
 		cacti_log('ERROR: Failed to retrieve archive table name');
 		return -1;
 	}
@@ -156,7 +156,7 @@ function output_rrd_data($start_time, $force = FALSE) {
 					$memory_used = $cur_memory;
 				}
 			}
-		}else{
+		} else {
 			break;
 		}
 
@@ -172,7 +172,7 @@ function output_rrd_data($start_time, $force = FALSE) {
 	/* log memory usage */
 	if (function_exists('memory_get_peak_usage')) {
 		db_execute("REPLACE INTO settings (name, value) VALUES ('boost_peak_memory', '" . memory_get_peak_usage() . "')");
-	}else{
+	} else {
 		db_execute("REPLACE INTO settings (name, value) VALUES ('boost_peak_memory', '" . $memory_used . "')");
 	}
 
@@ -221,12 +221,12 @@ function log_boost_statistics($rrd_updates) {
 		$timer_cycles = 0;
 		foreach($boost_stats_log as $area => $entry) {
 			if (isset($entry[BOOST_TIMER_TOTAL])) {
-				$outstr .= (strlen($outstr) ? ', ' : '') . $area . ':' . round($entry[BOOST_TIMER_TOTAL] - (($overhead * $entry[BOOST_TIMER_CYCLES])/BOOST_TIMER_OVERHEAD_MULTIPLIER), 2);
+				$outstr .= ($outstr != '' ? ', ' : '') . $area . ':' . round($entry[BOOST_TIMER_TOTAL] - (($overhead * $entry[BOOST_TIMER_CYCLES])/BOOST_TIMER_OVERHEAD_MULTIPLIER), 2);
 			}
 			$timer_cycles += $entry[BOOST_TIMER_CYCLES];
 		}
 
-		if (strlen($outstr)) {
+		if ($outstr != '') {
 			$outstr = "RRDUpdates:$rrd_updates, TotalTime:" . round($end - $start, 0) . ', ' . $outstr;
 			$timer_overhead = round((($overhead * $timer_cycles)/BOOST_TIMER_OVERHEAD_MULTIPLIER), 0);
 			if ($timer_overhead > 0) {
@@ -344,7 +344,7 @@ if ((read_config_option('boost_rrd_update_enable') == 'on') || $forcerun) {
 		$next_run_time = $current_time + $seconds_offset;
 		db_execute("REPLACE INTO settings (name, value) VALUES ('boost_last_run_time', '" . date('Y-m-d G:i:s', $current_time) . "')");
 		$last_run_time = $current_time;
-	}else{
+	} else {
 		$next_run_time = $last_run_time + $seconds_offset;
 	}
 	$time_till_next_run = $next_run_time - $current_time;
@@ -376,7 +376,7 @@ if ((read_config_option('boost_rrd_update_enable') == 'on') || $forcerun) {
 
 	/* store the next run time so that people understand */
 	db_execute("REPLACE INTO settings (name, value) VALUES ('boost_next_run_time', '" . date('Y-m-d G:i:s', $next_run_time) . "')");
-}else{
+} else {
 	/* turn off the system level updates */
 	if (read_config_option('boost_rrd_update_system_enable') == 'on') {
 		db_execute("REPLACE INTO settings (name,value)

@@ -28,7 +28,7 @@ include('./include/global.php');
 if (!isset($_SESSION['sess_user_id'])) {
 	if (isset($_SERVER['HTTP_REFERER'])) {
 		header('Location: ' . $_SERVER['HTTP_REFERER']);
-	}else{
+	} else {
 		header('Location: index.php');
 	}
 	header('Location: index.php');
@@ -36,14 +36,14 @@ if (!isset($_SESSION['sess_user_id'])) {
 }
 
 $user        = db_fetch_row_prepared('SELECT * FROM user_auth WHERE id = ?', array($_SESSION['sess_user_id']));
-$version     = db_fetch_cell('SELECT cacti FROM version');
+$version     = get_cacti_version();
 $auth_method = read_config_option('auth_method');
 
 if ($auth_method != 1 && $user['realm'] != 0) {
 	raise_message('nodomainpassword');
 	if (isset($_SERVER['HTTP_REFERER'])) {
 		header('Location: ' . $_SERVER['HTTP_REFERER']);
-	}else{
+	} else {
 		header('Location: index.php');
 	}
 	exit;
@@ -59,7 +59,7 @@ if ($user['password_change'] != 'on') {
 
 	if (isset($_SERVER['HTTP_REFERER'])) {
 		header('Location: ' . $_SERVER['HTTP_REFERER']);
-	}else{
+	} else {
 		header('Location: index.php');
 	}
 	exit;
@@ -96,7 +96,7 @@ case 'changepassword':
 	// Get password options for the new password
 	if (function_exists('password_hash')) {
 		$password_new = password_hash(get_nfilter_request_var('password'), PASSWORD_DEFAULT);
-	}else{
+	} else {
 		$password_new = '';
 	}
 	$password_old = md5(get_nfilter_request_var('password'));
@@ -114,7 +114,7 @@ case 'changepassword':
 			$bad_password = true;
 			$errorMessage = "<span class='badpassword_message'>" . __('Your new password cannot be the same as the old password. Please try again.') . "</span>";
 		}
-	}else{
+	} else {
 		if ($user['password'] != $current_password_old) {
 			$bad_password = true;
 			$errorMessage = "<span class='badpassword_message'>" . __('Your current password is not correct. Please try again.') . "</span>";
@@ -188,7 +188,7 @@ case 'changepassword':
 		if (basename(get_nfilter_request_var('ref')) == 'auth_changepassword.php' || basename(get_nfilter_request_var('ref')) == '') {
 			if ($has_console) {
 				set_request_var('ref', 'index.php');
-			}else{
+			} else {
 				set_request_var('ref', 'graph_view.php');
 			}
 		}
@@ -204,12 +204,12 @@ case 'changepassword':
 				default:
 					api_plugin_hook_function('login_options_navigate', $user['login_opts']);
 			}
-		}else{
+		} else {
 			header('Location: graph_view.php');
 		}
 		exit;
 
-	}else{
+	} else {
 		$bad_password = true;
 	}
 
@@ -233,34 +233,39 @@ if (read_config_option('secpass_minlen') > 0) {
 }
 
 if (read_config_option('secpass_reqmixcase') == 'on') {
-	$secpass_body .= (strlen($secpass_body) ? '<br>':'') . __('Must include mixed case');
+	$secpass_body .= ($secpass_body != '' ? '<br>':'') . __('Must include mixed case');
 }
 
 if (read_config_option('secpass_reqnum') == 'on') {
-	$secpass_body .= (strlen($secpass_body) ? '<br>':'') . __('Must include at least 1 number');
+	$secpass_body .= ($secpass_body != '' ? '<br>':'') . __('Must include at least 1 number');
 }
 
 if (read_config_option('secpass_reqspec') == 'on') {
-	$secpass_body .= (strlen($secpass_body) ? '<br>':'') . __('Must include at least 1 special character');
+	$secpass_body .= ($secpass_body != '' ? '<br>':'') . __('Must include at least 1 special character');
 }
 
 if (read_config_option('secpass_history') != '0') {
-	$secpass_body .= (strlen($secpass_body) ? '<br>':'') . __('Cannot be reused for %d password changes', read_config_option('secpass_history')+1);
+	$secpass_body .= ($secpass_body != '' ? '<br>':'') . __('Cannot be reused for %d password changes', read_config_option('secpass_history')+1);
 }
 
 $secpass_tooltip .= $secpass_body;
+
+$selectedTheme = get_selected_theme();
 
 print "<!DOCTYPE html>\n";
 print "<html>\n";
 print "<head>\n";
 print "\t<title>" . __('Change Password') . "</title>\n";
 print "\t<meta http-equiv='Content-Type' content='text/html;charset=utf-8'>\n";
+print "\t<meta content='width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0' name='viewport'>\n";
+print "\t<meta name='apple-mobile-web-app-capable' content='yes'>\n";
+print "\t<meta name='mobile-web-app-capable' content='yes'>\n";
 print "\t<meta http-equiv='X-UA-Compatible' content='IE=Edge,chrome=1'>\n";
-print "\t<link href='" . $config['url_path'] . "include/themes/" . get_selected_theme() . "/jquery-ui.css' type='text/css' rel='stylesheet'>\n";
+print "\t<link href='" . $config['url_path'] . "include/themes/" . $selectedTheme . "/jquery-ui.css' type='text/css' rel='stylesheet'>\n";
 print "\t<link href='" . $config['url_path'] . "include/" .  "/fa/css/font-awesome.css' type='text/css' rel='stylesheet'>\n";
-print "\t<link href='" . $config['url_path'] . "include/themes/" . get_selected_theme() . "/main.css' type='text/css' rel='stylesheet'>\n";
-print "\t<link href='" . $config['url_path'] . "include/themes/" . get_selected_theme() . "/images/favicon.ico' rel='shortcut icon'>\n";
-print "\t<link href='" . $config['url_path'] . "include/themes/" . get_selected_theme() . "/images/cacti_logo.gif' rel='icon' sizes='96x96'>\n";
+print "\t<link href='" . $config['url_path'] . "include/themes/" . $selectedTheme . "/main.css' type='text/css' rel='stylesheet'>\n";
+print "\t<link href='" . $config['url_path'] . "include/themes/" . $selectedTheme . "/images/favicon.ico' rel='shortcut icon'>\n";
+print "\t<link href='" . $config['url_path'] . "include/themes/" . $selectedTheme . "/images/cacti_logo.gif' rel='icon' sizes='96x96'>\n";
 print "\t<script type='text/javascript' src='" . $config['url_path'] . "include/js/jquery.js' language='javascript'></script>\n";
 print "\t<script type='text/javascript' src='" . $config['url_path'] . "include/js/jquery-migrate.js' language='javascript'></script>\n";
 print "\t<script type='text/javascript' src='" . $config['url_path'] . "include/js/jquery-ui.js' language='javascript'></script>\n";
@@ -268,8 +273,8 @@ print "\t<script type='text/javascript' src='" . $config['url_path'] . "include/
 print "\t<script type='text/javascript' src='" . $config['url_path'] . "include/js/jquery.tablesorter.js' language='javascript'></script>\n";
 print "\t<script type='text/javascript' src='" . $config['url_path'] . "include/js/jquery.hotkeys.js'></script>\n";
 print "\t<script type='text/javascript' src='" . $config['url_path'] . "include/layout.js'></script>\n";
-print "\t<script type='text/javascript' src='" . $config['url_path'] . "include/themes/" . get_selected_theme() . "/main.js'></script>\n";
-print "<script type='text/javascript'>var theme='" . get_selected_theme() . "';</script>\n";
+print "\t<script type='text/javascript' src='" . $config['url_path'] . "include/themes/" . $selectedTheme . "/main.js'></script>\n";
+print "<script type='text/javascript'>var theme='" . $selectedTheme . "';</script>\n";
 print "</head>\n";
 print "<body class='loginBody'>
 	<div class='loginLeft'></div>
@@ -277,7 +282,7 @@ print "<body class='loginBody'>
 		<div class='loginArea'>
 			<div class='cactiLogoutLogo'></div>
 			<legend>" . __('Change Password') . "</legend>
-			<form name='login' method='post' action='" . basename($_SERVER['PHP_SELF']) . "'>
+			<form name='login' method='post' action='" . get_current_page() . "'>
 				<input type='hidden' name='action' value='changepassword'>
 				<input type='hidden' name='ref' value='" . sanitize_uri(get_request_var('ref')) . "'>
 				<input type='hidden' name='name' value='" . (isset($user['username']) ? $user['username'] : '') . "'>

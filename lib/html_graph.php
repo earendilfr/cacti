@@ -54,7 +54,7 @@ function set_default_graph_action() {
 			default:
 				break;
 			}
-		}elseif (in_array($_SESSION['sess_graph_view_action'], array('tree', 'list', 'preview'))) {
+		} elseif (in_array($_SESSION['sess_graph_view_action'], array('tree', 'list', 'preview'))) {
 			if (is_view_allowed('show_' . $_SESSION['sess_graph_view_action'])) {
 				set_request_var('action', $_SESSION['sess_graph_view_action']);
 			}
@@ -64,11 +64,11 @@ function set_default_graph_action() {
 	if (!isset_request_var('action')) {
 		if (is_view_allowed('show_tree')) {
 			set_request_var('action', 'tree');
-		}elseif (is_view_allowed('show_preview')) {
+		} elseif (is_view_allowed('show_preview')) {
 			set_request_var('action', 'preview');
-		}elseif (is_view_allowed('show_list')) {
+		} elseif (is_view_allowed('show_list')) {
 			set_request_var('action', 'list');
-		}else{
+		} else {
 			set_request_var('action', '');
 		}
 	}
@@ -316,10 +316,10 @@ function html_graph_preview_filter($page, $action, $devices_where = '', $templat
 						<i class='shiftArrow fa fa-forward' onClick='timeshiftGraphFilterRight()' title='<?php print __('Shift Time Forward');?>'></i>
 					</td>
 					<td>
-						<input type='button' value='<?php print __('Refresh');?>' name='button_refresh_x' title='<?php print __('Refresh selected time span');?>' onClick='refreshGraphTimespanFilter()'>
+						<input id='tsrefresh' type='button' value='<?php print __('Refresh');?>' name='button_refresh_x' title='<?php print __('Refresh selected time span');?>' onClick='refreshGraphTimespanFilter()'>
 					</td>
 					<td>
-						<input type='button' value='<?php print __('Clear');?>' title='<?php print __('Return to the default time span');?>' onClick='clearGraphTimespanFilter()'>
+						<input id='tsclear' type='button' value='<?php print __('Clear');?>' title='<?php print __('Return to the default time span');?>' onClick='clearGraphTimespanFilter()'>
 					</td>
 				</tr>
 				<tr id='realtime' style='display:none;'>
@@ -352,6 +352,9 @@ function html_graph_preview_filter($page, $action, $devices_where = '', $templat
 					</td>
 					<td align='center' colspan='6'>
 						<span id='countdown'></span>
+					</td>
+					<td>
+						<input id='future' type='hidden' value='<?php print read_config_option('allow_graph_dates_in_future');?>'></input>
 					</td>
 				</tr>
 			</table>
@@ -434,7 +437,7 @@ function html_graph_preview_filter($page, $action, $devices_where = '', $templat
 				if (date1Open) {
 					date1Open = false;
 					$('#date1').datetimepicker('hide');
-				}else{
+				} else {
 					date1Open = true;
 					$('#date1').datetimepicker('show');
 				}
@@ -444,7 +447,7 @@ function html_graph_preview_filter($page, $action, $devices_where = '', $templat
 				if (date2Open) {
 					date2Open = false;
 					$('#date2').datetimepicker('hide');
-				}else{
+				} else {
 					date2Open = true;
 					$('#date2').datetimepicker('show');
 				}

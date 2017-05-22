@@ -45,7 +45,7 @@ function api_graph_remove_multi($local_graph_ids) {
 		foreach($local_graph_ids as $local_graph_id) {
 			if ($i == 0) {
 				$ids_to_delete .= $local_graph_id;
-			}else{
+			} else {
 				$ids_to_delete .= ', ' . $local_graph_id;
 			}
 
@@ -189,23 +189,39 @@ function api_duplicate_graph($_local_graph_id, $_graph_template_id, $graph_title
 		$local_graph_id = sql_save($save, 'graph_local');
 
 		$graph_template_graph['title'] = str_replace('<graph_title>', $graph_template_graph['title'], $graph_title);
-	}elseif (!empty($_graph_template_id)) {
-		$graph_template        = db_fetch_row_prepared('SELECT * FROM graph_templates WHERE id = ?', array($_graph_template_id));
-		$graph_template_graph  = db_fetch_row_prepared('SELECT * FROM graph_templates_graph WHERE graph_template_id = ? AND local_graph_id=0', array($_graph_template_id));
+	} elseif (!empty($_graph_template_id)) {
+		$graph_template        = db_fetch_row_prepared('SELECT * 
+			FROM graph_templates 
+			WHERE id = ?', 
+			array($_graph_template_id));
 
-		$graph_template_items  = db_fetch_assoc_prepared('SELECT * FROM graph_templates_item WHERE graph_template_id = ? AND local_graph_id=0', array($_graph_template_id));
-		$graph_template_inputs = db_fetch_assoc_prepared('SELECT * FROM graph_template_input WHERE graph_template_id = ?', array($_graph_template_id));
+		$graph_template_graph  = db_fetch_row_prepared('SELECT * 
+			FROM graph_templates_graph 
+			WHERE graph_template_id = ? 
+			AND local_graph_id=0', 
+			array($_graph_template_id));
+
+		$graph_template_items  = db_fetch_assoc_prepared('SELECT * 
+			FROM graph_templates_item 
+			WHERE graph_template_id = ? 
+			AND local_graph_id=0', 
+			array($_graph_template_id));
+
+		$graph_template_inputs = db_fetch_assoc_prepared('SELECT * 
+			FROM graph_template_input 
+			WHERE graph_template_id = ?', 
+			array($_graph_template_id));
 
 		/* create new entry: graph_templates */
-		$save['id']   = 0;
-		$save['hash'] = get_hash_graph_template(0);
-		$save['name'] = str_replace('<template_title>', $graph_template['name'], $graph_title);
+		$save['id']       = 0;
+		$save['hash']     = get_hash_graph_template(0);
+		$save['name']     = str_replace('<template_title>', $graph_template['name'], $graph_title);
+		$save['multiple'] = $graph_template['multiple'];
 
 		$graph_template_id = sql_save($save, 'graph_templates');
 	}
 
 	unset($save);
-	reset($struct_graph);
 
 	/* create new entry: graph_templates_graph */
 	$save['id']                            = 0;
@@ -214,8 +230,7 @@ function api_duplicate_graph($_local_graph_id, $_graph_template_id, $graph_title
 	$save['graph_template_id']             = (!empty($_local_graph_id) ? $graph_template_graph['graph_template_id'] : $graph_template_id);
 	$save['title_cache']                   = $graph_template_graph['title_cache'];
 
-	reset($struct_graph);
-	while (list($field, $array) = each($struct_graph)) {
+	foreach ($struct_graph as $field => $array) {
 		if ($array['method'] == 'spacer') continue;
 		$save{$field} = $graph_template_graph{$field};
 		$save{'t_' . $field} = $graph_template_graph{'t_' . $field};
@@ -227,7 +242,6 @@ function api_duplicate_graph($_local_graph_id, $_graph_template_id, $graph_title
 	if (sizeof($graph_template_items)) {
 		foreach ($graph_template_items as $graph_template_item) {
 			unset($save);
-			reset($struct_graph_item);
 
 			$save['id']                           = 0;
 			/* save a hash only for graph_template copy operations */
@@ -236,7 +250,7 @@ function api_duplicate_graph($_local_graph_id, $_graph_template_id, $graph_title
 			$save['graph_template_id']            = (!empty($_local_graph_id) ? $graph_template_item['graph_template_id'] : $graph_template_id);
 			$save['local_graph_template_item_id'] = (isset($graph_template_item['local_graph_template_item_id']) ? $graph_template_item['local_graph_template_item_id'] : 0);
 
-			while (list($field, $array) = each($struct_graph_item)) {
+			foreach ($struct_graph_item as $field => $array) {
 				$save{$field} = $graph_template_item{$field};
 			}
 
@@ -277,5 +291,47 @@ function api_duplicate_graph($_local_graph_id, $_graph_template_id, $graph_title
 	if (!empty($_local_graph_id)) {
 		update_graph_title_cache($local_graph_id);
 	}
+}
+
+function api_graph_change_device($local_graph_id, $host_id) {
+	$dqgraph = db_fetch_cell_prepared('SELECT snmp_query_id 
+		FROM graph_local 
+		WHERE id = ?', 
+		array($local_graph_id));
+
+	if (empty($dqgraph)) {
+		db_execute_prepared('UPDATE graph_local
+			SET host_id = ?
+			WHERE id = ?',
+			array($host_id, $local_graph_id));
+
+		update_graph_title_cache($local_graph_id);
+
+		/* update the data sources as well */
+		$data_ids = db_fetch_assoc_prepared('SELECT DISTINCT dtr.local_data_id
+			FROM graph_templates_item AS gti
+			INNER JOIN data_template_rrd AS dtr
+			ON gti.task_item_id=dtr.id
+			WHERE gti.local_graph_id = ?',
+			array($local_graph_id));
+
+		if (sizeof($data_ids)) {
+			foreach($data_ids as $data_id) {
+				db_execute_prepared('UPDATE data_local 
+					SET host_id = ? 
+					WHERE id = ?', 
+					array($host_id, $data_id['local_data_id']));
+
+				db_execute_prepared('UPDATE poller_item 
+					SET host_id = ? 
+					WHERE local_data_id = ?', 
+					array($host_id, $data_id['local_data_id']));
+			}
+		}
+
+		return true;
+	}
+
+	return false;
 }
 

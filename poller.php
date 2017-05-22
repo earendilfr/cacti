@@ -143,9 +143,6 @@ if (function_exists('pcntl_signal')) {
 
 api_plugin_hook('poller_top');
 
-// Flush the boost table if in recovery mode
-poller_recovery_flush_boost($poller_id);
-
 // Prime the poller_resource_cache for multiple pollers
 update_resource_cache($poller_id);
 
@@ -183,7 +180,7 @@ if (isset($poller_interval)) {
 	$sql_where   = 'WHERE rrd_next_step<=0 AND poller_id = ' . $poller_id;
 
 	define('MAX_POLLER_RUNTIME', $poller_runs * $poller_interval - 2);
-}else{
+} else {
 	$sql_where   = 'WHERE poller_id = ' . $poller_id;
 	$poller_runs = 1;
 	define('MAX_POLLER_RUNTIME', 298);
@@ -204,20 +201,20 @@ if (isset($items_perhost) && sizeof($items_perhost)) {
 	if ($items_per_process == 0) {
 		$process_leveling = 'off';
 	}
-}else{
+} else {
 	$process_leveling = 'off';
 }
 
 /* some text formatting for platform specific vocabulary */
 if ($config['cacti_server_os'] == 'unix') {
 	$task_type = 'Cron';
-}else{
+} else {
 	$task_type = 'Scheduled Task';
 }
 
 if ($debug) {
 	$level = POLLER_VERBOSITY_NONE;
-}else{
+} else {
 	$level = POLLER_VERBOSITY_MEDIUM;
 }
 
@@ -231,7 +228,7 @@ cacti_log("NOTE: Poller Int: '$poller_interval', $task_type Int: '$cron_interval
 /* our cron can run at either 1 or 5 minute intervals */
 if ($poller_interval <= 60) {
 	$min_period = '60';
-}else{
+} else {
 	$min_period = '300';
 }
 
@@ -267,13 +264,13 @@ while ($poller_runs_completed < $poller_runs) {
 
 	if ($poller_id == '1') {
 		$polling_hosts = array_merge(
-			array(0 => array('id' => '0')), 
+			array(0 => array('id' => '0')),
 			db_fetch_assoc_prepared('SELECT ' . SQL_NO_CACHE . ' id 
 				FROM host 
 				WHERE poller_id = ?
 				AND disabled="" 
 				ORDER BY id', array($poller_id)));
-	}else{
+	} else {
 		$polling_hosts = db_fetch_assoc_prepared('SELECT ' . SQL_NO_CACHE . ' id 
 			FROM host 
 			WHERE poller_id = ? 
@@ -351,21 +348,20 @@ while ($poller_runs_completed < $poller_runs) {
 			ON po.local_data_id=dl.id
 			LEFT JOIN host AS h
 			ON dl.host_id=h.id
-			WHERE h.poller_id = ? OR h.id IS NULL LIMIT ' . $issues_limit, array($poller_id));
-	}else{
-		if ($config['connection'] == 'online') {
-			$issues = db_fetch_assoc_prepared('SELECT ' . SQL_NO_CACHE . ' local_data_id, rrd_name 
-				FROM poller_output AS po
-				LEFT JOIN data_local AS dl
-				ON po.local_data_id=dl.id
-				LEFT JOIN host AS h
-				ON dl.host_id=h.id
-				WHERE (h.poller_id = ? OR h.id IS NULL)
-				AND time < FROM_UNIXTIME(UNIX_TIMESTAMP()-600)
-				LIMIT ' . $issues_limit, array($poller_id));
-		}else{
-			$issues = array();
-		}
+			WHERE h.poller_id = ? OR h.id IS NULL 
+			LIMIT ' . $issues_limit, array($poller_id));
+	} elseif ($config['connection'] == 'online') {
+		$issues = db_fetch_assoc_prepared('SELECT ' . SQL_NO_CACHE . ' local_data_id, rrd_name 
+			FROM poller_output AS po
+			LEFT JOIN data_local AS dl
+			ON po.local_data_id=dl.id
+			LEFT JOIN host AS h
+			ON dl.host_id=h.id
+			WHERE (h.poller_id = ? OR h.id IS NULL)
+			AND time < FROM_UNIXTIME(UNIX_TIMESTAMP()-600)
+			LIMIT ' . $issues_limit, array($poller_id));
+	} else{
+		$issues = array();
 	}
 
 	if (sizeof($issues)) {
@@ -379,7 +375,7 @@ while ($poller_runs_completed < $poller_runs) {
 
 		$issue_list = '';
 		foreach($issues as $issue) {
-			$issue_list .= (strlen($issue_list) ? ', ' : '') . $issue['rrd_name'] . '(DS[' . $issue['local_data_id'] . '])';
+			$issue_list .= ($issue_list != '' ? ', ' : '') . $issue['rrd_name'] . '(DS[' . $issue['local_data_id'] . '])';
 		}
 
 		if ($count > $issues_limit) {
@@ -400,7 +396,7 @@ while ($poller_runs_completed < $poller_runs) {
 	/* mainline */
 	if (read_config_option('poller_enabled') == 'on') {
 		/* determine the number of hosts to process per file */
-		$hosts_per_process = ceil(sizeof($polling_hosts) / $concurrent_processes );
+		$hosts_per_process = ceil(($poller_id == '1' ? sizeof($polling_hosts)-1 : sizeof($polling_hosts)) / $concurrent_processes );
 
 		$items_launched    = 0;
 
@@ -415,7 +411,7 @@ while ($poller_runs_completed < $poller_runs) {
 			$command_string = read_config_option('path_spine');
 			if (read_config_option('path_spine_config') != '' && file_exists(read_config_option('path_spine_config'))) {
 				$extra_args     = ' -C ' . read_config_option('path_spine_config');
-			}else{
+			} else {
 				$extra_args     = '';
 			}
 
@@ -427,7 +423,7 @@ while ($poller_runs_completed < $poller_runs) {
 			$extra_args     = '-q "' . $config['base_path'] . '/cmd.php"';
 			$method         = 'cmd.php';
 			$total_procs    = $concurrent_processes;
-		}else{
+		} else {
 			$command_string = read_config_option('path_php_binary');
 			$extra_args     = '-q "' . strtolower($config['base_path'] . '/cmd.php"');
 			$method         = 'cmd.php';
@@ -451,7 +447,7 @@ while ($poller_runs_completed < $poller_runs) {
 					$last_host    = $item['id'];
 					$change_proc  = true;
 				}
-			}else{
+			} else {
 				if (isset($items_perhost[$item['id']])) {
 					$items_launched += $items_perhost[$item['id']];
 				}
@@ -523,7 +519,7 @@ while ($poller_runs_completed < $poller_runs) {
 				}
 
 				log_cacti_stats($loop_start, $method, $concurrent_processes, $max_threads,
-					sizeof($polling_hosts), $hosts_per_process, $num_polling_items, $rrds_processed);
+					($poller_id == '1' ? sizeof($polling_hosts) - 1 : sizeof($polling_hosts)), $hosts_per_process, $num_polling_items, $rrds_processed);
 
 				break;
 			}else {
@@ -546,10 +542,10 @@ while ($poller_runs_completed < $poller_runs) {
 
 					api_plugin_hook_function('poller_exiting');
 					log_cacti_stats($loop_start, $method, $concurrent_processes, $max_threads,
-						sizeof($polling_hosts), $hosts_per_process, $num_polling_items, $rrds_processed);
+						($poller_id == '1' ? sizeof($polling_hosts) - 1 : sizeof($polling_hosts)), $hosts_per_process, $num_polling_items, $rrds_processed);
 
 					break;
-				}else if (microtime(true) - $mtb < 1) {
+				} elseif (microtime(true) - $mtb < 1) {
 					sleep(1);
 				}
 			}
@@ -578,7 +574,7 @@ while ($poller_runs_completed < $poller_runs) {
 				chdir($webroot);
 			}
 		}
-	}else{
+	} else {
 		cacti_log('NOTE: There are no items in your poller for this polling cycle!', true, 'POLLER', $level);
 	}
 
@@ -625,9 +621,12 @@ while ($poller_runs_completed < $poller_runs) {
 
 			api_plugin_hook('poller_top');
 		}
-	}else{
+	} else {
 		cacti_log('WARNING: Cacti Polling Cycle Exceeded Poller Interval by ' . $loop_end-$loop_start-$poller_interval . ' seconds', true, 'POLLER', $level);
 	}
+
+	// Flush the boost table if in recovery mode
+	poller_recovery_flush_boost($poller_id);
 }
 
 function poller_enabled_check($poller_id) {
@@ -689,7 +688,7 @@ function spikekill_poller_bottom () {
 
 /*  display_version - displays version information */
 function display_version() {
-    $version = db_fetch_cell('SELECT cacti FROM version');
+	$version = get_cacti_version();
 	echo "Cacti Main Poller, Version $version, " . COPYRIGHT_YEARS . "\n";
 }
 
@@ -715,7 +714,7 @@ if ($poller_id == 1) {
 	automation_poller_bottom();
 	poller_maintenance();
 	api_plugin_hook('poller_bottom');
-}else{
+} else {
 	automation_poller_bottom();
 	poller_maintenance();
 }

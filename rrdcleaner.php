@@ -191,7 +191,7 @@ function get_files() {
 	if (substr_count($arc_path, $rra_path)) {
 		$archive = true;
 		$arcbase = basename($arc_path);
-	}else{
+	} else {
 		$archive = false;
 		$arcbase = '';
 	}
@@ -241,7 +241,7 @@ function get_files() {
  * Display all rrd file entries
  */
 function list_rrd() {
-	global $config, $item_rows, $ds_actions, $rra_path, $hash_version_codes;
+	global $config, $item_rows, $ds_actions, $rra_path;
  
 	/* suppress warnings */
 	error_reporting(0);
@@ -289,7 +289,7 @@ function list_rrd() {
 
 	if (get_request_var('rows') == '-1') {
 		$rows = read_config_option('num_rows_table');
-	}else{
+	} else {
 		$rows = get_request_var('rows');
 	}
 
@@ -307,7 +307,7 @@ function list_rrd() {
 
 	if (get_request_var('age') == 0) {
 		$sql_where .= " AND last_mod>='" . date("Y-m-d H:i:s", time()-(86400*7)) . "'";
-	}else{
+	} else {
 		$sql_where .= " AND last_mod<='" . date("Y-m-d H:i:s", (time() - $secsback)) . "'";
 	}
 
@@ -438,7 +438,7 @@ function do_rrd() {
 	/* install the rrdclean error handler */
 	set_error_handler('rrdclean_error_handler');
 
-	while (list ($var, $val) = each($_POST)) {
+	foreach ($_POST as $var => $val) {
 		if (preg_match('/^chk_(.*)$/', $var, $matches)) {
 			/* recreate the file name */
 			$unused_file = db_fetch_row_prepared('SELECT id, name, local_data_id 
@@ -529,7 +529,7 @@ function filter() {
 			<script type="text/javascript">
 			function refreshForm() {
 				strURL = 'rrdcleaner.php?header=false'+
-					'&filter='+$('#filter').val()+
+					'&filter='+escape($('#filter').val())+
 					'&age='+$('#age').val()+
 					'&rows='+$('#rows').val();
 				loadPageNoHeader(strURL);

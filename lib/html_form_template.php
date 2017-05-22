@@ -47,7 +47,7 @@ function draw_nontemplated_fields_graph($graph_template_id, &$values_array, $fie
 		WHERE graph_template_id = ?
 		AND local_graph_id=0', array($graph_template_id));
 
-	while (list($field_name, $field_array) = each($struct_graph)) {
+	foreach ($struct_graph as $field_name => $field_array) {
 		/* find our field name */
 		$form_field_name = str_replace('|field|', $field_name, $field_name_format);
 
@@ -60,21 +60,21 @@ function draw_nontemplated_fields_graph($graph_template_id, &$values_array, $fie
 
 		if ($field_array['method'] == 'spacer') {
 			unset($form_array[$form_field_name]);
-		}elseif (isset($graph_template['t_' . $field_name]) && $graph_template['t_' . $field_name] != 'on') {
+		} elseif (isset($graph_template['t_' . $field_name]) && $graph_template['t_' . $field_name] != 'on') {
 			if ($include_hidden_fields == true) {
 				$form_array[$form_field_name]['method'] = 'hidden';
-			}else{
+			} else {
 				unset($form_array[$form_field_name]);
 			}
-		}elseif ((!empty($snmp_query_graph_id)) && (sizeof(db_fetch_assoc_prepared('SELECT id FROM snmp_query_graph_sv WHERE snmp_query_graph_id = ? AND field_name = ?', array($snmp_query_graph_id, $field_name))) > 0)) {
+		} elseif ((!empty($snmp_query_graph_id)) && (sizeof(db_fetch_assoc_prepared('SELECT id FROM snmp_query_graph_sv WHERE snmp_query_graph_id = ? AND field_name = ?', array($snmp_query_graph_id, $field_name))) > 0)) {
 			if ($include_hidden_fields == true) {
 				$form_array[$form_field_name]['method'] = 'hidden';
-			}else{
+			} else {
 				unset($form_array[$form_field_name]);
 			}
-		}else{
+		} else {
 			if (($draw_any_items == false) && ($header_title != '')) {
-				print "<tr class='tableHeader'><td colspan='2' class='tableSubHeaderColumn'>$header_title</td></tr>\n";
+				print "<div class='tableHeader'><div class='tableSubHeaderColumn'>$header_title</div></div>\n";
 			}
 
 			$draw_any_items = true;
@@ -84,7 +84,7 @@ function draw_nontemplated_fields_graph($graph_template_id, &$values_array, $fie
 	/* setup form options */
 	if ($alternate_colors == true) {
 		$form_config_array = array('no_form_tag' => true);
-	}else{
+	} else {
 		$form_config_array = array('no_form_tag' => true, 'force_row_color' => true);
 	}
 
@@ -153,7 +153,7 @@ function draw_nontemplated_fields_graph_item($graph_template_id, $local_graph_id
 					AND graph_template_input_defs.graph_template_input_id = ?
 					AND graph_templates_item.local_graph_id = ?
 					LIMIT 1', array( $item['id'], $local_graph_id));
-			}else{
+			} else {
 				$current_def_value = db_fetch_row_prepared('SELECT
 					graph_templates_item.' . $item['column_name'] . ',
 					graph_templates_item.id
@@ -194,9 +194,9 @@ function draw_nontemplated_fields_graph_item($graph_template_id, $local_graph_id
 			source fields because they are basically meaningless at this point */
 			if ((empty($local_graph_id)) && ($item['column_name'] == 'task_item_id')) {
 				unset($form_array[$form_field_name]);
-			}else{
+			} else {
 				if (($draw_any_items == false) && ($header_title != '')) {
-					print "<tr class='tableHeader'><td colspan='2' class='tableSubHeaderColumn'>$header_title</td></tr>\n";
+					print "<div class='tableHeader'><div class='tableSubHeaderColumn'>$header_title</div></div>\n";
 				}
 
 				$draw_any_items = true;
@@ -207,7 +207,7 @@ function draw_nontemplated_fields_graph_item($graph_template_id, $local_graph_id
 	/* setup form options */
 	if ($alternate_colors == true) {
 		$form_config_array = array('no_form_tag' => true);
-	}else{
+	} else {
 		$form_config_array = array('no_form_tag' => true, 'force_row_color' => true);
 	}
 
@@ -249,7 +249,7 @@ function draw_nontemplated_fields_data_source($data_template_id, $local_data_id,
 		WHERE data_template_id = ?
 		AND local_data_id=0', array($data_template_id));
 
-	while (list($field_name, $field_array) = each($struct_data_source)) {
+	foreach ($struct_data_source as $field_name => $field_array) {
 		/* find our field name */
 		$form_field_name = str_replace('|field|', $field_name, $field_name_format);
 
@@ -266,24 +266,24 @@ function draw_nontemplated_fields_data_source($data_template_id, $local_data_id,
 		if (($current_template_flag != 'on') || ($current_flag == 'ALWAYSTEMPLATE')) {
 			if ($include_hidden_fields == true) {
 				$form_array[$form_field_name]['method'] = 'hidden';
-			}else{
+			} else {
 				unset($form_array[$form_field_name]);
 			}
-		}elseif ((!empty($snmp_query_graph_id)) && (sizeof(db_fetch_assoc_prepared('SELECT id FROM snmp_query_graph_rrd_sv WHERE snmp_query_graph_id = ? AND data_template_id = ? AND field_name = ?', array($snmp_query_graph_id, $data_template_id, $field_name))) > 0)) {
+		} elseif ((!empty($snmp_query_graph_id)) && (sizeof(db_fetch_assoc_prepared('SELECT id FROM snmp_query_graph_rrd_sv WHERE snmp_query_graph_id = ? AND data_template_id = ? AND field_name = ?', array($snmp_query_graph_id, $data_template_id, $field_name))) > 0)) {
 			if ($include_hidden_fields == true) {
 				$form_array[$form_field_name]['method'] = 'hidden';
-			}else{
+			} else {
 				unset($form_array[$form_field_name]);
 			}
-		}elseif ((empty($local_data_id)) && ($field_name == 'data_source_path')) {
+		} elseif ((empty($local_data_id)) && ($field_name == 'data_source_path')) {
 			if ($include_hidden_fields == true) {
 				$form_array[$form_field_name]['method'] = 'hidden';
-			}else{
+			} else {
 				unset($form_array[$form_field_name]);
 			}
-		}else{
+		} else {
 			if (($draw_any_items == false) && ($header_title != '')) {
-				print "<tr class='tableHeader'><td colspan='2' class='tableSubHeaderColumn'>$header_title</td></tr>\n";
+				print "<div class='tableHeader'><div class='tableSubHeaderColumn'>$header_title</div></div>\n";
 			}
 
 			$draw_any_items = true;
@@ -293,7 +293,7 @@ function draw_nontemplated_fields_data_source($data_template_id, $local_data_id,
 	/* setup form options */
 	if ($alternate_colors == true) {
 		$form_config_array = array('no_form_tag' => true);
-	}else{
+	} else {
 		$form_config_array = array('no_form_tag' => true, 'force_row_color' => true);
 	}
 
@@ -332,13 +332,12 @@ function draw_nontemplated_fields_data_source_item($data_template_id, &$values_a
 	/* setup form options */
 	if ($alternate_colors == true) {
 		$form_config_array = array('no_form_tag' => true);
-	}else{
+	} else {
 		$form_config_array = array('no_form_tag' => true, 'force_row_color' => true);
 	}
 
 	if (sizeof($values_array)) {
 		foreach ($values_array as $rrd) {
-			reset($struct_data_source_item);
 			$form_array = array();
 
 			/* if the user specifies a title, we only want to draw that. if not, we should create our
@@ -349,13 +348,13 @@ function draw_nontemplated_fields_data_source_item($data_template_id, &$values_a
 
 			if (empty($rrd['local_data_id'])) { /* this is a template */
 				$data_template_rrd = $rrd;
-			}else{ /* this is not a template */
+			} else { /* this is not a template */
 				$data_template_rrd = db_fetch_row_prepared('SELECT * 
 					FROM data_template_rrd 
 					WHERE id = ?', array($rrd['local_data_template_rrd_id']));
 			}
 
-			while (list($field_name, $field_array) = each($struct_data_source_item)) {
+			foreach ($struct_data_source_item as $field_name => $field_array) {
 				/* find our field name */
 				$form_field_name = str_replace('|field|', $field_name, $field_name_format);
 				$form_field_name = str_replace('|id|', $rrd['id'], $form_field_name);
@@ -375,20 +374,20 @@ function draw_nontemplated_fields_data_source_item($data_template_id, &$values_a
 				if ($data_template_rrd{'t_' . $field_name} != 'on') {
 					if ($include_hidden_fields == true) {
 						$form_array[$form_field_name]['method'] = 'hidden';
-					}else{
+					} else {
 						unset($form_array[$form_field_name]);
 					}
-				}elseif ((!empty($snmp_query_graph_id)) && (sizeof(db_fetch_assoc_prepared('SELECT id FROM snmp_query_graph_rrd_sv WHERE snmp_query_graph_id = ? AND data_template_id = ? AND field_name = ?', array($snmp_query_graph_id, $data_template_id, $field_name))) > 0)) {
+				} elseif ((!empty($snmp_query_graph_id)) && (sizeof(db_fetch_assoc_prepared('SELECT id FROM snmp_query_graph_rrd_sv WHERE snmp_query_graph_id = ? AND data_template_id = ? AND field_name = ?', array($snmp_query_graph_id, $data_template_id, $field_name))) > 0)) {
 					if ($include_hidden_fields == true) {
 						$form_array[$form_field_name]['method'] = 'hidden';
-					}else{
+					} else {
 						unset($form_array[$form_field_name]);
 					}
-				}else{
+				} else {
 					if (($draw_any_items == false) && ($draw_title_for_each_item == false) && ($header_title != '')) {
-						print "<tr class='tableHeader'><td colspan='2' class='tableSubHeaderColumn'>$header_title</td></tr>\n";
-					}elseif (($draw_any_items == false) && ($draw_title_for_each_item == true) && ($header_title != '')) {
-						print "<tr class='tableHeader'><td colspan='2' class='tableSubHeaderColumn'>$header_title [" . $rrd['data_source_name'] . "]</td></tr>\n";
+						print "<div class='tableHeader'><div class='tableSubHeaderColumn'>$header_title</div></div>\n";
+					} elseif (($draw_any_items == false) && ($draw_title_for_each_item == true) && ($header_title != '')) {
+						print "<div class='tableHeader'><div class='tableSubHeaderColumn'>$header_title [" . $rrd['data_source_name'] . "]</div></div>\n";
 					}
 
 					$draw_any_items = true;
@@ -402,10 +401,10 @@ function draw_nontemplated_fields_data_source_item($data_template_id, &$values_a
 							WHERE data_template_id = ? 
 							AND local_data_id=0', array($rrd['data_template_id']));
 
-						$form_array[$form_field_name]['sql'] = "SELECT id,CONCAT(data_name,' - ',name) AS name 
+						$form_array[$form_field_name]['sql'] = "SELECT id, CONCAT(data_name,' - ',name) AS name 
 							FROM data_input_fields 
 							WHERE data_input_id=" . $data_input_id . " 
-							AND input_output='out' 
+							AND input_output = 'out'
 							AND update_rra='on' 
 							ORDER BY data_name,name";
 					}
@@ -465,7 +464,7 @@ function draw_nontemplated_fields_custom_data($data_template_data_id, $field_nam
 	$fields = db_fetch_assoc_prepared('SELECT * 
 		FROM data_input_fields 
 		WHERE data_input_id = ? 
-		AND input_output="in" 
+		AND input_output = "in"
 		ORDER BY sequence', 
 		array($data['data_input_id']));
 
@@ -481,14 +480,14 @@ function draw_nontemplated_fields_custom_data($data_template_data_id, $field_nam
 
 			if (sizeof($data_input_data)) {
 				$old_value = $data_input_data['value'];
-			}else{
+			} else {
 				$old_value = '';
 			}
 
 			/* if data template then get t_value from template, else always allow user input */
 			if (empty($data['data_template_id'])) {
 				$can_template = 'on';
-			}else{
+			} else {
 				$can_template = db_fetch_cell_prepared('SELECT t_value 
 					FROM data_input_data 
 					WHERE data_template_data_id = ? 
@@ -503,34 +502,30 @@ function draw_nontemplated_fields_custom_data($data_template_data_id, $field_nam
 				if ($include_hidden_fields == true) {
 					form_hidden_box($form_field_name, $old_value, '');
 				}
-			}elseif ((!empty($snmp_query_id)) && (preg_match('/^(index_type|index_value|output_type)$/i', $field['type_code']))) {
+			} elseif ((!empty($snmp_query_id)) && (preg_match('/^(index_type|index_value|output_type)$/i', $field['type_code']))) {
 				/* no data query fields */
 				if ($include_hidden_fields == true) {
 					form_hidden_box($form_field_name, $old_value, '');
 				}
-			}elseif (empty($can_template)) {
+			} elseif (empty($can_template)) {
 				/* no templated fields */
 				if ($include_hidden_fields == true) {
 					form_hidden_box($form_field_name, $old_value, '');
 				}
-			}else{
+			} else {
 				if (($draw_any_items == false) && ($header_title != '')) {
-					print "<tr class='tableHeader'><td colspan='2' class='tableSubHeaderColumn'>$header_title</td></tr>\n";
+					print "<div class='tableHeader'><div class='tableSubHeaderColumn'>$header_title</div></div>\n";
 				}
 
-				if ($alternate_colors == true) {
-					form_alternate_row();
-				}else{
-					print "<tr class='odd'>\n";
-				}
+				print "<div class='formRow'>\n";
 
-				print "<td style='width:50%;'><strong>" . $field['name'] . "</strong></td>\n";
-				print '<td>';
+				print "<div class='formColumnLeft'>" . $field['name'] . "</div>\n";
+				print "<div class='formColumnRight'>";
 
 				draw_custom_data_row($form_field_name, $field['id'], $data['id'], $old_value);
 
-				print '</td>';
-				print "</tr>\n";
+				print '</div>';
+				print "</div>\n";
 
 				$draw_any_items = true;
 				$i++;
@@ -564,11 +559,11 @@ function draw_custom_data_row($field_name, $data_input_field_id, $data_template_
 			GROUP BY host_snmp_cache.field_name', array($data_template_data_id));
 
 		if (sizeof($index_type) == 0) {
-			print "<em>Data query data sources must be created through <a href='" . htmlspecialchars('graphs_new.php') . "'>New Graphs</a>.</em>\n";
-		}else{
+			print "<em>" . __('Data Query Data Sources must be created through %s', "<a href='" . htmlspecialchars('graphs_new.php') . "'>" . __('New Graphs') . ".</a>") . "</em>\n";
+		} else {
 			form_dropdown($field_name, $index_type, 'field_name', 'field_name', $current_value, '', '', '');
 		}
-	}elseif (($field['type_code'] == 'output_type') && (db_fetch_cell_prepared('SELECT local_data_id FROM data_template_data WHERE id = ?', array($data_template_data_id)) > 0)) {
+	} elseif (($field['type_code'] == 'output_type') && (db_fetch_cell_prepared('SELECT local_data_id FROM data_template_data WHERE id = ?', array($data_template_data_id)) > 0)) {
 		$output_type = db_fetch_assoc_prepared('SELECT
 			snmp_query_graph.id,
 			snmp_query_graph.name
@@ -579,11 +574,11 @@ function draw_custom_data_row($field_name, $data_input_field_id, $data_template_
 			GROUP BY snmp_query_graph.id', array($data_template_data_id));
 
 		if (sizeof($output_type) == 0) {
-			print "<em>Data query data sources must be created through <a href='" . htmlspecialchars('graphs_new.php') . "'>New Graphs</a>.</em>\n";
-		}else{
+			print "<em>" . __('Data Query Data Sources must be created through %s', "<a href='" . htmlspecialchars('graphs_new.php') . "'>" . __('New Graphs') . ".</a>") . "</em>\n";
+		} else {
 			form_dropdown($field_name, $output_type, 'name', 'id', $current_value, '', '', '');
 		}
-	}else{
+	} else {
 		form_text_box($field_name, $current_value, '', '');
 	}
 }

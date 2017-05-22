@@ -23,7 +23,7 @@
 */
 
 function import_xml_data(&$xml_data, $import_as_new, $profile_id, $remove_orphans = false) {
-	global $config, $hash_type_codes, $hash_version_codes, $preview_only, $remove_orphans, $import_debug_info;
+	global $config, $hash_type_codes, $cacti_version_codes, $preview_only, $remove_orphans, $import_debug_info;
 
 	include_once($config['library_path'] . '/xml.php');
 
@@ -37,7 +37,7 @@ function import_xml_data(&$xml_data, $import_as_new, $profile_id, $remove_orphan
 		return $info_array;
 	}
 
-	while (list($hash, $hash_array) = each($xml_array)) {
+	foreach ($xml_array as $hash => $hash_array) {
 		/* parse information from the hash */
 		$parsed_hash = parse_xml_hash($hash);
 
@@ -46,7 +46,7 @@ function import_xml_data(&$xml_data, $import_as_new, $profile_id, $remove_orphan
 
 		if (isset($dep_hash_cache{$parsed_hash['type']})) {
 			array_push($dep_hash_cache{$parsed_hash['type']}, $parsed_hash);
-		}else{
+		} else {
 			$dep_hash_cache{$parsed_hash['type']} = array($parsed_hash);
 		}
 	}
@@ -59,22 +59,23 @@ function import_xml_data(&$xml_data, $import_as_new, $profile_id, $remove_orphan
 	/* the order of the $hash_type_codes array is ordered such that the items
 	with the most dependencies are last and the items with no dependencies are first.
 	this means dependencies will just magically work themselves out :) */
-	reset($hash_type_codes);
-	while (list($type, $code) = each($hash_type_codes)) {
+	foreach ($hash_type_codes as $type => $code) {
 		/* do we have any matches for this type? */
 		if (isset($dep_hash_cache[$type])) {
 			/* yes we do. loop through each match for this type */
 			for ($i=0; $i<count($dep_hash_cache[$type]); $i++) {
+				$import_debug_info = false;
+
 				cacti_log('$dep_hash_cache[$type][$i][\'type\']: ' . $dep_hash_cache[$type][$i]['type'], false, 'IMPORT', POLLER_VERBOSITY_HIGH);
 				cacti_log('$dep_hash_cache[$type][$i][\'version\']: ' . $dep_hash_cache[$type][$i]['version'], false, 'IMPORT', POLLER_VERBOSITY_HIGH);
-				cacti_log('$hash_version_codes{$dep_hash_cache[$type][$i][\'version\']}: ' . $hash_version_codes{$dep_hash_cache[$type][$i]['version']}, false, 'IMPORT', POLLER_VERBOSITY_HIGH);
+				cacti_log('$cacti_version_codes{$dep_hash_cache[$type][$i][\'version\']}: ' . $cacti_version_codes{$dep_hash_cache[$type][$i]['version']}, false, 'IMPORT', POLLER_VERBOSITY_HIGH);
 				cacti_log('$dep_hash_cache[$type][$i][\'hash\']: ' . $dep_hash_cache[$type][$i]['hash'], false, 'IMPORT', POLLER_VERBOSITY_HIGH);
 
-				$hash_array = $xml_array['hash_' . $hash_type_codes{$dep_hash_cache[$type][$i]['type']} . $hash_version_codes{$dep_hash_cache[$type][$i]['version']} . $dep_hash_cache[$type][$i]['hash']];
+				$hash_array = $xml_array['hash_' . $hash_type_codes{$dep_hash_cache[$type][$i]['type']} . $cacti_version_codes{$dep_hash_cache[$type][$i]['version']} . $dep_hash_cache[$type][$i]['hash']];
 
 				switch($type) {
 				case 'graph_template':
-					$hash_cache += xml_to_graph_template($dep_hash_cache[$type][$i]['hash'], $hash_array, $hash_cache, $dep_hash_cache[$type][$i]['version']);
+					$hash_cache += xml_to_graph_template($dep_hash_cache[$type][$i]['hash'], $hash_array, $hash_cache, $dep_hash_cache[$type][$i]['version'], $remove_orphans);
 					break;
 				case 'data_template':
 					$hash_cache += xml_to_data_template($dep_hash_cache[$type][$i]['hash'], $hash_array, $hash_cache, $import_as_new, $profile_id);
@@ -100,14 +101,17 @@ function import_xml_data(&$xml_data, $import_as_new, $profile_id, $remove_orphan
 					$hash_cache += xml_to_vdef($dep_hash_cache[$type][$i]['hash'], $hash_array, $hash_cache);
 					break;
 				case 'data_source_profile':
-					$hash_cache += xml_to_data_source_profile($dep_hash_cache[$type][$i]['hash'], $hash_array, $hash_cache, $import_as_new, $profile_id);
+					$cache_add = xml_to_data_source_profile($dep_hash_cache[$type][$i]['hash'], $hash_array, $hash_cache, $import_as_new, $profile_id);
+					if ($cache_add !== false) {
+						$hash_cache += $cache_add;
+					}
 					break;
 				case 'round_robin_archive':
 					// Deprecated
 					break;
 				}
 
-				if (isset($import_debug_info)) {
+				if (!empty($import_debug_info)) {
 					$info_array[$type]{isset($info_array[$type]) ? count($info_array[$type]) : 0} = $import_debug_info;
 				}
 			}
@@ -162,7 +166,7 @@ function import_package($xmlfile, $profile_id = 1, $remove_orphans = false, $pre
 			$xml .= "$x";
 		}
 		fclose($f); 
-	}else{
+	} else {
 		cacti_log('FATAL: Unable to open file ' . $filename, true, 'IMPORT', POLLER_VERBOSITY_LOW);	
 		return false;
 	}
@@ -223,7 +227,7 @@ function import_package($xmlfile, $profile_id = 1, $remove_orphans = false, $pre
 						fclose($file);
 						clearstatcache();
 						$filestatus[$filename] = __('written');
-					}else{
+					} else {
 						$filestatus[$filename] = __('could not open');
 					}
 
@@ -232,13 +236,13 @@ function import_package($xmlfile, $profile_id = 1, $remove_orphans = false, $pre
 
 						$filestatus[$filename] = __('not exists');
 					}
-				}else{
+				} else {
 					$filestatus[$filename] = __('not writable');
 				}
-			}else{
+			} else {
 				if (!is_writable($filename)) {
 					$filestatus[$filename] = __('not writable');
-				}else{
+				} else {
 					$filestatus[$filename] = __('writable');
 				}
 			}
@@ -254,8 +258,8 @@ function import_package($xmlfile, $profile_id = 1, $remove_orphans = false, $pre
 	return array($debug_data, $filestatus);
 }
 
-function xml_to_graph_template($hash, &$xml_array, &$hash_cache, $hash_version) {
-	global $struct_graph, $struct_graph_item, $fields_graph_template_input_edit, $hash_version_codes, $preview_only, $graph_item_types, $import_debug_info;
+function xml_to_graph_template($hash, &$xml_array, &$hash_cache, $hash_version, $remove_orphans = false) {
+	global $struct_graph, $struct_graph_item, $fields_graph_template_input_edit, $cacti_version_codes, $preview_only, $graph_item_types, $import_debug_info;
 
 	/* track changes */
 	$status = 0;
@@ -270,7 +274,7 @@ function xml_to_graph_template($hash, &$xml_array, &$hash_cache, $hash_version) 
 		$previous_data = db_fetch_row_prepared('SELECT * 
 			FROM graph_templates 
 			WHERE id = ?', array($_graph_template_id));
-	}else{
+	} else {
 		$previous_data = array();
 	}
 
@@ -278,13 +282,17 @@ function xml_to_graph_template($hash, &$xml_array, &$hash_cache, $hash_version) 
 	$save['hash'] = $hash;
 	$save['name'] = $xml_array['name'];
 
+	if (isset($xml_array['multiple'])) {
+		$save['multiple'] = $xml_array['multiple'];
+	}
+
 	/* check for status changes */
 	$status += compare_data($save, $previous_data, 'graph_templates');
 
 	if (!$preview_only) {
 		$graph_template_id = sql_save($save, 'graph_templates');
 		$hash_cache['graph_template'][$hash] = $graph_template_id;
-	}else{
+	} else {
 		$graph_template_id = $_graph_template_id;
 		$hash_cache['graph_template'][$hash] = $graph_template_id;
 	}
@@ -302,14 +310,13 @@ function xml_to_graph_template($hash, &$xml_array, &$hash_cache, $hash_version) 
 			FROM graph_templates_graph 
 			WHERE id = ?', 
 			array($save['id']));
-	}else{
+	} else {
 		$previous_data = array();
 	}
 
 	$save['graph_template_id'] = $graph_template_id;
 
-	reset($struct_graph);
-	while (list($field_name, $field_array) = each($struct_graph)) {
+	foreach ($struct_graph as $field_name => $field_array) {
 		/* make sure this field exists in the xml array first */
 		if (isset($xml_array['graph']{'t_' . $field_name})) {
 			$save{'t_' . $field_name} = $xml_array['graph']{'t_' . $field_name};
@@ -321,7 +328,7 @@ function xml_to_graph_template($hash, &$xml_array, &$hash_cache, $hash_version) 
 			 * so we need to know the version of the current hash code we're just working on */
 			if (($field_name == 'unit_exponent_value') && (get_version_index($hash_version) < get_version_index('0.8.5')) && ($xml_array['graph'][$field_name] == '0')) { /* backwards compatability */
 				$save[$field_name] = '';
-			}else{
+			} else {
 				$save[$field_name] = xml_character_decode($xml_array['graph'][$field_name]);
 			}
 		}
@@ -332,7 +339,7 @@ function xml_to_graph_template($hash, &$xml_array, &$hash_cache, $hash_version) 
 
 	if (!$preview_only) {
 		$graph_template_graph_id = sql_save($save, 'graph_templates_graph');
-	}else{
+	} else {
 		$graph_template_graph_id = $save['id'];
 	}
 
@@ -352,11 +359,11 @@ function xml_to_graph_template($hash, &$xml_array, &$hash_cache, $hash_version) 
 					$orphaned_items[$item['hash']] = $item;
 				}
 			}
-		}else{
+		} else {
 			$orphaned_items = array();
 		}
 
-		while (list($item_hash, $item_array) = each($xml_array['items'])) {
+		foreach ($xml_array['items'] as $item_hash => $item_array) {
 			/* parse information from the hash */
 			$parsed_hash = parse_xml_hash($item_hash);
 
@@ -381,7 +388,7 @@ function xml_to_graph_template($hash, &$xml_array, &$hash_cache, $hash_version) 
 					FROM graph_templates_item 
 					WHERE id = ?', 
 					array($_graph_template_item_id));
-			}else{
+			} else {
 				$previous_data = array();
 			}
 
@@ -389,14 +396,13 @@ function xml_to_graph_template($hash, &$xml_array, &$hash_cache, $hash_version) 
 			$save['hash']              = $parsed_hash['hash'];
 			$save['graph_template_id'] = $graph_template_id;
 
-			reset($struct_graph_item);
-			while (list($field_name, $field_array) = each($struct_graph_item)) {
+			foreach ($struct_graph_item as $field_name => $field_array) {
 				/* make sure this field exists in the xml array first */
 				if (isset($item_array[$field_name])) {
 					/* is the value of this field a hash or not? */
 					if (preg_match('/hash_([a-f0-9]{2})([a-f0-9]{4})([a-f0-9]{32})/', $item_array[$field_name])) {
 						$save[$field_name] = resolve_hash_to_id($item_array[$field_name], $hash_cache);
-					}elseif (($field_name == 'color_id') && (preg_match('/^[a-fA-F0-9]{6}$/', $item_array[$field_name])) && (get_version_index($parsed_hash['version']) >= get_version_index('0.8.5'))) { /* treat the 'color' field differently */
+					} elseif (($field_name == 'color_id') && (preg_match('/^[a-fA-F0-9]{6}$/', $item_array[$field_name])) && (get_version_index($parsed_hash['version']) >= get_version_index('0.8.5'))) { /* treat the 'color' field differently */
 						$color_id = db_fetch_cell_prepared('SELECT id 
 							FROM colors 
 							WHERE hex = ?', 
@@ -411,7 +417,7 @@ function xml_to_graph_template($hash, &$xml_array, &$hash_cache, $hash_version) 
 						}
 
 						$save[$field_name] = $color_id;
-					}else{
+					} else {
 						$save[$field_name] = xml_character_decode($item_array[$field_name]);
 					}
 				}
@@ -430,7 +436,7 @@ function xml_to_graph_template($hash, &$xml_array, &$hash_cache, $hash_version) 
 				$graph_template_item_id = sql_save($save, 'graph_templates_item');
 
 				$hash_cache['graph_template_item']{$parsed_hash['hash']} = $graph_template_item_id;
-			}else{
+			} else {
 				$hash_cache['graph_template_item']{$parsed_hash['hash']} = $_graph_template_item_id;
 			}
 		}
@@ -438,7 +444,7 @@ function xml_to_graph_template($hash, &$xml_array, &$hash_cache, $hash_version) 
 
 	/* import into: graph_template_input */
 	if (is_array($xml_array['inputs'])) {
-		while (list($item_hash, $item_array) = each($xml_array['inputs'])) {
+		foreach ($xml_array['inputs'] as $item_hash => $item_array) {
 			/* parse information from the hash */
 			$parsed_hash = parse_xml_hash($item_hash);
 
@@ -457,7 +463,7 @@ function xml_to_graph_template($hash, &$xml_array, &$hash_cache, $hash_version) 
 					FROM graph_template_input 
 					WHERE id = ?', 
 					array($_graph_template_input_id));
-			}else{
+			} else {
 				$previous_data = array();
 			}
 
@@ -465,8 +471,7 @@ function xml_to_graph_template($hash, &$xml_array, &$hash_cache, $hash_version) 
 			$save['hash']              = $parsed_hash['hash'];
 			$save['graph_template_id'] = $graph_template_id;
 
-			reset($fields_graph_template_input_edit);
-			while (list($field_name, $field_array) = each($fields_graph_template_input_edit)) {
+			foreach ($fields_graph_template_input_edit as $field_name => $field_array) {
 				/* make sure this field exists in the xml array first */
 				if (isset($item_array[$field_name])) {
 					$save[$field_name] = xml_character_decode($item_array[$field_name]);
@@ -520,9 +525,20 @@ function xml_to_graph_template($hash, &$xml_array, &$hash_cache, $hash_version) 
 	if (isset($orphaned_items) && sizeof($orphaned_items)) {
 		$orphan_text = array();
 		foreach($orphaned_items as $item) {
-			$orphan_text[] = 'Orphaned Graph Items, Type: ' . $graph_item_types[$item['graph_type_id']] . ', Text Format: ' . $item['text_format'] . ', Value: ' . $item['value'];
+			if ($remove_orphans) {
+				$orphan_text[] = 'Removed Orphaned Graph Items, Type: ' . $graph_item_types[$item['graph_type_id']] . ', Text Format: ' . $item['text_format'] . ', Value: ' . $item['value'];
+				db_execute_prepared('DELETE FROM graph_templates_item WHERE hash = ?', array($item['hash']));				
+				db_execute_prepared('DELETE FROM graph_templates_item WHERE local_graph_template_item_id = ?', array($item['id']));
+			} else {
+				$orphan_text[] = 'Found Orphaned Graph Items, Type: ' . $graph_item_types[$item['graph_type_id']] . ', Text Format: ' . $item['text_format'] . ', Value: ' . $item['value'];
+			}
 		}
 		$import_debug_info['orphans'] = $orphan_text;
+
+		if ($remove_orphans) {
+			retemplate_graphs($graph_template_id);
+			
+		}
 	}
 
 	return $hash_cache;
@@ -545,7 +561,7 @@ function xml_to_data_template($hash, &$xml_array, &$hash_cache, $import_as_new, 
 			FROM data_template 
 			WHERE id = ?', 
 			array($_data_template_id));
-	}else{
+	} else {
 		$previous_data = array();
 	}
 
@@ -560,7 +576,7 @@ function xml_to_data_template($hash, &$xml_array, &$hash_cache, $import_as_new, 
 		$data_template_id = sql_save($save, 'data_template');
 
 		$hash_cache['data_template'][$hash] = $data_template_id;
-	}else{
+	} else {
 		$data_template_id = $_data_template_id;
 
 		$hash_cache['data_template'][$hash] = $_data_template_id;
@@ -580,15 +596,14 @@ function xml_to_data_template($hash, &$xml_array, &$hash_cache, $import_as_new, 
 			FROM data_template_data
 			WHERE id = ?', 
 			array($save['id']));
-	}else{
+	} else {
 		$previous_data = array();
 	}
 
 	$save['data_template_id'] = $data_template_id;
 	$save['data_source_profile_id'] = $profile_id;
 
-	reset($struct_data_source);
-	while (list($field_name, $field_array) = each($struct_data_source)) {
+	foreach ($struct_data_source as $field_name => $field_array) {
 		/* make sure this field exists in the xml array first */
 		if (isset($xml_array['ds']{'t_' . $field_name})) {
 			$save{'t_' . $field_name} = $xml_array['ds']{'t_' . $field_name};
@@ -599,25 +614,26 @@ function xml_to_data_template($hash, &$xml_array, &$hash_cache, $import_as_new, 
 			/* is the value of this field a hash or not? */
 			if ($field_name == 'data_source_profile_id') {
 				$save[$field_name] = $profile_id;
-			}elseif (preg_match('/hash_([a-f0-9]{2})([a-f0-9]{4})([a-f0-9]{32})/', $xml_array['ds'][$field_name])) {
+			} elseif (preg_match('/hash_([a-f0-9]{2})([a-f0-9]{4})([a-f0-9]{32})/', $xml_array['ds'][$field_name])) {
 				$save[$field_name] = resolve_hash_to_id($xml_array['ds'][$field_name], $hash_cache);
-			}else{
+			} else {
 				$save[$field_name] = xml_character_decode($xml_array['ds'][$field_name]);
 			}
 		}
 	}
 	
-	/* use the profiles step if we are not importing a new one */
-	if ($import_as_new == false) {
+	/* set the rrd_step */
+	if ($profile_id > 0) {
 		$save['rrd_step'] = db_fetch_cell_prepared('SELECT step 
 			FROM data_source_profiles 
 			WHERE id = ?', 
 			array($profile_id));
-	}
-	
-	/* Fix for importing during installation - use the polling interval as the step if we are to use the default rra settings */
-	if (is_array($profile_id) == true)  {
-		$save['rrd_step'] = read_config_option('poller_interval');
+	} else {
+		$profile_id = db_fetch_cell('SELECT id FROM data_source_profiles ORDER BY `default` DESC LIMIT 1');
+		$save['rrd_step'] = db_fetch_cell_prepared('SELECT step
+			FROM data_source_profiles
+			WHERE id = ?',
+			array($profile_id));
 	}
 
 	/* check for status changes */
@@ -631,7 +647,7 @@ function xml_to_data_template($hash, &$xml_array, &$hash_cache, $import_as_new, 
 
 	/* import into: data_template_rrd */
 	if (is_array($xml_array['items'])) {
-		while (list($item_hash, $item_array) = each($xml_array['items'])) {
+		foreach ($xml_array['items'] as $item_hash => $item_array) {
 			/* parse information from the hash */
 			$parsed_hash = parse_xml_hash($item_hash);
 
@@ -651,7 +667,7 @@ function xml_to_data_template($hash, &$xml_array, &$hash_cache, $import_as_new, 
 					FROM data_template_rrd
 					WHERE id = ?', 
 					array($_data_template_rrd_id));
-			}else{
+			} else {
 				$previous_data = array();
 			}
 
@@ -659,8 +675,7 @@ function xml_to_data_template($hash, &$xml_array, &$hash_cache, $import_as_new, 
 			$save['hash']             = $parsed_hash['hash'];
 			$save['data_template_id'] = $data_template_id;
 
-			reset($struct_data_source_item);
-			while (list($field_name, $field_array) = each($struct_data_source_item)) {
+			foreach ($struct_data_source_item as $field_name => $field_array) {
 				/* make sure this field exists in the xml array first */
 				if (isset($item_array{'t_' . $field_name})) {
 					$save{'t_' . $field_name} = $item_array{'t_' . $field_name};
@@ -671,7 +686,7 @@ function xml_to_data_template($hash, &$xml_array, &$hash_cache, $import_as_new, 
 					/* is the value of this field a hash or not? */
 					if (preg_match('/hash_([a-f0-9]{2})([a-f0-9]{4})([a-f0-9]{32})/', $item_array[$field_name])) {
 						$save[$field_name] = resolve_hash_to_id($item_array[$field_name], $hash_cache);
-					}else{
+					} else {
 						$save[$field_name] = xml_character_decode($item_array[$field_name]);
 					}
 				}
@@ -697,7 +712,7 @@ function xml_to_data_template($hash, &$xml_array, &$hash_cache, $import_as_new, 
 				$data_template_rrd_id = sql_save($save, 'data_template_rrd');
 
 				$hash_cache['data_template_item']{$parsed_hash['hash']} = $data_template_rrd_id;
-			}else{
+			} else {
 				$hash_cache['data_template_item']{$parsed_hash['hash']} = $_data_template_rrd_id;
 			}
 		}
@@ -706,7 +721,7 @@ function xml_to_data_template($hash, &$xml_array, &$hash_cache, $import_as_new, 
 	/* import into: data_input_data */
 	if (!$preview_only) {
 		if (is_array($xml_array['data'])) {
-			while (list($item_hash, $item_array) = each($xml_array['data'])) {
+			foreach ($xml_array['data'] as $item_hash => $item_array) {
 				unset($save);
 				$save['data_template_data_id'] = $data_template_data_id;
 				$save['data_input_field_id']   = resolve_hash_to_id($item_array['data_input_field_id'], $hash_cache);
@@ -756,21 +771,20 @@ function xml_to_data_query($hash, &$xml_array, &$hash_cache) {
 			FROM snmp_query 
 			WHERE id = ?', 
 			array($_data_query_id));
-	}else{
+	} else {
 		$previous_data = array();
 	}
 
 	$save['id']     = (empty($_data_query_id) ? '0' : $_data_query_id);
 	$save['hash']   = $hash;
 
-	reset($fields_data_query_edit);
-	while (list($field_name, $field_array) = each($fields_data_query_edit)) {
+	foreach ($fields_data_query_edit as $field_name => $field_array) {
 		/* make sure this field exists in the xml array first */
 		if (isset($xml_array[$field_name])) {
 			/* is the value of this field a hash or not? */
 			if (preg_match('/hash_([a-f0-9]{2})([a-f0-9]{4})([a-f0-9]{32})/', $xml_array[$field_name])) {
 				$save[$field_name] = resolve_hash_to_id($xml_array[$field_name], $hash_cache);
-			}else{
+			} else {
 				$save[$field_name] = xml_character_decode($xml_array[$field_name]);
 			}
 		}
@@ -785,7 +799,7 @@ function xml_to_data_query($hash, &$xml_array, &$hash_cache) {
 		$hash_cache['data_query'][$hash] = $data_query_id;
 
 		update_replication_crc(0, 'poller_replicate_snmp_query_crc');
-	}else{
+	} else {
 		$data_query_id = $_data_query_id;
 
 		$hash_cache['data_query'][$hash] = $_data_query_id;
@@ -793,7 +807,7 @@ function xml_to_data_query($hash, &$xml_array, &$hash_cache) {
 
 	/* import into: snmp_query_graph */
 	if (is_array($xml_array['graphs'])) {
-		while (list($item_hash, $item_array) = each($xml_array['graphs'])) {
+		foreach ($xml_array['graphs'] as $item_hash => $item_array) {
 			/* parse information from the hash */
 			$parsed_hash = parse_xml_hash($item_hash);
 
@@ -812,7 +826,7 @@ function xml_to_data_query($hash, &$xml_array, &$hash_cache) {
 					FROM snmp_query_graph
 					WHERE id = ?', 
 					array($_data_query_graph_id));
-			}else{
+			} else {
 				$previous_data = array();
 			}
 
@@ -820,14 +834,13 @@ function xml_to_data_query($hash, &$xml_array, &$hash_cache) {
 			$save['hash']          = $parsed_hash['hash'];
 			$save['snmp_query_id'] = $data_query_id;
 
-			reset($fields_data_query_item_edit);
-			while (list($field_name, $field_array) = each($fields_data_query_item_edit)) {
+			foreach ($fields_data_query_item_edit as $field_name => $field_array) {
 				/* make sure this field exists in the xml array first */
 				if (isset($item_array[$field_name])) {
 					/* is the value of this field a hash or not? */
 					if (preg_match('/hash_([a-f0-9]{2})([a-f0-9]{4})([a-f0-9]{32})/', $item_array[$field_name])) {
 						$save[$field_name] = resolve_hash_to_id($item_array[$field_name], $hash_cache);
-					}else{
+					} else {
 						$save[$field_name] = xml_character_decode($item_array[$field_name]);
 					}
 				}
@@ -843,7 +856,7 @@ function xml_to_data_query($hash, &$xml_array, &$hash_cache) {
 
 				/* import into: snmp_query_graph_rrd */
 				if (is_array($item_array['rrd'])) {
-					while (list($sub_item_hash, $sub_item_array) = each($item_array['rrd'])) {
+					foreach ($item_array['rrd'] as $sub_item_hash => $sub_item_array) {
 						unset($save);
 						$save['snmp_query_graph_id']  = $data_query_graph_id;
 						$save['data_template_id']     = resolve_hash_to_id($sub_item_array['data_template_id'], $hash_cache);
@@ -853,7 +866,7 @@ function xml_to_data_query($hash, &$xml_array, &$hash_cache) {
 						sql_save($save, 'snmp_query_graph_rrd', array('snmp_query_graph_id', 'data_template_id', 'data_template_rrd_id'), false);
 					}
 				}
-			}else{
+			} else {
 				$data_query_graph_id = $_data_query_graph_id;
 
 				$hash_cache['data_query_graph']{$parsed_hash['hash']} = $_data_query_graph_id;
@@ -861,7 +874,7 @@ function xml_to_data_query($hash, &$xml_array, &$hash_cache) {
 
 			/* import into: snmp_query_graph_sv */
 			if (is_array($item_array['sv_graph'])) {
-				while (list($sub_item_hash, $sub_item_array) = each($item_array['sv_graph'])) {
+				foreach ($item_array['sv_graph'] as $sub_item_hash => $sub_item_array) {
 					/* parse information from the hash */
 					$parsed_hash = parse_xml_hash($sub_item_hash);
 
@@ -880,7 +893,7 @@ function xml_to_data_query($hash, &$xml_array, &$hash_cache) {
 							FROM snmp_query_graph_sv
 							WHERE id = ?', 
 							array($_data_query_graph_sv_id));
-					}else{
+					} else {
 						$previous_data = array();
 					}
 
@@ -898,7 +911,7 @@ function xml_to_data_query($hash, &$xml_array, &$hash_cache) {
 						$data_query_graph_sv_id = sql_save($save, 'snmp_query_graph_sv');
 
 						$hash_cache['data_query_sv_graph']{$parsed_hash['hash']} = $data_query_graph_sv_id;
-					}else{
+					} else {
 						$hash_cache['data_query_sv_graph']{$parsed_hash['hash']} = $_data_query_graph_sv_id;
 					}
 				}
@@ -906,7 +919,7 @@ function xml_to_data_query($hash, &$xml_array, &$hash_cache) {
 
 			/* import into: snmp_query_graph_rrd_sv */
 			if (is_array($item_array['sv_data_source'])) {
-				while (list($sub_item_hash, $sub_item_array) = each($item_array['sv_data_source'])) {
+				foreach ($item_array['sv_data_source'] as $sub_item_hash => $sub_item_array) {
 					/* parse information from the hash */
 					$parsed_hash = parse_xml_hash($sub_item_hash);
 
@@ -925,7 +938,7 @@ function xml_to_data_query($hash, &$xml_array, &$hash_cache) {
 							FROM snmp_query_graph_rrd_sv
 							WHERE id = ?', 
 							array($_data_query_graph_rrd_sv_id));
-					}else{
+					} else {
 						$previous_data = array();
 					}
 
@@ -944,7 +957,7 @@ function xml_to_data_query($hash, &$xml_array, &$hash_cache) {
 						$data_query_graph_rrd_sv_id = sql_save($save, 'snmp_query_graph_rrd_sv');
 
 						$hash_cache['data_query_sv_data_source']{$parsed_hash['hash']} = $data_query_graph_rrd_sv_id;
-					}else{
+					} else {
 						$hash_cache['data_query_sv_data_source']{$parsed_hash['hash']} = $_data_query_graph_rrd_sv_id;
 					}
 				}
@@ -977,15 +990,14 @@ function xml_to_gprint_preset($hash, &$xml_array, &$hash_cache) {
 			FROM graph_templates_gprint
 			WHERE id = ?', 
 			array($_gprint_preset_id));
-	}else{
+	} else {
 		$previous_data = array();
 	}
 
 	$save['id']   = (empty($_gprint_preset_id) ? '0' : $_gprint_preset_id);
 	$save['hash'] = $hash;
 
-	reset($fields_grprint_presets_edit);
-	while (list($field_name, $field_array) = each($fields_grprint_presets_edit)) {
+	foreach ($fields_grprint_presets_edit as $field_name => $field_array) {
 		/* make sure this field exists in the xml array first */
 		if (isset($xml_array[$field_name])) {
 			$save[$field_name] = xml_character_decode($xml_array[$field_name]);
@@ -999,7 +1011,7 @@ function xml_to_gprint_preset($hash, &$xml_array, &$hash_cache) {
 		$gprint_preset_id = sql_save($save, 'graph_templates_gprint');
 
 		$hash_cache['gprint_preset'][$hash] = $gprint_preset_id;
-	}else{
+	} else {
 		$hash_cache['gprint_preset'][$hash] = $_gprint_preset_id;
 	}
 
@@ -1018,8 +1030,7 @@ function xml_to_data_source_profile($hash, &$xml_array, &$hash_cache, $import_as
 		$save['id']   = 0;
 		$save['hash'] = get_hash_data_source_profile(0);
 
-		reset($fields_profile_edit);
-		while (list($field_name, $field_array) = each($fields_profile_edit)) {
+		foreach ($fields_profile_edit as $field_name => $field_array) {
 			/* make sure this field exists in the xml array first */
 			if (isset($xml_array[$field_name])) {
 				$save[$field_name] = xml_character_decode($xml_array[$field_name]);
@@ -1055,14 +1066,13 @@ function xml_to_data_source_profile($hash, &$xml_array, &$hash_cache, $import_as
 
 			/* import into: data_source_profiles_rra */
 			if (is_array($xml_array['items'])) {
-				while (list($item_name, $item_array) = each($xml_array['items'])) {
+				foreach ($xml_array['items'] as $item_name => $item_array) {
 					unset($save);
 
 					$save['id']                     = 0;
 					$save['data_source_profile_id'] = $dsp_id;
 
-					reset($fields_profile_rra_edit);
-					while (list($field_name, $field_array) = each($fields_profile_rra_edit)) {
+					foreach ($fields_profile_rra_edit as $field_name => $field_array) {
 						/* make sure this field exists in the xml array first */
 						if (isset($item_array[$field_name])) {
 							$save[$field_name] = xml_character_decode($item_array[$field_name]);
@@ -1080,9 +1090,12 @@ function xml_to_data_source_profile($hash, &$xml_array, &$hash_cache, $import_as
 		$import_debug_info['type']   = 'new';
 		$import_debug_info['title']  = $xml_array['name'] . ' (imported)';
 		$import_debug_info['result'] = ($preview_only ? 'preview':(empty($dsp_id) ? 'fail' : 'success'));
+
+		return $hash_cache;
+	} else {
+		return false;
 	}
 
-	return $hash_cache;
 }
 
 function xml_to_host_template($hash, &$xml_array, &$hash_cache) {
@@ -1102,15 +1115,14 @@ function xml_to_host_template($hash, &$xml_array, &$hash_cache) {
 			FROM host_template
 			WHERE id = ?', 
 			array($_host_template_id));
-	}else{
+	} else {
 		$previous_data = array();
 	}
 
 	$save['id']   = (empty($_host_template_id) ? '0' : $_host_template_id);
 	$save['hash'] = $hash;
 
-	reset($fields_host_template_edit);
-	while (list($field_name, $field_array) = each($fields_host_template_edit)) {
+	foreach ($fields_host_template_edit as $field_name => $field_array) {
 		/* make sure this field exists in the xml array first */
 		if (isset($xml_array[$field_name])) {
 			$save[$field_name] = xml_character_decode($xml_array[$field_name]);
@@ -1164,7 +1176,7 @@ function xml_to_host_template($hash, &$xml_array, &$hash_cache) {
 				}
 			}
 		}
-	}else{
+	} else {
 		$hash_cache['host_template'][$hash] = $_host_template_id;
 	}
 
@@ -1199,15 +1211,14 @@ function xml_to_cdef($hash, &$xml_array, &$hash_cache) {
 			FROM cdef
 			WHERE id = ?', 
 			array($_cdef_id));
-	}else{
+	} else {
 		$previous_data = array();
 	}
 
 	$save['id']   = (empty($_cdef_id) ? '0' : $_cdef_id);
 	$save['hash'] = $hash;
 
-	reset($fields_cdef_edit);
-	while (list($field_name, $field_array) = each($fields_cdef_edit)) {
+	foreach ($fields_cdef_edit as $field_name => $field_array) {
 		/* make sure this field exists in the xml array first */
 		if (isset($xml_array[$field_name])) {
 			$save[$field_name] = xml_character_decode($xml_array[$field_name]);
@@ -1221,7 +1232,7 @@ function xml_to_cdef($hash, &$xml_array, &$hash_cache) {
 		$cdef_id = sql_save($save, 'cdef');
 
 		$hash_cache['cdef'][$hash] = $cdef_id;
-	}else{
+	} else {
 		$cdef_id = $_cdef_id;
 
 		$hash_cache['cdef'][$hash] = $_cdef_id;
@@ -1229,7 +1240,7 @@ function xml_to_cdef($hash, &$xml_array, &$hash_cache) {
 
 	/* import into: cdef_items */
 	if (is_array($xml_array['items'])) {
-		while (list($item_hash, $item_array) = each($xml_array['items'])) {
+		foreach ($xml_array['items'] as $item_hash => $item_array) {
 			/* parse information from the hash */
 			$parsed_hash = parse_xml_hash($item_hash);
 
@@ -1248,7 +1259,7 @@ function xml_to_cdef($hash, &$xml_array, &$hash_cache) {
 					FROM cdef_items
 					WHERE id = ?', 
 					array($_cdef_item_id));
-			}else{
+			} else {
 				$previous_data = array();
 			}
 
@@ -1256,8 +1267,7 @@ function xml_to_cdef($hash, &$xml_array, &$hash_cache) {
 			$save['hash']    = $parsed_hash['hash'];
 			$save['cdef_id'] = $cdef_id;
 
-			reset($fields_cdef_item_edit);
-			while (list($field_name, $field_array) = each($fields_cdef_item_edit)) {
+			foreach ($fields_cdef_item_edit as $field_name => $field_array) {
 				/* make sure this field exists in the xml array first */
 				if (isset($item_array[$field_name])) {
 					/* check, if an inherited cdef as to be decoded (value == 5)
@@ -1291,7 +1301,7 @@ function xml_to_cdef($hash, &$xml_array, &$hash_cache) {
 				$cdef_item_id = sql_save($save, 'cdef_items');
 
 				$hash_cache['cdef_item']{$parsed_hash['hash']} = $cdef_item_id;
-			}else{
+			} else {
 				$hash_cache['cdef_item']{$parsed_hash['hash']} = $_cdef_item_id;
 			}
 		}
@@ -1324,7 +1334,7 @@ function xml_to_vdef($hash, &$xml_array, &$hash_cache) {
 			FROM vdef
 			WHERE id = ?', 
 			array($_vdef_id));
-	}else{
+	} else {
 		$previous_data = array();
 	}
 
@@ -1332,8 +1342,7 @@ function xml_to_vdef($hash, &$xml_array, &$hash_cache) {
 	$save['hash'] = $hash;
 
 	$fields_vdef_edit = preset_vdef_form_list();
-	reset($fields_vdef_edit);
-	while (list($field_name, $field_array) = each($fields_vdef_edit)) {
+	foreach ($fields_vdef_edit as $field_name => $field_array) {
 		/* make sure this field exists in the xml array first */
 		if (isset($xml_array[$field_name])) {
 			$save[$field_name] = xml_character_decode($xml_array[$field_name]);
@@ -1347,7 +1356,7 @@ function xml_to_vdef($hash, &$xml_array, &$hash_cache) {
 		$vdef_id = sql_save($save, 'vdef');
 
 		$hash_cache['vdef'][$hash] = $vdef_id;
-	}else{
+	} else {
 		$vdef_id = $_vdef_id;
 
 		$hash_cache['vdef'][$hash] = $_vdef_id;
@@ -1355,7 +1364,7 @@ function xml_to_vdef($hash, &$xml_array, &$hash_cache) {
 
 	/* import into: vdef_items */
 	if (is_array($xml_array['items'])) {
-		while (list($item_hash, $item_array) = each($xml_array['items'])) {
+		foreach ($xml_array['items'] as $item_hash => $item_array) {
 			/* parse information from the hash */
 			$parsed_hash = parse_xml_hash($item_hash);
 
@@ -1374,7 +1383,7 @@ function xml_to_vdef($hash, &$xml_array, &$hash_cache) {
 					FROM vdef_items
 					WHERE id = ?', 
 					array($_vdef_item_id));
-			}else{
+			} else {
 				$previous_data = array();
 			}
 
@@ -1383,8 +1392,7 @@ function xml_to_vdef($hash, &$xml_array, &$hash_cache) {
 			$save['vdef_id'] = $vdef_id;
 
 			$fields_vdef_item_edit = preset_vdef_item_form_list();
-			reset($fields_vdef_item_edit);
-			while (list($field_name, $field_array) = each($fields_vdef_item_edit)) {
+			foreach ($fields_vdef_item_edit as $field_name => $field_array) {
 				/* make sure this field exists in the xml array first */
 				if (isset($item_array[$field_name])) {
 					$save[$field_name] = xml_character_decode($item_array[$field_name]);
@@ -1398,7 +1406,7 @@ function xml_to_vdef($hash, &$xml_array, &$hash_cache) {
 				$vdef_item_id = sql_save($save, 'vdef_items');
 
 				$hash_cache['vdef_item']{$parsed_hash['hash']} = $vdef_item_id;
-			}else{
+			} else {
 				$hash_cache['vdef_item']{$parsed_hash['hash']} = $_vdef_item_id;
 			}
 		}
@@ -1432,20 +1440,21 @@ function xml_to_data_input_method($hash, &$xml_array, &$hash_cache) {
 			FROM data_input
 			WHERE id = ?', 
 			array($_data_input_id));
-	}else{
+	} else {
 		$previous_data = array();
 	}
 
 	$save['id']   = (empty($_data_input_id) ? '0' : $_data_input_id);
 	$save['hash'] = $hash;
 
-	reset($fields_data_input_edit);
-	while (list($field_name, $field_array) = each($fields_data_input_edit)) {
+	foreach ($fields_data_input_edit as $field_name => $field_array) {
 		/* make sure this field exists in the xml array first */
 		if (isset($xml_array[$field_name])) {
 			/* fix issue with data input method importing and white spaces */
 			if ($field_name == 'input_string') {
 				$xml_array[$field_name] = str_replace('><', '> <', $xml_array[$field_name]);
+				$xml_array[$field_name] = str_replace('>""<', '>" "<', $xml_array[$field_name]);
+				$xml_array[$field_name] = str_replace('>\'\'<', '>\' \'<', $xml_array[$field_name]);
 			}
 
 			$save[$field_name] = xml_character_decode($xml_array[$field_name]);
@@ -1461,7 +1470,7 @@ function xml_to_data_input_method($hash, &$xml_array, &$hash_cache) {
 		$hash_cache['data_input_method'][$hash] = $data_input_id;
 
 		update_replication_crc(0, 'poller_replicate_data_input_crc');
-	}else{
+	} else {
 		$data_input_id = $_data_input_id;
 
 		$hash_cache['data_input_method'][$hash] = $_data_input_id;
@@ -1469,7 +1478,7 @@ function xml_to_data_input_method($hash, &$xml_array, &$hash_cache) {
 
 	/* import into: data_input_fields */
 	if (is_array($xml_array['fields'])) {
-		while (list($item_hash, $item_array) = each($xml_array['fields'])) {
+		foreach ($xml_array['fields'] as $item_hash => $item_array) {
 			/* parse information from the hash */
 			$parsed_hash = parse_xml_hash($item_hash);
 
@@ -1488,7 +1497,7 @@ function xml_to_data_input_method($hash, &$xml_array, &$hash_cache) {
 					FROM data_input_fields
 					WHERE id = ?', 
 					array($_data_input_field_id));
-			}else{
+			} else {
 				$previous_data = array();
 			}
 
@@ -1496,8 +1505,7 @@ function xml_to_data_input_method($hash, &$xml_array, &$hash_cache) {
 			$save['hash']          = $parsed_hash['hash'];
 			$save['data_input_id'] = $data_input_id;
 
-			reset($fields_data_input_field_edit);
-			while (list($field_name, $field_array) = each($fields_data_input_field_edit)) {
+			foreach ($fields_data_input_field_edit as $field_name => $field_array) {
 				/* make sure this field exists in the xml array first */
 				if (isset($item_array[$field_name])) {
 					$save[$field_name] = xml_character_decode($item_array[$field_name]);
@@ -1513,7 +1521,7 @@ function xml_to_data_input_method($hash, &$xml_array, &$hash_cache) {
 				$hash_cache['data_input_field']{$parsed_hash['hash']} = $data_input_field_id;
 
 				update_replication_crc(0, 'poller_replicate_data_input_fields_crc');
-			}else{
+			} else {
 				$hash_cache['data_input_field']{$parsed_hash['hash']} = $_data_input_field_id;
 			}
 		}
@@ -1549,18 +1557,32 @@ function compare_data($save, $previous_data, $table) {
 			'data_template_id',
 			'data_input_field_id'
 		);
-	}else{
+	} else {
 		$ignores = array();
 	}
 
 	if (!sizeof($previous_data)) {
 		return 0;
-	}else{
+	} else {
 		$different = 0;
 		foreach($save as $column => $value) {
 			if (array_search($column, $ignores) !== false) continue;
 
 			if ($previous_data[$column] != $value) {
+				$cols = db_get_table_column_types($table);
+
+				if (strstr($cols[$column]['type'], 'int') !== false ||
+					strstr($cols[$column]['type'], 'float') !== false ||
+					strstr($cols[$column]['type'], 'decimal') !== false ||
+					strstr($cols[$column]['type'], 'double') !== false) {
+
+					if (empty($previous_data[$column]) && empty($value)) {
+						continue;
+					}
+				} elseif (empty($previous_data[$column]) && empty($value)) {
+					continue;
+				}
+
 				$different++;
 				$import_debug_info['differences'][] = 'Table: ' . $table . ', Column: ' . $column . ', New Value: \'' . $value . '\', Old Value: \'' . $previous_data[$column] . '\''; 
 			}
@@ -1581,7 +1603,7 @@ function hash_to_friendly_name($hash, $display_type_name) {
 
 	if ($display_type_name == true) {
 		$prepend = '(<em>' . $hash_type_names{$parsed_hash['type']} . '</em>) ';
-	}else{
+	} else {
 		$prepend = '';
 	}
 
@@ -1622,10 +1644,10 @@ function resolve_hash_to_id($hash, &$hash_cache_array) {
 	/* invalid/wrong hash */
 	if ($parsed_hash == false) { return false; }
 
-	if (isset($hash_cache_array{$parsed_hash['type']}{$parsed_hash['hash']})) {
+	if (isset($hash_cache_array[$parsed_hash['type']][$parsed_hash['hash']])) {
 		$import_debug_info['dep'][$hash] = 'met';
-		return $hash_cache_array{$parsed_hash['type']}{$parsed_hash['hash']};
-	}else{
+		return $hash_cache_array[$parsed_hash['type']][$parsed_hash['hash']];
+	} else {
 		$import_debug_info['dep'][$hash] = 'unmet';
 		return 0;
 	}
@@ -1642,7 +1664,7 @@ function parse_xml_hash($hash) {
 			cacti_log(__FUNCTION__ . ' ERROR type or version not found for hash: ' . $hash, false, 'IMPORT', POLLER_VERBOSITY_LOW);
 			return false;
 		}
-	}else{
+	} else {
 		cacti_log(__FUNCTION__ . ' ERROR wrong hash format for hash: ' . $hash, false, 'IMPORT', POLLER_VERBOSITY_LOW);
 		return false;
 	}
@@ -1656,8 +1678,7 @@ function check_hash_type($hash_type) {
 	/* lets not mess up the pointer for other people */
 	$local_hash_type_codes = $hash_type_codes;
 
-	reset($local_hash_type_codes);
-	while (list($type, $code) = each($local_hash_type_codes)) {
+	foreach ($local_hash_type_codes as $type => $code) {
 		if ($code == $hash_type) {
 			$current_type = $type;
 		}
@@ -1672,13 +1693,12 @@ function check_hash_type($hash_type) {
 }
 
 function check_hash_version($hash_version) {
-	global $hash_version_codes, $config;
+	global $cacti_version_codes, $config;
 
 	$i = 0;
 
-	reset($hash_version_codes);
-	while (list($version, $code) = each($hash_version_codes)) {
-		if ($version == $config['cacti_version']) {
+	foreach ($cacti_version_codes as $version => $code) {
+		if ($version == CACTI_VERSION) {
 			$current_version_index = $i;
 		}
 
@@ -1694,11 +1714,11 @@ function check_hash_version($hash_version) {
 		cacti_log("ERROR: $hash_version Current Cacti Version does not exist!", false, 'IMPORT', POLLER_VERBOSITY_HIGH);
 		raise_message(15); /* error: current cacti version does not exist! */
 		return false;
-	}elseif (!isset($hash_version_index)) {
+	} elseif (!isset($hash_version_index)) {
 		cacti_log("ERROR: $hash_version hash version does not exist!", false, 'IMPORT', POLLER_VERBOSITY_HIGH);
 		raise_message(16); /* error: hash version does not exist! */
 		return false;
-	}elseif ($hash_version_index > $current_version_index) {
+	} elseif ($hash_version_index > $current_version_index) {
 		cacti_log("ERROR: $hash_version hash version if for a newer Cacti!", false, 'IMPORT', POLLER_VERBOSITY_HIGH);
 		raise_message(17); /* error: hash made with a newer version of cacti */
 		return false;
@@ -1708,12 +1728,11 @@ function check_hash_version($hash_version) {
 }
 
 function get_version_index($string_version) {
-	global $hash_version_codes;
+	global $cacti_version_codes;
 
 	$i = 0;
 
-	reset($hash_version_codes);
-	while (list($version, $code) = each($hash_version_codes)) {
+	foreach ($cacti_version_codes as $version => $code) {
 		if ($string_version == $version) {
 			return $i;
 		}
@@ -1747,7 +1766,7 @@ function import_display_results($import_debug_info, $filestatus, $web = false, $
 		if (sizeof($filestatus)) {
 			if ($preview) {
 				print "<tr class='odd'><td><p class='textArea'>" . __('Cacti would make the following changes if the Package was imported:') . "</p>\n";
-			}else{
+			} else {
 				print "<tr class='odd'><td><p class='textArea'>" . __('Cacti has imported the following items for the Package:') . "</p>\n";
 			}
 
@@ -1758,31 +1777,31 @@ function import_display_results($import_debug_info, $filestatus, $web = false, $
 				print "<li>" . ($preview ? __("[preview] "):"") . $filename . " [" . $status . "]</li>\n";
 			}
 			print "</ul>";
-		}else{
+		} else {
 			if ($preview) {
 				print "<tr class='odd'><td><p class='textArea'>" . __('Cacti would make the following changes if the Template was imported:') . "</p>\n";
-			}else{
+			} else {
 				print "<tr class='odd'><td><p class='textArea'>" . __('Cacti has imported the following items for the Template:') . "</p>\n";
 			}
 		}
 
-		while (list($type, $type_array) = each($import_debug_info)) {
+		foreach ($import_debug_info as $type => $type_array) {
 			print "<p><strong>" . $hash_type_names[$type] . "</strong></p>\n";
 
-			while (list($index, $vals) = each($type_array)) {
+			foreach ($type_array as $index => $vals) {
 				if ($vals['result'] == 'success') {
 					$result_text = "<span class='success'>" . __('[success]') . "</span>";
-				}elseif ($vals['result'] == 'fail') {
+				} elseif ($vals['result'] == 'fail') {
 					$result_text = "<span class='failed'>" . __('[fail]') . "</span>";
-				}else{
+				} else {
 					$result_text = "<span class='success'>" . __('[preview]') . "</span>";
 				}
 
 				if ($vals['type'] == 'updated') {
 					$type_text = "<span class='updateObject'>" . __('[updated]') . "</span>\n";
-				}elseif ($vals['type'] == 'new') {
+				} elseif ($vals['type'] == 'new') {
 					$type_text = "<span class='newObject'>" . __('[new]') . "</span>\n";
-				}else{
+				} else {
 					$type_text = "<span class='deviceUp'>" . __('[unchanged]') . "</span>\n";
 				}
 
@@ -1817,10 +1836,10 @@ function import_display_results($import_debug_info, $filestatus, $web = false, $
 					$dep_errors = false;
 
 					if ((isset($vals['dep'])) && (sizeof($vals['dep']) > 0)) {
-						while (list($dep_hash, $dep_status) = each($vals['dep'])) {
+						foreach ($vals['dep'] as $dep_hash => $dep_status) {
 							if ($dep_status == 'met') {
 								$dep_status_text = "<span class='foundDependency'>" . __('Found Dependency:') . "</span>";
-							}else{
+							} else {
 								$dep_status_text = "<span class='unmetDependency'>" . __('Unmet Dependency:') . "</span>";
 								$dep_errors = true;
 							}
@@ -1844,7 +1863,7 @@ function import_display_results($import_debug_info, $filestatus, $web = false, $
 
 	if ($web) {
 		print ob_get_clean();
-	}else{
+	} else {
 		$output = ob_get_clean();
 		$output = explode("\n", $output);
 		if (sizeof($output)) {

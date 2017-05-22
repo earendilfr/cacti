@@ -49,8 +49,7 @@ function get_matching_nodes() {
 	$filter = '%' . get_nfilter_request_var('str') . '%';
 
 	if (get_nfilter_request_var('str') != '') {
-		$matching = db_fetch_assoc_prepared("SELECT gti.id, gti.parent, 
-			gti.graph_tree_id, IF(gti.title != '', '1', '0') AS node
+		$matching = db_fetch_assoc_prepared("SELECT gti.parent, gti.graph_tree_id
 			FROM graph_tree_items AS gti 
 			LEFT JOIN host AS h
 			ON h.id=gti.host_id
@@ -61,22 +60,18 @@ function get_matching_nodes() {
 			OR h.hostname LIKE ?
 			OR gti.title LIKE ?",
 			array($filter, $filter, $filter, $filter));
-	}else{
-		$matching = db_fetch_assoc("SELECT gti.id, gti.parent, 
-			gti.graph_tree_id, IF(gti.title != '', '1', '0') AS node
-			FROM graph_tree_items AS gti 
-			LEFT JOIN host AS h
-			ON h.id=gti.host_id
-			LEFT JOIN graph_templates_graph AS gtg
-			ON gtg.local_graph_id=gti.local_graph_id AND gtg.local_graph_id>0");
+	} else {
+		$matching = db_fetch_assoc("SELECT parent, graph_tree_id FROM graph_tree_items");
 	}
 
 	if (sizeof($matching)) {
 		foreach($matching as $row) {
 			while ($row['parent'] != '0') {
 				$match[] = 'tbranch-' . $row['parent'];
-				$row = db_fetch_row_prepared('SELECT id, parent, graph_tree_id FROM graph_tree_items WHERE id = ?', array($row['parent']));
-				if (!sizeof($row)) break;
+				$row = db_fetch_row_prepared('SELECT parent, graph_tree_id FROM graph_tree_items WHERE id = ?', array($row['parent']));
+				if (!sizeof($row)) {
+				    break;
+				}
 			}
 
 			if (sizeof($row)) {
@@ -95,7 +90,7 @@ function get_matching_nodes() {
 				if (isset($match[$level])) {
 					if ($level == 0) {
 						$final_array[$match[$level]][$match[$level]] = 1;
-					}else{
+					} else {
 						$final_array[$match[0]][$match[$level]] = 1;
 					}
 					$found++;
@@ -103,10 +98,14 @@ function get_matching_nodes() {
 			}
 			$level++;
 
-			if ($found == 0) break;
+			if ($found == 0) {
+			    break;
+			}
 		}
 
 		if (sizeof($final_array)) {
+			$fa = array();
+
 			foreach($final_array as $key => $matches) {
 				foreach($matches as $branch => $dnc) {
 					$fa[] = $branch;
@@ -129,6 +128,10 @@ case 'ajax_hosts':
 case 'ajax_search':
 	get_matching_nodes(); 
 	exit;
+
+	break;
+case 'update_timespan':
+	// we really don't need to do anything.  The session variables have already been updated
 
 	break;
 case 'save':
@@ -161,7 +164,7 @@ case 'save':
 			if (isset_request_var('thumbnails')) {
 				set_graph_config_option('thumbnail_section_preview', get_nfilter_request_var('thumbnails') == 'true' ? 'on':'');
 			}
-		}else{
+		} else {
 			if (isset_request_var('columns')) {
 				set_graph_config_option('num_columns_tree', get_request_var('columns'));
 			}
@@ -199,21 +202,21 @@ case 'get_node':
 			get_nfilter_request_var('tree_id') == '') {
 
 			$tree_id = read_user_setting('default_tree_id');
-		}elseif (get_nfilter_request_var('tree_id') == 0 && 
+		} elseif (get_nfilter_request_var('tree_id') == 0 &&
 			substr_count(get_nfilter_request_var('id'), 'tree_anchor') > 0) {
 
 			$ndata = explode('-', get_nfilter_request_var('id'));
 			$tree_id = $ndata[1];
 			input_validate_input_number($tree_id);
 		}
-	}else{
+	} else {
 		$tree_id = read_user_setting('default_tree_id');
 	}
 
 	if (isset_request_var('id') && get_nfilter_request_var('id') != '#') {
 		if (substr_count(get_nfilter_request_var('id'), 'tree_anchor')) {
 			$parent = -1;
-		}else{
+		} else {
 			$ndata = explode('_', get_nfilter_request_var('id'));
 
 			foreach($ndata as $node) {
@@ -244,10 +247,10 @@ case 'tree_content':
 
 		if (!isempty_request_var('hgd')) {
 			$_SESSION['sess_graph_hgd'] = get_request_var('hgd');
-		}else{
+		} else {
 			$_SESSION['sess_graph_hgd'] = '';
 		}
-	}elseif (isset($_SESSION['sess_graph_node'])) {
+	} elseif (isset($_SESSION['sess_graph_node'])) {
 		set_request_var('node', $_SESSION['sess_graph_node']);
 		set_request_var('hgd', $_SESSION['sess_graph_hgd']);
 	}
@@ -286,7 +289,7 @@ case 'tree_content':
 		if (strpos(get_request_var('node'), 'tree_anchor') !== false) {
 			$tree_id = $parts[1];
 			$node_id = 0;
-		}elseif (strpos(get_request_var('node'), 'tbranch') !== false) {
+		} elseif (strpos(get_request_var('node'), 'tbranch') !== false) {
 			// Check for branch
 			$node_id = $parts[1];
 			$tree_id = db_fetch_cell_prepared('SELECT graph_tree_id 
@@ -320,7 +323,7 @@ case 'preview':
 	html_graph_validate_preview_request_vars();
 
 	/* include graph view filter selector */
-	html_start_box(__('Graph Preview Filters') . (isset_request_var('style') && strlen(get_request_var('style')) ? ' ' . __('[ Custom Graph List Applied - Filtering from List ]'):''), '100%', '', '3', 'center', '');
+	html_start_box(__('Graph Preview Filters') . (isset_request_var('style') && get_request_var('style') != '' ? ' ' . __('[ Custom Graph List Applied - Filtering from List ]'):''), '100%', '', '3', 'center', '');
 
 	html_graph_preview_filter('graph_view.php', 'preview');
 
@@ -336,7 +339,7 @@ case 'preview':
 				foreach (explode(',', get_request_var('graph_list')) as $item) {
 					$graph_list[$item] = 1;
 				}
-			}else{
+			} else {
 				$graph_list = array();
 			}
 			if (!isempty_request_var('graph_add')) {
@@ -372,11 +375,11 @@ case 'preview':
 		$sql_where .= " gtg.title_cache RLIKE '" . get_request_var('rfilter') . "'";
 	}
 
-	$sql_where .= (strlen($sql_or) && strlen($sql_where) ? ' AND ':'') . $sql_or;
+	$sql_where .= ($sql_or != '' && $sql_where != '' ? ' AND ':'') . $sql_or;
 
 	if (!isempty_request_var('host_id') && get_request_var('host_id') > 0) {
 		$sql_where .= (empty($sql_where) ? '' : ' AND') . ' gl.host_id=' . get_request_var('host_id');
-	}elseif (isempty_request_var('host_id')) {
+	} elseif (isempty_request_var('host_id')) {
 		$sql_where .= (empty($sql_where) ? '' : ' AND') . ' gl.host_id=0';
 	}
 
@@ -397,7 +400,7 @@ case 'preview':
 
 	if (get_request_var('thumbnails') == 'true') {
 		html_graph_thumbnail_area($graphs, '', 'graph_start=' . get_current_graph_start() . '&graph_end=' . get_current_graph_end(), '', get_request_var('columns'));
-	}else{
+	} else {
 		html_graph_area($graphs, '', 'graph_start=' . get_current_graph_start() . '&graph_end=' . get_current_graph_end(), '', get_request_var('columns'));
 	}
 
@@ -470,7 +473,7 @@ case 'list':
 
 	if (get_request_var('rows') == '-1') {
 		$rows = read_config_option('num_rows_table');
-	}else{
+	} else {
 		$rows = get_request_var('rows');
 	}
 
@@ -479,7 +482,7 @@ case 'list':
 		foreach (explode(',', get_request_var('graph_list')) as $item) {
 			$graph_list[$item] = 1;
 		}
-	}else{
+	} else {
 		$graph_list = array();
 	}
 
@@ -503,7 +506,7 @@ case 'list':
 	form_start('graph_view.php', 'form_graph_list');
 
 	/* display graph view filter selector */
-	html_start_box(__('Graph List View Filters') . (isset_request_var('style') && strlen(get_request_var('style')) ? ' ' . __('[ Custom Graph List Applied - Filter FROM List ]'):''), '100%', '', '3', 'center', '');
+	html_start_box(__('Graph List View Filters') . (isset_request_var('style') && get_request_var('style') != '' ? ' ' . __('[ Custom Graph List Applied - Filter FROM List ]'):''), '100%', '', '3', 'center', '');
 
 	?>
 	<tr class='even noprint'>
@@ -557,9 +560,9 @@ case 'list':
 							<option value='-1'<?php print (get_request_var('rows') == '-1' ? ' selected>':'>') . __('Default');?></option>
 							<?php
 							if (sizeof($item_rows) > 0) {
-							foreach ($item_rows as $key => $value) {
-								print "<option value='" . $key . "'"; if (get_request_var('rows') == $key) { print ' selected'; } print '>' . $value . "</option>\n";
-							}
+								foreach ($item_rows as $key => $value) {
+									print "<option value='" . $key . "'"; if (get_request_var('rows') == $key) { print ' selected'; } print '>' . $value . "</option>\n";
+								}
 							}
 							?>
 						</select>
@@ -594,7 +597,7 @@ case 'list':
 
 	if (!isempty_request_var('host_id') && get_request_var('host_id') > 0) {
 		$sql_where .= ($sql_where == '' ? '' : ' AND') . ' gl.host_id=' . get_request_var('host_id');
-	}elseif (isempty_request_var('host_id')) {
+	} elseif (isempty_request_var('host_id')) {
 		$sql_where .= ($sql_where == '' ? '' : ' AND') . ' gl.host_id=0';
 	}
 
@@ -629,7 +632,7 @@ case 'list':
 				if (!empty($aggregate)) {
 					$graph['description']   = __('Aggregated Device');
 					$graph['template_name'] = $aggregate;
-				}else{
+				} else {
 					$graph['description']   = __('Non-Device');
 					$graph['template_name'] = __('Not Applicable');
 				}

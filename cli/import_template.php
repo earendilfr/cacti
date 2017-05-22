@@ -104,7 +104,7 @@ if (sizeof($parms)) {
 				$id = db_fetch_cell_prepared('SELECT id FROM data_source_profiles ORDER BY `default` DESC LIMIT 1');
 			}
 		}
-	}else{
+	} else {
 		$id = db_fetch_cell_prepared('SELECT id FROM data_source_profiles ORDER BY `default` DESC LIMIT 1');
 	}
 
@@ -123,7 +123,7 @@ if (sizeof($parms)) {
 
 			$debug_data = import_xml_data($xml_data, false, $id, $remove_orphans);
 
-			import_display_results($debug_data, false, $preview_only);
+			import_display_results($debug_data, array(), $preview_only);
 		} else {
 			echo "ERROR: file $filename is not readable, or does not exist\n\n";
 			exit(1);
@@ -141,7 +141,7 @@ if (sizeof($parms)) {
 
 /*  display_version - displays version information */
 function display_version() {
-	$version = db_fetch_cell('SELECT cacti FROM version');
+	$version = get_cacti_version();
 	echo "Cacti Import Template Utility, Version $version, " . COPYRIGHT_YEARS . "\n";
 }
 

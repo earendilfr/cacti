@@ -61,6 +61,23 @@ switch (get_request_var('action')) {
 
 		header('Location: graphs.php?header=false&action=graph_edit&id=' . get_request_var('local_graph_id'));
 		break;
+	case 'ajax_graph_items':
+		$sql_where = '';
+
+		load_current_session_value('host_id', 'sess_graph_items_hi', '-1');
+		load_current_session_value('data_template_id', 'sess_graph_items_dti', '-1');
+
+		if (get_filter_request_var('host_id') > 0) {
+			$sql_where .= 'dl.host_id=' . get_request_var('host_id');
+		}
+
+		if (get_filter_request_var('data_template_id') > 0) {
+			$sql_where .= ($sql_where != '' ? ' AND ':'') . 'dtd.data_template_id=' . get_request_var('data_template_id');
+		}
+
+		get_allowed_ajax_graph_items(true, $sql_where);
+
+		break;
 }
 
 /* --------------------------
@@ -90,23 +107,56 @@ function form_save() {
 					'color_id' => '0',
 					'graph_type_id' => '9',
 					'consolidation_function_id' => '4',
-					'text_format' => 'Current:',
+					'text_format' => 'Cur:',
 					'hard_return' => ''
 					),
 				1 => array(
 					'color_id' => '0',
 					'graph_type_id' => '9',
 					'consolidation_function_id' => '1',
-					'text_format' => 'Average:',
+					'text_format' => 'Avg:',
 					'hard_return' => ''
 					),
 				2 => array(
 					'color_id' => '0',
 					'graph_type_id' => '9',
 					'consolidation_function_id' => '3',
-					'text_format' => 'Maximum:',
+					'text_format' => 'Max:',
 					'hard_return' => 'on'
 					));
+		} elseif ($graph_item_types[get_nfilter_request_var('graph_type_id')] == 'LEGEND_CAMM') {
+	         /* this can be a major time saver when creating lots of graphs with the typical
+				GPRINT LAST/AVERAGE/MAX legends */
+			$items = array(
+				0 => array(
+					'color_id' => '0',
+					'graph_type_id' => '9',
+					'consolidation_function_id' => '4',
+					'text_format' => __('Cur:'),
+					'hard_return' => ''
+				),
+				1 => array(
+					'color_id' => '0',
+					'graph_type_id' => '9',
+					'consolidation_function_id' => '1',
+					'text_format' => __('Avg:'),
+					'hard_return' => ''
+				),
+				2 => array(
+					'color_id' => '0',
+					'graph_type_id' => '9',
+					'consolidation_function_id' => '2',
+					'text_format' => __('Min:'),
+					'hard_return' => ''
+				),
+				3 => array(
+					'color_id' => '0',
+					'graph_type_id' => '9',
+					'consolidation_function_id' => '3',
+					'text_format' => __('Max:'),
+					'hard_return' => 'on'
+				)
+			);
 		}
 
 		$sequence = get_nfilter_request_var('sequence');
@@ -149,8 +199,8 @@ function form_save() {
 				}
    			}
 
-			$save['dashes']         = form_input_validate((isset_request_var('dashes') ? get_nfilter_request_var('dashes') : ''), 'dashes', '^[0-9]+[,0-9]*$', true, 3);
-            $save['dash_offset']    = form_input_validate((isset_request_var('dash_offset') ? get_nfilter_request_var('dash_offset') : ''), 'dash_offset', '^[0-9]+$', true, 3);
+			$save['dashes']         = form_input_validate((isset_request_var('dashes') ? get_nfilter_request_var('dashes') : ''), 'dashes', '', true, 3);
+			$save['dash_offset']    = form_input_validate((isset_request_var('dash_offset') ? get_nfilter_request_var('dash_offset') : ''), 'dash_offset', '^[0-9]+$', true, 3);
 			$save['cdef_id']        = form_input_validate(get_nfilter_request_var('cdef_id'), 'cdef_id', '^[0-9]+$', true, 3);
 			$save['vdef_id']        = form_input_validate(get_nfilter_request_var('vdef_id'), 'vdef_id', '^[0-9]+$', true, 3);
 			$save['shift']          = form_input_validate((isset_request_var('shift') ? get_nfilter_request_var('shift') : ''), 'shift', '^((on)|)$', true, 3);
@@ -167,7 +217,7 @@ function form_save() {
 
 				if ($graph_template_item_id) {
 					raise_message(1);
-				}else{
+				} else {
 					raise_message(2);
 				}
 			}
@@ -178,7 +228,7 @@ function form_save() {
 		if (is_error_message()) {
 			header('Location: graphs.php?header=false&action=item_edit&graph_template_item_id=' . (empty($graph_template_item_id) ? get_nfilter_request_var('graph_template_item_id') : $graph_template_item_id) . '&id=' . get_nfilter_request_var('local_graph_id'));
 			exit;
-		}else{
+		} else {
 			header('Location: graphs.php?header=false&action=graph_edit&id=' . get_nfilter_request_var('local_graph_id'));
 			exit;
 		}
@@ -202,7 +252,7 @@ function item_movedown() {
 
 	if ((!empty($next_id)) && (isset($arr{get_request_var('id')}))) {
 		move_graph_group(get_request_var('id'), $arr, $next_id, 'next');
-	}elseif (preg_match('/(GPRINT|VRULE|HRULE|COMMENT)/', $graph_item_types{db_fetch_cell_prepared('SELECT graph_type_id FROM graph_templates_item WHERE id = ?', array(get_request_var('id')))})) {
+	} elseif (preg_match('/(GPRINT|VRULE|HRULE|COMMENT)/', $graph_item_types{db_fetch_cell_prepared('SELECT graph_type_id FROM graph_templates_item WHERE id = ?', array(get_request_var('id')))})) {
 		move_item_down('graph_templates_item', get_request_var('id'), 'local_graph_id=' . get_request_var('local_graph_id'));
 	}
 }
@@ -220,7 +270,7 @@ function item_moveup() {
 
 	if ((!empty($previous_id)) && (isset($arr{get_request_var('id')}))) {
 		move_graph_group(get_request_var('id'), $arr, $previous_id, 'previous');
-	}elseif (preg_match('/(GPRINT|VRULE|HRULE|COMMENT)/', $graph_item_types{db_fetch_cell_prepared('SELECT graph_type_id FROM graph_templates_item WHERE id = ?', array(get_request_var('id')))})) {
+	} elseif (preg_match('/(GPRINT|VRULE|HRULE|COMMENT)/', $graph_item_types{db_fetch_cell_prepared('SELECT graph_type_id FROM graph_templates_item WHERE id = ?', array(get_request_var('id')))})) {
 		move_item_up('graph_templates_item', get_request_var('id'), 'local_graph_id=' . get_request_var('local_graph_id'));
 	}
 }
@@ -239,23 +289,20 @@ function item_edit() {
 	/* ================= input validation ================= */
 	get_filter_request_var('id');
 	get_filter_request_var('host_id');
-	get_filter_request_var('graph_template_id');
 	get_filter_request_var('local_graph_id');
-	get_filter_request_var('host_id');
 	get_filter_request_var('data_template_id');
 	/* ==================================================== */
 
-	/* remember these search fields in session vars so we don't have to keep passing them around */
-	load_current_session_value('local_graph_id', 'sess_local_graph_id', '');
-	load_current_session_value('host_id', 'sess_ds_host_id', '-1');
-	load_current_session_value('data_template_id', 'sess_data_template_id', '-1');
-
 	$id = (!isempty_request_var('id') ? '&id=' . get_request_var('id') : '');
-	$host = db_fetch_row_prepared('SELECT hostname FROM host WHERE id = ?', array(get_request_var('host_id')));
+
+	$host = db_fetch_row_prepared('SELECT hostname 
+		FROM host 
+		WHERE id = ?', 
+		array(get_request_var('host_id')));
 
 	if (empty($host['hostname'])) {
 		$header = __('Data Sources [No Device]');
-	}else{
+	} else {
 		$header = __('Data Sources [%s]', $host['hostname']);
 	}
 
@@ -267,25 +314,7 @@ function item_edit() {
 		<form name='form_graph_items' action='graphs_items.php'>
 			<table class='filterTable'>
 				<tr>
-					<td>
-						<?php print __('Device');?>
-					</td>
-					<td>
-						<select id='host_id' onChange='applyFilter()'>
-							<option value='-1'<?php if (get_request_var('host_id') == '-1') {?> selected<?php }?>><?php print __('Any');?></option>
-							<option value='0'<?php if (get_request_var('host_id') == '0') {?> selected<?php }?>><?php print __('None');?></option>
-							<?php
-							$hosts = db_fetch_assoc("SELECT id, CONCAT_WS('',description,' (',hostname,')') AS name FROM host ORDER BY description, hostname");
-
-							if (sizeof($hosts) > 0) {
-								foreach ($hosts as $host) {
-									print "<option value='" . $host['id'] . "'" . (get_request_var('host_id') == $host['id'] ? ' selected':'') . '>' . htmlspecialchars($host['name']) . "</option>\n";
-								}
-							}
-							?>
-
-						</select>
-					</td>
+					<?php print html_host_filter(get_request_var('host_id'));?>
 				</tr>
 				<tr>
 					<td class='nowrap'>
@@ -296,7 +325,19 @@ function item_edit() {
 							<option value='-1'<?php if (get_request_var('data_template_id') == '-1') {?> selected<?php }?>><?php print __('Any');?></option>
 							<option value='0'<?php if (get_request_var('data_template_id') == '0') {?> selected<?php }?>><?php print __('None');?></option>
 							<?php
-							$data_templates = db_fetch_assoc('SELECT id, name FROM data_template ORDER BY name');
+							if (get_request_var('host_id') <= 0) {
+								$data_templates = db_fetch_assoc('SELECT id, name 
+									FROM data_template 
+									ORDER BY name');
+							} else {
+								$data_templates = db_fetch_assoc_prepared('SELECT DISTINCT dt.id, dt.name 
+									FROM data_template AS dt
+									INNER JOIN data_local AS dl
+									ON dl.data_template_id=dt.id
+									WHERE dl.host_id = ?
+									ORDER BY name',
+									array(get_request_var('host_id')));
+							}
 
 							if (sizeof($data_templates)) {
 								foreach ($data_templates as $data_template) {
@@ -315,25 +356,34 @@ function item_edit() {
 
 	html_end_box();
 
+	load_current_session_value('host_id', 'sess_graph_items_hi', '-1');
+	load_current_session_value('data_template_id', 'sess_graph_items_dti', '-1');
+
 	if (get_request_var('host_id') > 0) {
 		$sql_where = 'h.id=' . get_request_var('host_id');
-	}elseif (get_request_var('host_id') == 0) {
+	} elseif (get_request_var('host_id') == 0) {
 		$sql_where = 'h.id IS NULL';
-	}else{
+	} else {
 		$sql_where = '';
 	}
 
 	if (get_request_var('data_template_id') == '-1') {
 		$sql_where .= '';
-	}elseif (get_request_var('data_template_id') == '0') {
+	} elseif (get_request_var('data_template_id') == '0') {
 		$sql_where .= ($sql_where != '' ? ' AND ':'') . 'dl.data_template_id=0';
-	}elseif (!isempty_request_var('data_template_id')) {
+	} elseif (!isempty_request_var('data_template_id')) {
 		$sql_where .= ($sql_where != '' ? ' AND ':'') . 'dl.data_template_id=' . get_request_var('data_template_id');
 	}
 
 	if (!isempty_request_var('id')) {
-		$template_item = db_fetch_row_prepared('SELECT * FROM graph_templates_item WHERE id = ?', array(get_request_var('id')));
-		$host_id       = db_fetch_cell_prepared('SELECT host_id FROM graph_local WHERE id = ?', array(get_request_var('local_graph_id')));
+		$template_item = db_fetch_row_prepared('SELECT * 
+			FROM graph_templates_item 
+			WHERE id = ?', 
+			array(get_request_var('id')));
+	} else {
+		$template_item = array();
+
+		kill_session_var('sess_graph_items_dti');
 	}
 
 	$title = db_fetch_cell_prepared('SELECT title_cache 
@@ -345,19 +395,41 @@ function item_edit() {
 
 	form_start('graphs_items.php', 'greph_edit');
 
-	html_start_box($header_label, '100%', '', '3', 'center', '');
+	html_start_box($header_label, '100%', true, '3', 'center', '');
 
 	/* by default, select the LAST DS chosen to make everyone's lives easier */
 	if (!isempty_request_var('local_graph_id')) {
-		$default = db_fetch_row_prepared('SELECT task_item_id 
-			FROM graph_templates_item 
-			WHERE local_graph_id = ? 
-			ORDER BY sequence DESC', array(get_request_var('local_graph_id')));
+		$struct_graph_item['task_item_id']['default'] = 0;
 
-		if (sizeof($default) > 0) {
-			$struct_graph_item['task_item_id']['default'] = $default['task_item_id'];
-		}else{
-			$struct_graph_item['task_item_id']['default'] = 0;
+		if (isset($template_item['task_item_id'])) {
+			$task_item_id = $template_item['task_item_id'];
+			$value = db_fetch_cell_prepared("SELECT
+				CONCAT_WS('', dtd.name_cache,' (', dtr.data_source_name, ')') as name
+				FROM data_local AS dl
+				INNER JOIN data_template_data AS dtd
+				ON dtd.local_data_id=dl.id
+				INNER JOIN data_template_rrd AS dtr
+				ON dtr.local_data_id=dl.id
+				LEFT JOIN host AS h
+				ON dl.host_id=h.id
+				WHERE dtr.id = ?",
+				array($task_item_id));
+		} else {
+			$task_item_id = 0;
+			$value = '';
+		}
+
+		if (get_selected_theme() != 'classic') {
+			$struct_graph_item['task_item_id'] = array(
+				'method' => 'drop_callback',
+				'friendly_name' => __('Data Source'),
+				'description' => __('Choose the Data Source to associate with this Graph Item.'),
+				'sql' => '',
+				'action' => 'ajax_graph_items',
+				'none_value' => __('None'),
+				'id' => $task_item_id,
+				'value' => $value
+			);
 		}
 
 		/* modifications to the default graph items array */
@@ -379,16 +451,20 @@ function item_edit() {
 				$struct_graph_item['task_item_id']['sql'] .= " WHERE $sql_where";
 			}
 		}
+
 		$struct_graph_item['task_item_id']['sql'] .= ' ORDER BY name';
 	}
 
 	$form_array = array();
 
-	while (list($field_name, $field_array) = each($struct_graph_item)) {
+	foreach ($struct_graph_item as $field_name => $field_array) {
 		$form_array += array($field_name => $struct_graph_item[$field_name]);
 
-		$form_array[$field_name]['value'] = (isset($template_item) ? $template_item[$field_name] : '');
-		$form_array[$field_name]['form_id'] = (isset($template_item) ? $template_item['id'] : '0');
+		if ($field_name != 'task_item_id') {
+			$form_array[$field_name]['value']   = (isset($template_item[$field_name]) ? $template_item[$field_name] : '');
+		}
+
+		$form_array[$field_name]['form_id'] = (isset($template_item['id']) ? $template_item['id'] : '0');
 	}
 
 	draw_edit_form(
@@ -399,15 +475,15 @@ function item_edit() {
 	);
 
 	form_hidden_box('local_graph_id', get_request_var('local_graph_id'), '0');
-	form_hidden_box('graph_template_item_id', (isset($template_item) ? $template_item['id'] : '0'), '');
-	form_hidden_box('local_graph_template_item_id', (isset($template_item) ? $template_item['local_graph_template_item_id'] : '0'), '');
-	form_hidden_box('graph_template_id', (isset($template_item) ? $template_item['graph_template_id'] : '0'), '');
-	form_hidden_box('_graph_type_id', (isset($template_item) ? $template_item['graph_type_id'] : '0'), '');
+	form_hidden_box('graph_template_item_id', (!empty($template_item) ? $template_item['id'] : '0'), '');
+	form_hidden_box('local_graph_template_item_id', (!empty($template_item) ? $template_item['local_graph_template_item_id'] : '0'), '');
+	form_hidden_box('graph_template_id', (!empty($template_item) ? $template_item['graph_template_id'] : '0'), '');
+	form_hidden_box('_graph_type_id', (!empty($template_item) ? $template_item['graph_type_id'] : '0'), '');
 	form_hidden_box('save_component_item', '1', '');
 	form_hidden_box('invisible_alpha', $form_array['alpha']['value'], 'FF');
 	form_hidden_box('rrdtool_version', read_config_option('rrdtool_version'), '');
 
-	html_end_box();
+	html_end_box(true, true);
 
 	form_save_button('graphs.php?action=graph_edit&id=' . get_request_var('local_graph_id'));
 
@@ -418,7 +494,7 @@ function item_edit() {
 		$('#shift').click(function(data) {
 			if ($('#shift').is(':checked')) {
 				$('#row_value').show();
-			}else{
+			} else {
 				$('#row_value').hide();
 			}
 		});
@@ -581,10 +657,10 @@ function item_edit() {
 			$('#row_textalign').hide();
 			$('#row_shift').hide();
 			$('#row_alpha').show();
-			$('#row_consolidation_function_id').show();
+			$('#row_consolidation_function_id').hide();
 			$('#row_cdef_id').show();
 			$('#row_vdef_id').show();
-			$('#row_value').hide();
+			$('#row_value').show();
 			$('#row_gprint_id').hide();
 			$('#row_text_format').show();
 			$('#row_hard_return').show();

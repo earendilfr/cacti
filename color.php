@@ -87,7 +87,7 @@ function form_save() {
 		if (get_nfilter_request_var('read_only') == '') {
 			$save['name']      = get_nfilter_request_var('name');
 			$save['hex']       = form_input_validate(get_nfilter_request_var('hex'),  'hex',  '^[a-fA-F0-9]+$' , false, 3);
-		}else{
+		} else {
 			$save['name']      = get_nfilter_request_var('hidden_name');
 			$save['read_only'] = 'on';
 		}
@@ -97,28 +97,36 @@ function form_save() {
 
 			if ($color_id) {
 				raise_message(1);
-			}else{
+			} else {
 				raise_message(2);
 			}
 		}
 
 		if (is_error_message()) {
 			header('Location: color.php?header=false&action=edit&id=' . (empty($color_id) ? get_nfilter_request_var('id') : $color_id));
-		}else{
+		} else {
 			header('Location: color.php?header=false');
 		}
-	}elseif (isset_request_var('save_component_import')) {
-		if (($_FILES['import_file']['tmp_name'] != 'none') && ($_FILES['import_file']['tmp_name'] != '')) {
-            $csv_data = file($_FILES['import_file']['tmp_name']);
-			$debug_data = color_import_processor($csv_data);
+	} elseif (isset_request_var('save_component_import')) {
+		if (isset($_FILES['import_file']['tmp_name'])) {
+			if (($_FILES['import_file']['tmp_name'] != 'none') && ($_FILES['import_file']['tmp_name'] != '')) {
+				$csv_data = file($_FILES['import_file']['tmp_name']);
+				$debug_data = color_import_processor($csv_data);
+	
+				if (sizeof($debug_data)) {
+					$_SESSION['import_debug_info'] = $debug_data;
+				}
 
-			if (sizeof($debug_data)) {
-				$_SESSION['import_debug_info'] = $debug_data;
+				header('Location: color.php?action=import');
 			}
+		} else {
+			raise_message(35);
 
 			header('Location: color.php?action=import');
 		}
 	}
+
+	exit;
 }
 
 /* -----------------------
@@ -147,16 +155,17 @@ function form_actions() {
 	}
 
 	/* setup some variables */
-	$color_list = ''; $i = 0;
+	$color_list = '';
+	$i = 0;
 
 	/* loop through each of the graphs selected on the previous page and get more info about them */
-	while (list($var,$val) = each($_POST)) {
+	foreach ($_POST as $var => $val) {
 		if (preg_match('/^chk_([0-9]+)$/', $var, $matches)) {
 			/* ================= input validation ================= */
 			input_validate_input_number($matches[1]);
 			/* ==================================================== */
 
-			$color = db_fetch_row_prepared('SELECT * FROM colors WHERE id = ?', array($matches[1]));
+			$color = db_fetch_row_prepared('SELECT name, hex FROM colors WHERE id = ?', array($matches[1]));
 
 			$color_list .= '<li>' . ($color['name'] != '' ? htmlspecialchars($color['name']): __('Unnamed Color')) . ' (<span style="background-color:#' . $color['hex'] . '">' . $color['hex'] . '</span>)</li>';
 			$color_array[$i] = $matches[1];
@@ -182,7 +191,7 @@ function form_actions() {
 
 			$save_html = "<input type='button' value='" . __('Cancel') . "' onClick='cactiReturnTo()'>&nbsp;<input type='submit' value='" . __('Continue') . "' title='" . __n('Delete Color', 'Delete Colors', sizeof($color_array)) . "'>";
 		}
-	}else{
+	} else {
 		print "<tr><td class='odd'><span class='textError'>" . __('You must select at least one Color.') . "</span></td></tr>\n";
 		$save_html = "<input type='button' value='" . __('Return') . "' onClick='cactiReturnTo()'>";
 	}
@@ -209,62 +218,62 @@ function color_import_processor(&$colors) {
 	$return_array = array();
 
 	if (sizeof($colors)) {
-	foreach($colors as $color_line) {
-		/* parse line */
-		$line_array = explode(',', $color_line);
+		foreach($colors as $color_line) {
+			/* parse line */
+			$line_array = explode(',', $color_line);
 
-		/* header row */
-		if ($i == 0) {
-			$save_order = '(';
-			$j = 0;
-			$first_column = TRUE;
-			$required = 0;
-			$update_suffix = '';
+			/* header row */
+			if ($i == 0) {
+				$save_order = '(';
+				$j = 0;
+				$first_column = TRUE;
+				$required = 0;
+				$update_suffix = '';
 
-			if (sizeof($line_array)) {
-			foreach($line_array as $line_item) {
-				$line_item = trim(str_replace("'", '', $line_item));
-				$line_item = trim(str_replace('"', '', $line_item));
+				if (sizeof($line_array)) {
+				foreach($line_array as $line_item) {
+					$line_item = trim(str_replace("'", '', $line_item));
+					$line_item = trim(str_replace('"', '', $line_item));
 
-				switch ($line_item) {
-					case 'hex':
-						$hexcol = $j;
-					case 'name':
-						if (!$first_column) {
-							$save_order .= ', ';
-						}
+					switch ($line_item) {
+						case 'hex':
+							$hexcol = $j;
+						case 'name':
+							if (!$first_column) {
+								$save_order .= ', ';
+							}
 
-						$save_order .= $line_item;
+							$save_order .= $line_item;
 
-						$insert_columns[] = $j;
-						$first_column = FALSE;
+							$insert_columns[] = $j;
+							$first_column = FALSE;
 
-						if (strlen($update_suffix)) {
-							$update_suffix .= ", $line_item=VALUES($line_item)";
-						}else{
-							$update_suffix .= " ON DUPLICATE KEY UPDATE $line_item=VALUES($line_item)";
-						}
+							if ($update_suffix != '') {
+								$update_suffix .= ", $line_item=VALUES($line_item)";
+							} else {
+								$update_suffix .= " ON DUPLICATE KEY UPDATE $line_item=VALUES($line_item)";
+							}
 
-						$required++;
+							$required++;
 
-						break;
-					default:
-						/* ignore unknown columns */
+							break;
+						default:
+							/* ignore unknown columns */
+					}
+
+					$j++;
 				}
-
-				$j++;
-			}
 			}
 
 			$save_order .= ')';
 
 			if ($required >= 2) {
 				array_push($return_array, '<b>HEADER LINE PROCESSED OK</b>:  <br>Columns found where: ' . $save_order . '<br>');
-			}else{
+			} else {
 				array_push($return_array, '<b>HEADER LINE PROCESSING ERROR</b>: Missing required field <br>Columns found where:' . $save_order . '<br>');
 				break;
 			}
-		}else{
+		} else {
 			$save_value = '(';
 			$j = 0;
 			$first_column = TRUE;
@@ -278,7 +287,7 @@ function color_import_processor(&$colors) {
 
 					if (!$first_column) {
 						$save_value .= ',';
-					}else{
+					} else {
 						$first_column = FALSE;
 					}
 
@@ -302,22 +311,22 @@ function color_import_processor(&$colors) {
 
 					if (db_execute($sql_execute)) {
 						array_push($return_array,"INSERT SUCCEEDED: $save_value");
-					}else{
+					} else {
 						array_push($return_array,"INSERT FAILED: $save_value");
 					}
-				}else{
+				} else {
 					/* perform check to see if the row exists */
 					$existing_row = db_fetch_row("SELECT * FROM colors $sql_where");
 
 					if (sizeof($existing_row)) {
 						array_push($return_array,"<strong>INSERT SKIPPED, EXISTING:</strong> $save_value");
-					}else{
+					} else {
 						$sql_execute = 'INSERT INTO colors ' . $save_order .
 							' VALUES ' . $save_value;
 
 						if (db_execute($sql_execute)) {
 							array_push($return_array,"INSERT SUCCEEDED: $save_value");
-						}else{
+						} else {
 							array_push($return_array,"INSERT FAILED: $save_value");
 						}
 					}
@@ -362,7 +371,7 @@ function color_import() {
 		<td align='left'>
 			<div>
 				<label class='import_label' for='import_file'><?php print __('Select a File'); ?></label>
-				<input class='import_button' type='file' id='import_file'>
+				<input class='import_button' type='file' id='import_file' name='import_file'>
 				<span class='import_text'></span>
 			</div>
 		</td>
@@ -405,13 +414,13 @@ function color_edit() {
 	if (!isempty_request_var('id')) {
 		$color = db_fetch_row_prepared('SELECT * FROM colors WHERE id = ?', array(get_request_var('id')));
 		$header_label = __('Colors [edit: %s]', $color['hex']);
-	}else{
+	} else {
 		$header_label = __('Colors [new]');
 	}
 
 	form_start('color.php', 'color');
 
-	html_start_box( $header_label, '100%', '', '3', 'center', '');
+	html_start_box($header_label, '100%', true, '3', 'center', '');
 
 	draw_edit_form(array(
 		'config' => array('no_form_tag' => true),
@@ -419,7 +428,7 @@ function color_edit() {
 		)
 	);
 
-	html_end_box();
+	html_end_box(true, true);
 
 	form_save_button('color.php');
 
@@ -441,7 +450,7 @@ function color_edit() {
 			if ($('#read_only').is(':checked') || $('#read_only').val() == 'on') {
 				$('#name').prop('disabled', true);
 				$('#hex').prop('disabled', true);
-			}else{
+			} else {
 				$('#name').prop('disabled', false);
 				$('#hex').prop('disabled', false);
 			}
@@ -504,7 +513,7 @@ function color() {
 
 	if (get_request_var('rows') == '-1') {
 		$rows = read_config_option('num_rows_table');
-	}else{
+	} else {
 		$rows = get_request_var('rows');
 	}
 
@@ -567,7 +576,7 @@ function color() {
 			</form>
 			<script type='text/javascript'>
 			function applyFilter() {
-				strURL = 'color.php?filter='+$('#filter').val()+'&rows='+$('#rows').val()+'&page='+$('#page').val()+'&has_graphs='+$('#has_graphs').is(':checked')+'&named='+$('#named').is(':checked')+'&header=false';
+				strURL = 'color.php?filter='+escape($('#filter').val())+'&rows='+$('#rows').val()+'&page='+$('#page').val()+'&has_graphs='+$('#has_graphs').is(':checked')+'&named='+$('#named').is(':checked')+'&header=false';
 				loadPageNoHeader(strURL);
 			}
 
@@ -619,17 +628,17 @@ function color() {
 	if (get_request_var('filter') != '') {
 		$sql_where = "WHERE (name LIKE '%" . get_request_var('filter') . "%' 
 			OR hex LIKE '%" .  get_request_var('filter') . "%')";
-	}else{
+	} else {
 		$sql_where = '';
 	}
 
 	if (get_request_var('named') == 'true') {
-		$sql_where .= (strlen($sql_where) ? ' AND':'WHERE') . " read_only='on'";
+		$sql_where .= ($sql_where != '' ? ' AND' : 'WHERE') . " read_only='on'";
 	}
 
 	if (get_request_var('has_graphs') == 'true') {
 		$sql_having = 'HAVING graphs>0 OR templates>0';
-	}else{
+	} else {
 		$sql_having = '';
 	}
 
@@ -688,8 +697,8 @@ function color() {
 		'read_only' => array('display' => __('Named Color'), 'align' => 'left', 'sort' => 'ASC', 'tip' => __('Is this color a named color which are read only.')),
 		'nosort1'   => array('display' => __('Color'), 'align' => 'center', 'sort' => 'DESC', 'tip' => __('The Color as shown on the screen.')),
 		'nosort'    => array('display' => __('Deletable'), 'align' => 'right', 'sort' => '', 'tip' => __('Colors in use cannot be Deleted.  In use is defined as being referenced either by a Graph or a Graph Template.')),
-		'graphs'    => array('display' => __('Graphs'), 'align' => 'right', 'sort' => 'DESC', 'tip' => __('The number of Graph using this Color.')),
-		'templates' => array('display' => __('Templates'), 'align' => 'right', 'sort' => 'DESC', 'tip' => __('The number of Graph Templates using this Color.'))
+		'graphs'    => array('display' => __('Graphs Using'), 'align' => 'right', 'sort' => 'DESC', 'tip' => __('The number of Graph using this Color.')),
+		'templates' => array('display' => __('Templates Using'), 'align' => 'right', 'sort' => 'DESC', 'tip' => __('The number of Graph Templates using this Color.'))
 	);
 
 	html_header_sort_checkbox($display_text, get_request_var('sort_column'), get_request_var('sort_direction'), false);
@@ -699,7 +708,7 @@ function color() {
 		foreach ($colors as $color) {
 			if ($color['graphs'] == 0 && $color['templates'] == 0) {
 				$disabled = false;
-			}else{
+			} else {
 				$disabled = true;
 			}
 
@@ -713,12 +722,12 @@ function color() {
 			form_selectable_cell($color['read_only'] == 'on' ? __('Yes'):__('No'), $color['id']);
 			form_selectable_cell('', $color['id'], '', 'text-align:right;background-color:#' . $color['hex'] . ';min-width:30%');
 			form_selectable_cell($disabled ? __('No'):__('Yes'), $color['id'], '', 'text-align:right');
-			form_selectable_cell(number_format_i18n($color['graphs']), $color['id'], '', 'text-align:right');
-			form_selectable_cell(number_format_i18n($color['templates']), $color['id'], '', 'text-align:right');
+			form_selectable_cell(number_format_i18n($color['graphs'], '-1'), $color['id'], '', 'text-align:right');
+			form_selectable_cell(number_format_i18n($color['templates'], '-1'), $color['id'], '', 'text-align:right');
 			form_checkbox_cell($color['name'], $color['id'], $disabled);
 			form_end_row();
 		}
-	}else{
+	} else {
 		print "<tr class='tableRow'><td colspan='7'><em>" . __('No Colors Found') . "</em></td></tr>\n";
 	}
 
@@ -741,17 +750,17 @@ function color_export() {
 	if (get_request_var('filter') != '') {
 		$sql_where = "WHERE (name LIKE '%" . get_request_var('filter') . "%' 
 			OR hex LIKE '%" .  get_request_var('filter') . "%')";
-	}else{
+	} else {
 		$sql_where = '';
 	}
 
 	if (get_request_var('named') == 'true') {
-		$sql_where .= (strlen($sql_where) ? ' AND':'WHERE') . " read_only='on'";
+		$sql_where .= ($sql_where != '' ? ' AND' : 'WHERE') . " read_only='on'";
 	}
 
 	if (get_request_var('has_graphs') == 'true') {
 		$sql_having = 'HAVING graphs>0 OR templates>0';
-	}else{
+	} else {
 		$sql_having = '';
 	}
 

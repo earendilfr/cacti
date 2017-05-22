@@ -100,6 +100,7 @@ define('GRAPH_ITEM_TYPE_GPRINT_LAST',       11);
 define('GRAPH_ITEM_TYPE_GPRINT_MAX',        12);
 define('GRAPH_ITEM_TYPE_GPRINT_MIN',        13);
 define('GRAPH_ITEM_TYPE_GPRINT_AVERAGE',    14);
+define('GRAPH_ITEM_TYPE_LEGEND_CAMM',       15);
 define('GRAPH_ITEM_TYPE_LINESTACK',         20);
 define('GRAPH_ITEM_TYPE_TIC',               30);
 define('GRAPH_ITEM_TYPE_TEXTALIGN',         40);
@@ -269,7 +270,6 @@ define('REPORTS_TYPE_INLINE_GIF', 3);
 define('REPORTS_TYPE_ATTACH_PNG', 11);
 define('REPORTS_TYPE_ATTACH_JPG', 12);
 define('REPORTS_TYPE_ATTACH_GIF', 13);
-define('REPORTS_TYPE_ATTACH_PDF', 14);
 define('REPORTS_TYPE_INLINE_PNG_LN', 91);
 define('REPORTS_TYPE_INLINE_JPG_LN', 92);
 define('REPORTS_TYPE_INLINE_GIF_LN', 93);
@@ -371,11 +371,11 @@ define('AUTOMATION_ACTION_TREE_DELETE', 99);
 
 if ($database_type == 'mysql') {
 	define('SQL_NO_CACHE', 'SQL_NO_CACHE');
-}else{
+} else {
 	define('SQL_NO_CACHE', '');
 }
 
-define('MAX_DISPLAY_PAGES', 9);
+define('MAX_DISPLAY_PAGES', 5);
 define('CHECKED', 'on');
 
 define('FILTER_VALIDATE_IS_REGEX',          99999);

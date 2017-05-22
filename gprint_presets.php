@@ -76,7 +76,7 @@ function form_save() {
 
 			if ($gprint_preset_id) {
 				raise_message(1);
-			}else{
+			} else {
 				raise_message(2);
 			}
 		}
@@ -84,7 +84,7 @@ function form_save() {
 		if (is_error_message()) {
 			header('Location: gprint_presets.php?header=false&action=edit&id=' . (empty($gprint_preset_id) ? get_nfilter_request_var('id') : $gprint_preset_id));
 			exit;
-		}else{
+		} else {
 			header('Location: gprint_presets.php?header=false');
 
 			exit;
@@ -122,7 +122,7 @@ function form_actions() {
 	$gprint_list = ''; $i = 0;
 
 	/* loop through each of the graphs selected on the previous page and get more info about them */
-	while (list($var,$val) = each($_POST)) {
+	foreach ($_POST as $var => $val) {
 		if (preg_match('/^chk_([0-9]+)$/', $var, $matches)) {
 			/* ================= input validation ================= */
 			input_validate_input_number($matches[1]);
@@ -152,7 +152,7 @@ function form_actions() {
 
 			$save_html = "<input type='button' value='" . __('Cancel') ."' onClick='cactiReturnTo()'>&nbsp;<input type='submit' value='" . __('Continue') . "' title='" . __('Delete GPRINT Preset(s)') ."'>";
 		}
-	}else{
+	} else {
 		print "<tr><td class='odd'><span class='textError'>" . __('You must select at least one GPRINT Preset.') ."</span></td></tr>\n";
 		$save_html = "<input type='button' value='" . __('Return') ."' onClick='cactiReturnTo()'>";
 	}
@@ -183,13 +183,13 @@ function gprint_presets_edit() {
 	if (!isempty_request_var('id')) {
 		$gprint_preset = db_fetch_row_prepared('SELECT * FROM graph_templates_gprint WHERE id = ?', array(get_request_var('id')));
 		$header_label = __('GPRINT Presets [edit: %s]', htmlspecialchars($gprint_preset['name']));
-	}else{
+	} else {
 		$header_label = __('GPRINT Presets [new]');
 	}
 
 	form_start('gprint_presets.php', 'gprint_presets');
 
-	html_start_box($header_label, '100%', '', '3', 'center', '');
+	html_start_box($header_label, '100%', true, '3', 'center', '');
 
 	draw_edit_form(
 		array(
@@ -198,7 +198,7 @@ function gprint_presets_edit() {
 		)
 	);
 
-	html_end_box();
+	html_end_box(true, true);
 
 	form_save_button('gprint_presets.php');
 }
@@ -246,7 +246,7 @@ function gprint_presets() {
 
 	if (get_request_var('rows') == '-1') {
 		$rows = read_config_option('num_rows_table');
-	}else{
+	} else {
 		$rows = get_request_var('rows');
 	}
 
@@ -298,7 +298,7 @@ function gprint_presets() {
 			<script type='text/javascript'>
 
 			function applyFilter() {
-				strURL = 'gprint_presets.php?filter='+$('#filter').val()+'&rows='+$('#rows').val()+'&page='+$('#page').val()+'&has_graphs='+$('#has_graphs').is(':checked')+'&header=false';
+				strURL = 'gprint_presets.php?filter='+escape($('#filter').val())+'&rows='+$('#rows').val()+'&page='+$('#page').val()+'&has_graphs='+$('#has_graphs').is(':checked')+'&header=false';
 				loadPageNoHeader(strURL);
 			}
 
@@ -336,13 +336,13 @@ function gprint_presets() {
 	/* form the 'where' clause for our main sql query */
 	if (get_request_var('filter') != '') {
 		$sql_where = "WHERE (name LIKE '%" . get_request_var('filter') . "%')";
-	}else{
+	} else {
 		$sql_where = '';
 	}
 
 	if (get_request_var('has_graphs') == 'true') {
 		$sql_having = 'HAVING graphs>0';
-	}else{
+	} else {
 		$sql_having = '';
 	}
 
@@ -401,7 +401,7 @@ function gprint_presets() {
 		foreach ($gprint_list as $gp) {
 			if ($gp['graphs'] == 0 && $gp['templates'] == 0) {
 				$disabled = false;
-			}else{
+			} else {
 				$disabled = true;
 			}
 
@@ -409,12 +409,12 @@ function gprint_presets() {
 			form_selectable_cell(filter_value($gp['name'], get_request_var('filter'), 'gprint_presets.php?action=edit&id=' . $gp['id']), $gp['id']);
             form_selectable_cell($gp['gprint_text'], $gp['id'], '', 'text-align:right');
             form_selectable_cell($disabled ? __('No'):__('Yes'), $gp['id'], '', 'text-align:right');
-            form_selectable_cell(number_format_i18n($gp['graphs']), $gp['id'], '', 'text-align:right');
-            form_selectable_cell(number_format_i18n($gp['templates']), $gp['id'], '', 'text-align:right');
+            form_selectable_cell(number_format_i18n($gp['graphs'], '-1'), $gp['id'], '', 'text-align:right');
+            form_selectable_cell(number_format_i18n($gp['templates'], '-1'), $gp['id'], '', 'text-align:right');
             form_checkbox_cell($gp['name'], $gp['id'], $disabled);
             form_end_row();
 		}
-	}else{
+	} else {
 		print "<tr class='tableRow'><td colspan='6'><em>" . __('No GPRINT Presets') . "</em></td></tr>\n";
 	}
 

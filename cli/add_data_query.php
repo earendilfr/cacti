@@ -186,7 +186,7 @@ if (sizeof($parms)) {
 		($exists_already > 0)) {
 		echo "ERROR: Data Query is already associated for host: ($host_id: $host_name) data query ($data_query_id: $data_query_name) reindex method ($reindex_method: " . $reindex_types[$reindex_method] . ")\n";
 		exit(1);
-	}else{
+	} else {
 		db_execute('REPLACE INTO host_snmp_query 
 			(host_id,snmp_query_id,reindex_method) 
 			VALUES (' . 
@@ -205,14 +205,14 @@ if (sizeof($parms)) {
 		echo "Success - Host ($host_id: $host_name) data query ($data_query_id: $data_query_name) reindex method ($reindex_method: " . $reindex_types[$reindex_method] . ")\n";
 		exit;
 	}
-}else{
+} else {
 	display_help();
 	exit;
 }
 
 /*  display_version - displays version information */
 function display_version() {
-	$version = db_fetch_cell('SELECT cacti FROM version');
+	$version = get_cacti_version();
 	echo "Cacti Add Data Query Utility, Version $version, " . COPYRIGHT_YEARS . "\n";
 }
 

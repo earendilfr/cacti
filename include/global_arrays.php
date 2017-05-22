@@ -24,6 +24,65 @@
 
 global $menu, $menu_glyphs;
 
+/* Array of Cacti versions and template hash codes 
+   Remember to add every version here. */
+$cacti_version_codes = array(
+	'0.8'    => 'NaN',
+	'0.8.1'  => 'NaN',
+	'0.8.2'  => 'NaN',
+	'0.8.2a' => 'NaN',
+	'0.8.3'  => 'NaN',
+	'0.8.3a' => 'NaN',
+	'0.8.4'  => '0000',
+	'0.8.5'  => '0001',
+	'0.8.5a' => '0002',
+	'0.8.6'  => '0003',
+	'0.8.6a' => '0004',
+	'0.8.6b' => '0005',
+	'0.8.6c' => '0006',
+	'0.8.6d' => '0007',
+	'0.8.6e' => '0008',
+	'0.8.6f' => '0009',
+	'0.8.6g' => '0010',
+	'0.8.6h' => '0011',
+	'0.8.6i' => '0012',
+	'0.8.6j' => '0013',
+	'0.8.7'  => '0014',
+	'0.8.7a' => '0015',
+	'0.8.7b' => '0016',
+	'0.8.7c' => '0017',
+	'0.8.7d' => '0018',
+	'0.8.7e' => '0019',
+	'0.8.7f' => '0020',
+	'0.8.7g' => '0021',
+	'0.8.7h' => '0022',
+	'0.8.7i' => '0023',
+	'0.8.8'  => '0024',
+	'0.8.8a' => '0024',
+	'0.8.8b' => '0024',
+	'0.8.8c' => '0025',
+	'0.8.8d' => '0025',
+	'0.8.8e' => '0025',
+	'0.8.8f' => '0025',
+	'0.8.8g' => '0025',
+	'0.8.8h' => '0025',
+	'1.0.0'  => '0100',
+	'1.0.1'  => '0100',
+	'1.0.2'  => '0100',
+	'1.0.3'  => '0100',
+	'1.0.4'  => '0100',
+	'1.0.5'  => '0100',
+	'1.0.6'  => '0100',
+	'1.1.0'  => '0100',
+	'1.1.1'  => '0100',
+	'1.1.2'  => '0100',
+	'1.1.3'  => '0100',
+	'1.1.4'  => '0100',
+	'1.1.5'  => '0100',
+	'1.1.6'  => '0101',
+	'1.1.7'  => '0101',
+);
+
 $messages = array(
 	1  => array(
 		'message' => __('Save Successful.'),
@@ -102,6 +161,12 @@ $messages = array(
 		'type' => 'error'),
 	32 => array(
 		'message' => __('SNMPv3 Auth Passphrases must be 8 characters or greater.'),
+		'type' => 'error'),
+	33 => array(
+		'message' => __('Some Graphs not Updated. Unable to Change Device for Data Query based Graphs.'),
+		'type' => 'error'),
+	34 => array(
+		'message' => __('Unable to Change Device for Data Query based Graphs.'),
 		'type' => 'error'),
 	'clog_purged' => array(
 		'message' => __('Cacti Log purged successfully'), 
@@ -263,9 +328,16 @@ $input_types_script = array(
 
 $reindex_types = array(
 	DATA_QUERY_AUTOINDEX_NONE               => __('None'),
-	DATA_QUERY_AUTOINDEX_BACKWARDS_UPTIME   => __('Uptime Goes Backwards'),
-	DATA_QUERY_AUTOINDEX_INDEX_NUM_CHANGE   => __('Index Count Changed'),
-	DATA_QUERY_AUTOINDEX_FIELD_VERIFICATION => __('Verify All Fields')
+	DATA_QUERY_AUTOINDEX_BACKWARDS_UPTIME   => __('Uptime'),
+	DATA_QUERY_AUTOINDEX_INDEX_NUM_CHANGE   => __('Index Count'),
+	DATA_QUERY_AUTOINDEX_FIELD_VERIFICATION => __('Verify All')
+);
+
+$reindex_types_tips = array(
+	DATA_QUERY_AUTOINDEX_NONE               => __('All Re-Indexing will be manual or managed through scripts or Device Automation.'),
+	DATA_QUERY_AUTOINDEX_BACKWARDS_UPTIME   => __('When the Devices SNMP uptime goes backward, a Re-Index will be performed.'),
+	DATA_QUERY_AUTOINDEX_INDEX_NUM_CHANGE   => __('When the Data Query index count changes, a Re-Index will be performed.'),
+	DATA_QUERY_AUTOINDEX_FIELD_VERIFICATION => __('Every polling cycle, a Re-Index will be performed.  Very expensive.')
 );
 
 $snmp_query_field_actions = array(1 =>
@@ -341,6 +413,7 @@ $graph_item_types = array(
 	GRAPH_ITEM_TYPE_GPRINT_MAX      => 'GPRINT:MAX',
 	GRAPH_ITEM_TYPE_GPRINT_MIN      => 'GPRINT:MIN',
 	GRAPH_ITEM_TYPE_LEGEND          => 'LEGEND',
+	GRAPH_ITEM_TYPE_LEGEND_CAMM     => 'LEGEND_CAMM',
 	GRAPH_ITEM_TYPE_LINESTACK       => 'LINE:STACK',
 	GRAPH_ITEM_TYPE_TIC             => 'TICK',
 	GRAPH_ITEM_TYPE_TEXTALIGN       => 'TEXTALIGN',
@@ -584,20 +657,21 @@ $host_group_types = array(
 );
 
 $custom_data_source_types = array(
-	'CURRENT_DATA_SOURCE'         => __('Current Graph Item Data Source'),
-	'CURRENT_DATA_SOURCE_PI'      => __('Current Graph Item Polling Interval'),
-	'ALL_DATA_SOURCES_NODUPS'     => __('All Data Sources (Do not Include Duplicates)'),
-	'ALL_DATA_SOURCES_DUPS'       => __('All Data Sources (Include Duplicates)'),
-	'SIMILAR_DATA_SOURCES_NODUPS' => __('All Similar Data Sources (Do not Include Duplicates)'),
-	'SIMILAR_DATA_SOURCES_DUPS'   => __('All Similar Data Sources (Include Duplicates)'),
-	'CURRENT_DS_MINIMUM_VALUE'    => __('Current Data Source Item: Minimum Value'),
-	'CURRENT_DS_MAXIMUM_VALUE'    => __('Current Data Source Item: Maximum Value'),
-	'CURRENT_GRAPH_MINIMUM_VALUE' => __('Graph: Lower Limit'),
-	'CURRENT_GRAPH_MAXIMUM_VALUE' => __('Graph: Upper Limit'),
-	'COUNT_ALL_DS_NODUPS'         => __('Count of All Data Sources (Do not Include Duplicates)'),
-	'COUNT_ALL_DS_DUPS'           => __('Count of All Data Sources (Include Duplicates)'),
-	'COUNT_SIMILAR_DS_NODUPS'     => __('Count of All Similar Data Sources (Do not Include Duplicates)'),
-	'COUNT_SIMILAR_DS_DUPS'	      => __('Count of All Similar Data Sources (Include Duplicates)')
+	'CURRENT_DATA_SOURCE'            => __('Current Graph Item Data Source'),
+	'CURRENT_DATA_SOURCE_PI'         => __('Current Graph Item Polling Interval'),
+	'ALL_DATA_SOURCES_NODUPS'        => __('All Data Sources (Do not Include Duplicates)'),
+	'ALL_DATA_SOURCES_DUPS'          => __('All Data Sources (Include Duplicates)'),
+	'SIMILAR_DATA_SOURCES_NODUPS'    => __('All Similar Data Sources (Do not Include Duplicates)'),
+	'SIMILAR_DATA_SOURCES_NODUPS_PI' => __('All Similar Data Sources (Do not Include Duplicates) Polling Interval'),
+	'SIMILAR_DATA_SOURCES_DUPS'      => __('All Similar Data Sources (Include Duplicates)'),
+	'CURRENT_DS_MINIMUM_VALUE'       => __('Current Data Source Item: Minimum Value'),
+	'CURRENT_DS_MAXIMUM_VALUE'       => __('Current Data Source Item: Maximum Value'),
+	'CURRENT_GRAPH_MINIMUM_VALUE'    => __('Graph: Lower Limit'),
+	'CURRENT_GRAPH_MAXIMUM_VALUE'    => __('Graph: Upper Limit'),
+	'COUNT_ALL_DS_NODUPS'            => __('Count of All Data Sources (Do not Include Duplicates)'),
+	'COUNT_ALL_DS_DUPS'              => __('Count of All Data Sources (Include Duplicates)'),
+	'COUNT_SIMILAR_DS_NODUPS'        => __('Count of All Similar Data Sources (Do not Include Duplicates)'),
+	'COUNT_SIMILAR_DS_DUPS'	         => __('Count of All Similar Data Sources (Include Duplicates)')
 );
 
 if ($config['poller_id'] == 1 || $config['connection'] == 'online') {
@@ -655,7 +729,7 @@ if ($config['poller_id'] == 1 || $config['connection'] == 'online') {
 			'links.php'     => __('External Links'),
 			)
 	);
-}else{
+} else {
 	$menu = array(
 		__('Management') => array(
 			'host.php'             => __('Devices')
@@ -903,50 +977,6 @@ $hash_type_codes = array(
 	'data_source_profile' => '20'
 );
 
-$hash_version_codes = array(
-	'0.8.4'  => '0000',
-	'0.8.5'  => '0001',
-	'0.8.5a' => '0002',
-	'0.8.6'  => '0003',
-	'0.8.6a' => '0004',
-	'0.8.6b' => '0005',
-	'0.8.6c' => '0006',
-	'0.8.6d' => '0007',
-	'0.8.6e' => '0008',
-	'0.8.6f' => '0009',
-	'0.8.6g' => '0010',
-	'0.8.6h' => '0011',
-	'0.8.6i' => '0012',
-	'0.8.6j' => '0013',
-	'0.8.7'  => '0014',
-	'0.8.7a' => '0015',
-	'0.8.7b' => '0016',
-	'0.8.7c' => '0017',
-	'0.8.7d' => '0018',
-	'0.8.7e' => '0019',
-	'0.8.7f' => '0020',
-	'0.8.7g' => '0021',
-	'0.8.7h' => '0022',
-	'0.8.7i' => '0023',
-	'0.8.8'  => '0024',
-	'0.8.8a' => '0024',
-	'0.8.8b' => '0024',
-	'0.8.8c' => '0025',
-	'0.8.8d' => '0025',
-	'0.8.8e' => '0025',
-	'0.8.8f' => '0025',
-	'0.8.8g' => '0025',
-	'0.8.8h' => '0025',
-	'1.0.0'  => '0100',
-	'1.0.1'  => '0100',
-	'1.0.2'  => '0100',
-	'1.0.3'  => '0100',
-	'1.0.4'  => '0100',
-	'1.0.5'  => '0100',
-	'1.0.6'  => '0100',
-	'1.1.0'  => '0100',
-);
-
 $hash_type_names = array(
 	'cdef'                 => __('CDEF'),
 	'cdef_item'            => __('CDEF Item'),
@@ -1068,7 +1098,7 @@ $graph_weekdays = array(
 	WD_SATURDAY  => date('l', strtotime('Saturday'))
 );
 
-$graph_dateformats = array(
+$dateformats = array(
 	GD_MO_D_Y => __('Month Number, Day, Year'),
 	GD_MN_D_Y => __('Month Name, Day, Year'),
 	GD_D_MO_Y => __('Day, Month Number, Year'),
@@ -1077,7 +1107,7 @@ $graph_dateformats = array(
 	GD_Y_MN_D => __('Year, Month Name, Day')
 );
 
-$graph_datechar = array(
+$datechar = array(
 	GDC_HYPHEN => '-',
 	GDC_SLASH => '/'
 );
@@ -1197,11 +1227,11 @@ $attachment_sizes = array(
 );
 
 $reports_actions = array(
-	REPORTS_SEND_NOW  => 'Send Now',
-	REPORTS_DUPLICATE => 'Duplicate',
-	REPORTS_ENABLE    => 'Enable',
-	REPORTS_DISABLE   => 'Disable',
-	REPORTS_DELETE    => 'Delete',
+	REPORTS_SEND_NOW  => __('Send Now'),
+	REPORTS_DUPLICATE => __('Duplicate'),
+	REPORTS_ENABLE    => __('Enable'),
+	REPORTS_DISABLE   => __('Disable'),
+	REPORTS_DELETE    => __('Delete'),
 );
 
 if (is_realm_allowed(22)) {
@@ -1210,8 +1240,7 @@ if (is_realm_allowed(22)) {
 
 $attach_types = array(
 	REPORTS_TYPE_INLINE_PNG => __('Inline PNG Image'),
-	#REPORTS_TYPE_INLINE_JPG => 'Inline JPEG Image',
-	#REPORTS_TYPE_ATTACH_PDF => 'PDF Attachment',
+	#REPORTS_TYPE_INLINE_JPG => 'Inline JPEG Image'
 );
 
 if (extension_loaded(REPORTS_EXTENSION_GD)) {
@@ -1480,24 +1509,23 @@ $i18n_weekdays_short = array(
 );
 
 $phperrors = array (
-	1 => 'ERROR',
-	2 => 'WARNING',
-	4 => 'PARSE',
-	8 => 'NOTICE',
-	16 => 'CORE_ERROR',
-	32 => 'CORE_WARNING',
-	64 => 'COMPILE_ERROR',
-	128 => 'COMPILE_WARNING',
-	256 => 'USER_ERROR',
-	512 => 'USER_WARNING',
-	1024 => 'USER_NOTICE',
-	2048 => 'STRICT',
-	4096 => 'RECOVERABLE_ERROR',
-	8192 => 'DEPRECATED',
-	16384 => 'USER_DEPRECATED',
-	32767 => 'ALL'
+	E_ERROR => 'ERROR',
+	E_WARNING => 'WARNING',
+	E_PARSE => 'PARSE',
+	E_NOTICE => 'NOTICE',
+	E_CORE_ERROR => 'CORE_ERROR',
+	E_CORE_WARNING => 'CORE_WARNING',
+	E_COMPILE_ERROR  => 'COMPILE_ERROR',
+	E_COMPILE_WARNING => 'COMPILE_WARNING',
+	E_USER_ERROR => 'USER_ERROR',
+	E_USER_WARNING => 'USER_WARNING',
+	E_USER_NOTICE  => 'USER_NOTICE',
+	E_STRICT => 'STRICT',
+	E_RECOVERABLE_ERROR  => 'RECOVERABLE_ERROR',
+	E_DEPRECATED => 'DEPRECATED',
+	E_USER_DEPRECATED  => 'USER_DEPRECATED',
+	E_ALL => 'ALL'
 );
-
 
 api_plugin_hook('config_arrays');
 
